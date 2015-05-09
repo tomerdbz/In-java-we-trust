@@ -1,14 +1,18 @@
 package model;
 
+import java.util.Observable;
+
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
-public class MyModel implements Model {
+public class MyModel extends Observable implements Model{
 
 	@Override
 	public void generateMaze(int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal) {
 		System.out.println("Generating Maze");
+		setChanged();
+		notifyObservers();
 	}
 
 	@Override
