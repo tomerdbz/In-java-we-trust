@@ -19,6 +19,7 @@ public class MyView extends Observable implements View {
 	@Override
 	public void setCommands(Command c) {
 		System.out.println("setting command");
+		System.out.println("sosapsoaposapo");
 		commandsArray.add(c);
 	}
 
