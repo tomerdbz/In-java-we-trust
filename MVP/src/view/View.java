@@ -7,7 +7,7 @@ import algorithms.search.Solution;
 public interface View {
 	void start();
 	void setCommands(Command c);
-	Command getUserCommand(String Command);
-	void doCommand(Command c);
-	void Display(String s);
+	Command getUserCommand();
+	void displayMaze(Maze m);
+	void displaySolution(Solution s);
 }
