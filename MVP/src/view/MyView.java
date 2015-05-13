@@ -7,26 +7,27 @@ import presenter.Presenter.Command;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
+
 public class MyView extends Observable implements View {
-	ArrayList<Command> commandsArray=new ArrayList<Command>();
+	MVPRunnableCli cl;
 	@Override
 	public void start() {
 		System.out.println("starting view");
 		setChanged();
 		notifyObservers();
+		Thread t =new Thread(new MVPRunnableCli(null, null, null, null));
+		t.start();
 	}
 
 	@Override
 	public void setCommands(Command c) {
 		System.out.println("setting command");
-		System.out.println("sosapsoaposapo");
-		commandsArray.add(c);
 	}
 
 	@Override
-	public Command getUserCommand() {
+	public Command getUserCommand(String Command) {
 		System.out.println("gets user command");
-		return commandsArray.get(0);
+		return null;
 	}
 
 	@Override
@@ -39,4 +40,17 @@ public class MyView extends Observable implements View {
 		System.out.println("displays maze's solution");
 	}
 
+	@Override
+	public void doCommand(Command c) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void Display(String s) {
+		System.out.println(s);
+		
+	}
+
+	
 }
