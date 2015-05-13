@@ -3,24 +3,42 @@ package view;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
 public class MVPRunnableCli extends CLI implements Runnable {
 
-	MyView v;
-	public void SetView(MyView v){
-		this.v=v;
-	}
+	protected HashMap<String, Command> commands;
 	public MVPRunnableCli(BufferedReader in, PrintWriter out, UserCommands uc) {
 		
 		super(in, out, uc);
 		
 	}
+	public Command startnew(){
+		System.out.println("Enter command: ");
+		out.flush();
+		try {
+			String line = in.readLine();
+			String[] sp = line.split(" ");
+			
+			String commandName = sp[0];
+			String arg = null;
+			if (sp.length > 1)
+				arg = sp[1];
+			
+			return this.commands.get(commandName);
+		}catch(IOException e){
+			
+		}
+		
+	return null;
+	}
+	/*
 	@Override
 	public void start(){
-		v.Display("Enter command: ");
+		System.out.println("Enter command: ");
 		out.flush();
 		try {
 			String line = in.readLine();
@@ -33,17 +51,16 @@ public class MVPRunnableCli extends CLI implements Runnable {
 				String arg = null;
 				if (sp.length > 1)
 					arg = sp[1];
-				// Invoke the command
 				presenter.Presenter.Command command = v.getUserCommand(commandName);
 				if(command!=null && arg!=null)
 					v.doCommand(command);
 				out.flush();
 				
-				v.Display("Enter command: ");
+				System.out.println("Enter command: ");
 				out.flush();
 				line = in.readLine();
 			}
-			v.Display("Goodbye");
+			System.out.println("Goodbye");
 						
 		} catch (IOException e) {			
 			e.printStackTrace();
@@ -56,7 +73,7 @@ public class MVPRunnableCli extends CLI implements Runnable {
 			}			
 		}	
 		
-	}
+	}*/
 
 	@Override
 	public void run() {
