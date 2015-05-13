@@ -34,7 +34,7 @@ public class Presenter implements Observer {
 	public void update(Observable o, Object arg1) {
 		if(o == v)
 		{
-			v.getUserCommand().doCommand("");
+			v.getUserCommand().doCommand(""); //PLEASE LOOK AT THIS THE ARGUMENTS HAVE CHANGED
 		}
 		else if (o==m)
 		{

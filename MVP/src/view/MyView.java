@@ -13,9 +13,7 @@ public class MyView extends Observable implements View {
 	@Override
 	public void start() {
 		System.out.println("starting view");
-		setChanged();
-		notifyObservers();
-		Thread t =new Thread(new MVPRunnableCli(null, null, null, null));
+		Thread t =new Thread(new MVPRunnableCli(null, null, null));
 		t.start();
 	}
 
@@ -27,22 +25,16 @@ public class MyView extends Observable implements View {
 	@Override
 	public Command getUserCommand(String Command) {
 		System.out.println("gets user command");
+		setChanged();
+		notifyObservers();
 		return null;
 	}
 
-	@Override
-	public void displayMaze(Maze m) {
-		System.out.println("displays maze");
-	}
-
-	@Override
-	public void displaySolution(Solution s) {
-		System.out.println("displays maze's solution");
-	}
 
 	@Override
 	public void doCommand(Command c) {
-		// TODO Auto-generated method stub
+		setChanged();
+		notifyObservers();
 		
 	}
 
