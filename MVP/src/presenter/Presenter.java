@@ -105,7 +105,7 @@ public class Presenter implements Observer {
 		commandMap.put("display solution",new DisplaySolutionCommand());
 		commandMap.put("exit",new ExitCommand());
 
-		v.setCommands(commandsMap);
+		v.setCommands(commandMap);//how to convert ConcurrentHashMap to Hash map???
 	}
 	
 	/** FOR MODEL arg1 IS MAZE NAME. FOR VIEW DEFINE FOR YOURSELF....
@@ -113,8 +113,16 @@ public class Presenter implements Observer {
 	@Override
 	public void update(Observable o, Object arg1) {
 		if(o == v)
-		{//your part
-			v.getUserCommand().doCommand(""); //PLEASE LOOK AT THIS THE ARGUMENTS HAVE CHANGED
+		{
+			String Data =(String)arg1;
+			String name = Data.split(" ")[0];
+			String Params = null;
+			for(int i=1; i<Data.split(" ").length;i++)
+			{
+				Params = Params +  Data.split(" ")[i];
+			}
+				
+			v.getUserCommand().doCommand(name,Params);
 		}
 		else if (o==m)
 		{

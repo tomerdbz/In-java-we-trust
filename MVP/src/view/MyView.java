@@ -1,7 +1,9 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import presenter.Presenter.Command;
 import algorithms.mazeGenerators.Maze;
@@ -10,19 +12,14 @@ import algorithms.search.Solution;
 
 public class MyView extends Observable implements View {
 	MVPRunnableCli cl;
-	
-
+	public String arguments;
+	public presenter.Presenter.Command c;
 	@Override
-	public void setCommands(Command c) {
+	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands) {
+		cl.setCommands(commands);
 		System.out.println("setting command");
 	}
 
-	@Override
-	public void doCommand(Command c) {
-		setChanged();
-		notifyObservers();
-		
-	}
 
 	@Override
 	public void Display(String s) {
@@ -32,12 +29,8 @@ public class MyView extends Observable implements View {
 
 	@Override
 	public void start() {
-		//System.out.println("starting view");
-		//Thread t =new Thread(new MVPRunnableCli(null, null, null));
-		//t.start();
-		setChanged();
-		notifyObservers();
-		
+		Thread t = new Thread(cl);
+	    t.start();
 		}
 
 	@Override
@@ -56,10 +49,17 @@ public class MyView extends Observable implements View {
 	}
 
 	@Override
-	public Command getUserCommand() {
-		System.out.println("gets user command");
-		cl.start();
-		return null;
+	public presenter.Presenter.Command getUserCommand() {
+		//System.out.println("gets user command");
+		//Thread t = new Thread(cl);
+		//presenter.Presenter.Command c=	t.start();
+		return c;
+	}
+
+	@Override
+	public void exit() {
+		System.out.println("Exiting now");
+		
 	}
 
 	
