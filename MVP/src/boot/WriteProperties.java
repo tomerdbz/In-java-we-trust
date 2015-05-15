@@ -16,9 +16,9 @@ public class WriteProperties {
 		XMLEncoder e;
 		Properties prop=new Properties();//fine with the defaults I have defined
 		try {
-			FileOutputStream out=new FileOutputStream("properties.xml");
-			e = new XMLEncoder(out);
+			e = new XMLEncoder(new FileOutputStream("properties.xml"));
 			e.writeObject(prop);
+			e.flush();
 			e.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();

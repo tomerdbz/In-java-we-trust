@@ -13,8 +13,12 @@ public class Properties implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public enum MazeGenerator{DFS,RANDOM};
-	public enum MazeSolver{MANHATTAN_DISTANCE_ASTAR,AIR_DISTANCE_ASTAR,BFS};
+	public enum MazeGenerator {
+		DFS,RANDOM
+	};
+	public enum MazeSolver {
+		MANHATTAN_DISTANCE_ASTAR,AIR_DISTANCE_ASTAR,BFS
+	};
 	private int threadNumber;
 	private MazeSolver mazeSolver;
 	private MazeGenerator mazeGenerator;

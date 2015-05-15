@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-
 public class MVPRunnableCli extends CLI implements Runnable {
 	
 	MyView view;
