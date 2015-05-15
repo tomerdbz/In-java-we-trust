@@ -4,41 +4,32 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
+import presenter.Presenter.Command;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
 public class MVPRunnableCli extends CLI implements Runnable {
+	
+	MyView view;
+	public void SetView(MyView view){
+		this.view=view;
+	}
 
-	protected HashMap<String, Command> commands;
-	public MVPRunnableCli(BufferedReader in, PrintWriter out, UserCommands uc) {
+	protected ConcurrentHashMap<String, presenter.Presenter.Command>  commands;
+	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands2){
+		this.commands=commands2;
+	}
+	public MVPRunnableCli(BufferedReader in, PrintWriter out) {
 		
-		super(in, out, uc);
+		super(in, out, null);
 		
 	}
-	public Command startnew(){
-		System.out.println("Enter command: ");
-		out.flush();
-		try {
-			String line = in.readLine();
-			String[] sp = line.split(" ");
-			
-			String commandName = sp[0];
-			String arg = null;
-			if (sp.length > 1)
-				arg = sp[1];
-			
-			return this.commands.get(commandName);
-		}catch(IOException e){
-			
-		}
-		
-	return null;
-	}
-	/*
 	@Override
-	public void start(){
-		System.out.println("Enter command: ");
+	public void start()
+	{
+		out.print("Enter command: ");
 		out.flush();
 		try {
 			String line = in.readLine();
@@ -46,21 +37,21 @@ public class MVPRunnableCli extends CLI implements Runnable {
 			while (!line.equals("exit"))
 			{
 				String[] sp = line.split(" ");
-								
-				String commandName = sp[0];
-				String arg = null;
-				if (sp.length > 1)
-					arg = sp[1];
-				presenter.Presenter.Command command = v.getUserCommand(commandName);
-				if(command!=null && arg!=null)
-					v.doCommand(command);
-				out.flush();
-				
-				System.out.println("Enter command: ");
+				if(sp.length>2)
+				{
+				String commandName = sp[0]+" "+sp[1];
+				String arg= "";
+				for(int i =2;i<sp.length;i++)
+					 arg = arg+ sp[i];
+				presenter.Presenter.Command c= this.commands.get(commandName);
+				this.view.c=c;
+				this.view.notifyObservers(arg);
+				}
+				out.print("Enter command: ");
 				out.flush();
 				line = in.readLine();
 			}
-			System.out.println("Goodbye");
+			view.exit();
 						
 		} catch (IOException e) {			
 			e.printStackTrace();
@@ -72,8 +63,8 @@ public class MVPRunnableCli extends CLI implements Runnable {
 				e.printStackTrace();
 			}			
 		}	
-		
-	}*/
+	}
+	
 
 	@Override
 	public void run() {
