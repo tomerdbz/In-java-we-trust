@@ -105,8 +105,8 @@ public class Presenter implements Observer {
 		commandMap.put("display solution",new DisplaySolutionCommand());
 		commandMap.put("exit",new ExitCommand());
 
-		v.setCommands(commandMap);//how to convert ConcurrentHashMap to Hash map???
-	}
+		v.setCommands(commandMap);
+		}
 	
 	/** FOR MODEL arg1 IS MAZE NAME. FOR VIEW DEFINE FOR YOURSELF....
 	 */
@@ -128,7 +128,7 @@ public class Presenter implements Observer {
 		{
 			String name;
 			if(arg1!=null)
-			{//add here
+			{
 				if((name=modelNotifiedGenerated(arg1.toString()))!=null)
 						v.displayMaze(m.getMaze(name));
 				else if((name=modelNotifiedSolved(arg1.toString()))!=null)

@@ -21,9 +21,9 @@ public class MVPRunnableCli extends CLI implements Runnable {
 	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands2){
 		this.commands=commands2;
 	}
-	public MVPRunnableCli(BufferedReader in, PrintWriter out, UserCommands uc) {
+	public MVPRunnableCli(BufferedReader in, PrintWriter out) {
 		
-		super(in, out, uc);
+		super(in, out, null);
 		
 	}
 	@Override
@@ -40,7 +40,7 @@ public class MVPRunnableCli extends CLI implements Runnable {
 				if(sp.length>2)
 				{
 				String commandName = sp[0]+" "+sp[1];
-				String arg= null;
+				String arg= "";
 				for(int i =2;i<sp.length;i++)
 					 arg = arg+ sp[i];
 				presenter.Presenter.Command c= this.commands.get(commandName);

@@ -1,8 +1,11 @@
 package boot;
 
 import java.beans.XMLDecoder;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 import model.MyModel;
 import presenter.Presenter;
@@ -17,7 +20,7 @@ public class Run {
 	public static void main(String []args)
 	{
 		
-		MyView v=new MyView();
+		MyView v=new MyView(new BufferedReader(new InputStreamReader(System.in)),new PrintWriter(System.out));
 		MyModel m;
 		Properties prop;
 		if((prop=readProperties())!=null)

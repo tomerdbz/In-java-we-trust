@@ -1,11 +1,10 @@
 package view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import presenter.Presenter.Command;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
@@ -14,6 +13,10 @@ public class MyView extends Observable implements View {
 	MVPRunnableCli cl;
 	public String arguments;
 	public presenter.Presenter.Command c;
+	public MyView(BufferedReader in, PrintWriter out)
+	{
+		this.cl=new MVPRunnableCli(in,out);
+	}
 	@Override
 	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands) {
 		cl.setCommands(commands);
@@ -29,6 +32,7 @@ public class MyView extends Observable implements View {
 
 	@Override
 	public void start() {
+		cl.SetView(this);
 		Thread t = new Thread(cl);
 	    t.start();
 		}
@@ -50,9 +54,6 @@ public class MyView extends Observable implements View {
 
 	@Override
 	public presenter.Presenter.Command getUserCommand() {
-		//System.out.println("gets user command");
-		//Thread t = new Thread(cl);
-		//presenter.Presenter.Command c=	t.start();
 		return c;
 	}
 
