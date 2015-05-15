@@ -1,6 +1,5 @@
 package view;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import presenter.Presenter.Command;
