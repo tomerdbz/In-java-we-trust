@@ -114,12 +114,13 @@ public class Presenter implements Observer {
 	public void update(Observable o, Object arg1) {
 		if(o == v)
 		{
-			String Data =(String)arg1;
-			String name = Data.split(" ")[0];
-			String Params = null;
-			for(int i=1; i<Data.split(" ").length;i++)
+			String data =(String)arg1;
+			data=data.substring(1);
+			String name = data.split(" ")[0];
+			String Params = "";
+			for(int i=1; i<data.split(" ").length;i++)
 			{
-				Params = Params +  Data.split(" ")[i];
+				Params = Params +  data.split(" ")[i];
 			}
 				
 			v.getUserCommand().doCommand(name,Params);

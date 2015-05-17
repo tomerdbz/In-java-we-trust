@@ -20,16 +20,22 @@ public class MyView extends Observable implements View {
 	@Override
 	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands) {
 		cl.setCommands(commands);
-		System.out.println("setting command");
+		
 	}
 
 
 	@Override
 	public void Display(String s) {
-		System.out.println(s);
+		this.cl.out.println(s);
 		
 	}
-
+	
+	public void ChangeNotify(String arg){
+		System.out.println("WAT");
+		setChanged();
+		notifyObservers(arg);
+		
+	}
 	@Override
 	public void start() {
 		cl.SetView(this);
@@ -39,16 +45,17 @@ public class MyView extends Observable implements View {
 
 	@Override
 	public void displaySolution(Solution s) {
-		System.out.println("displaying solution");
-		s.getPath().toString();
+		
+		RegularSolutionDisplayer sd = new RegularSolutionDisplayer();
+		sd.SolutionDisplay(this.cl.out, s);
 		
 	}
 
 	@Override
 	public void displayMaze(Maze m) {
-		System.out.println("displaying maze");
+		
 		RegularMazeDisplayer dp = new RegularMazeDisplayer();
-		dp.DisplayMaze(m);
+		dp.DisplayMaze(this.cl.out,m);
 		
 	}
 
@@ -59,7 +66,7 @@ public class MyView extends Observable implements View {
 
 	@Override
 	public void exit() {
-		System.out.println("Exiting now");
+		cl.out.println("Exiting now");
 		
 	}
 

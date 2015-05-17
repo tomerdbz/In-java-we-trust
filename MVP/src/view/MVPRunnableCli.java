@@ -37,11 +37,12 @@ public class MVPRunnableCli extends CLI implements Runnable {
 				{
 				String commandName = sp[0]+" "+sp[1];
 				String arg= "";
-				for(int i =2;i<sp.length;i++)
-					 arg = arg+ sp[i];
+				for(int i =2;i<sp.length;i++){
+					 arg = arg+ " "+ sp[i];
+				}
 				presenter.Presenter.Command c= this.commands.get(commandName);
 				this.view.c=c;
-				this.view.notifyObservers(arg);
+				this.view.ChangeNotify(arg);
 				}
 				out.print("Enter command: ");
 				out.flush();
