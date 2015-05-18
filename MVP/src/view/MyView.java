@@ -67,7 +67,9 @@ public class MyView extends Observable implements View {
 	@Override
 	public void exit() {
 		cl.out.println("Exiting now");
-		
+		setChanged();
+		notifyObservers();
+	
 	}
 
 	

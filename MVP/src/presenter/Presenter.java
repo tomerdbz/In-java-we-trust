@@ -86,7 +86,6 @@ public class Presenter implements Observer {
 		@Override
 		public void doCommand(String arg, String params) {
 			m.stop();
-			v.exit();
 		}
 
 	}
@@ -114,15 +113,19 @@ public class Presenter implements Observer {
 	public void update(Observable o, Object arg1) {
 		if(o == v)
 		{
-			String data =(String)arg1;
-			data=data.substring(1);
-			String name = data.split(" ")[0];
-			String Params = "";
-			for(int i=1; i<data.split(" ").length;i++)
+			String name=null;
+			String Params=null;
+			if(arg1!=null)
 			{
-				Params = Params +  data.split(" ")[i];
-			}
-				
+				String data =(String)arg1;
+				data=data.substring(1);
+				name = data.split(" ")[0];
+				Params = "";
+				for(int i=1; i<data.split(" ").length;i++)
+				{
+					Params = Params +  data.split(" ")[i];
+				}
+			}	
 			v.getUserCommand().doCommand(name,Params);
 		}
 		else if (o==m)

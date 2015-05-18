@@ -48,14 +48,15 @@ public class MVPRunnableCli extends CLI implements Runnable {
 				out.flush();
 				line = in.readLine();
 			}
-			view.exit();
-						
+			//view.exit();
+			view.c=this.commands.get("exit");
 		} catch (IOException e) {			
 			e.printStackTrace();
 		} finally {
 			try {
 				in.close();
 				out.close();
+				view.exit();
 			} catch (IOException e) {				
 				e.printStackTrace();
 			}			

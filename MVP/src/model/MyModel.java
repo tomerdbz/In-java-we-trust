@@ -1,9 +1,19 @@
 package model;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 
 import presenter.Properties;
 import algorithms.demo.MazeAirDistance;
@@ -28,6 +38,7 @@ import com.google.common.util.concurrent.MoreExecutors;
  */
 public class MyModel extends Observable implements Model{
 	private ConcurrentHashMap<Maze,Solution> cache=new ConcurrentHashMap<Maze,Solution>();
+	private ConcurrentLinkedQueue<String> databaseNames=new ConcurrentLinkedQueue<String>();
 	private Properties prop;
 	private ListeningExecutorService executor;
 	private ConcurrentHashMap<String,Maze> generatedMazes=new ConcurrentHashMap<String,Maze>();
@@ -35,8 +46,39 @@ public class MyModel extends Observable implements Model{
 	//private ConcurrentLinkedQueue<Solution> solutionQueue=new ConcurrentLinkedQueue<Solution>();
 	public MyModel(Properties prop)
 	{
-		this.prop=prop;
-		executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
+			SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+			Session session = factory.openSession();
+			DBMaze check=(DBMaze)session.get(DBMaze.class,"bobo");
+			SerializableMaze chk=check.getMaze();
+			Query query = session.createQuery("from model.DBMaze");
+
+			List <DBMaze>list = query.list();
+			Iterator<DBMaze> it=list.iterator();
+			DBMaze dbmaze;
+			while(it.hasNext())
+			{
+				dbmaze=it.next();
+				databaseNames.add(dbmaze.getName());
+				generatedMazes.put(dbmaze.getName(), dbmaze.getMaze());
+				cache.put(dbmaze.getMaze(), dbmaze.getSolution());
+			}
+			this.prop=prop;
+			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
+		
+	}
+	private AnnotationConfiguration getConfiguration()
+	{
+		AnnotationConfiguration config=null;
+		try{
+			ObjectInputStream in=new ObjectInputStream(new FileInputStream("HibernateConfig.cfg"));
+			config=(AnnotationConfiguration)in.readObject();
+			in.close();
+		}catch(Exception e)
+		{
+			
+		}
+		return config;
+		
 	}
 	@Override
 	public void generateMaze(String name,int rows, int cols, int rowSource, int colSource,
@@ -165,7 +207,30 @@ public class MyModel extends Observable implements Model{
 	@Override
 	public void stop() {
 		System.out.println("stopping...");
+		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		Session session = factory.getCurrentSession();
+		session.beginTransaction();
+		ConcurrentLinkedQueue<String> names=namesToWriteToDB();
+		for(String str : names)
+		{
+			if(cache.containsKey(generatedMazes.get(str)))
+			{
+				DBMaze data=new DBMaze(str,new SerializableMaze(generatedMazes.get(str)),new SerializableSolution(cache.get(generatedMazes.get(str))));
+				session.save(data);//add flush every once in a while - 20?
+			}
+		}
+		session.getTransaction().commit();
 		executor.shutdown();
+	}
+	private ConcurrentLinkedQueue<String> namesToWriteToDB()
+	{
+		ConcurrentLinkedQueue<String> names=new ConcurrentLinkedQueue<String>(); 
+		for(String str : generatedMazes.keySet())
+		{
+			if(!databaseNames.contains(str))
+				names.add(str);
+		}
+		return names;
 	}
 
 }
