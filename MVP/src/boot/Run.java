@@ -30,6 +30,7 @@ public class Run {
 		Presenter p=new Presenter(m,v);
 		v.addObserver(p);
 		m.addObserver(p);
+		v.cl.addObserver(v);
 		v.start();
 	
 	}

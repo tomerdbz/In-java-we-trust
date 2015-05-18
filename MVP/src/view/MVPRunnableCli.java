@@ -8,15 +8,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MVPRunnableCli extends CLI implements Runnable {
 	
-	MyView view;
-	public void SetView(MyView view){
-		this.view=view;
-	}
+	
 
 	protected ConcurrentHashMap<String, presenter.Presenter.Command>  commands;
 	public void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands2){
 		this.commands=commands2;
 	}
+	public String args;
 	public MVPRunnableCli(BufferedReader in, PrintWriter out) {
 		
 		super(in, out, null);
@@ -41,22 +39,22 @@ public class MVPRunnableCli extends CLI implements Runnable {
 					 arg = arg+ " "+ sp[i];
 				}
 				presenter.Presenter.Command c= this.commands.get(commandName);
-				this.view.c=c;
-				this.view.ChangeNotify(arg);
+				this.args=arg;
+				setChanged();
+				notifyObservers(c);
 				}
 				out.print("Enter command: ");
 				out.flush();
 				line = in.readLine();
 			}
-			//view.exit();
-			view.c=this.commands.get("exit");
+			setChanged();
+			notifyObservers(this.commands.get("exit"));
 		} catch (IOException e) {			
 			e.printStackTrace();
 		} finally {
 			try {
 				in.close();
 				out.close();
-				view.exit();
 			} catch (IOException e) {				
 				e.printStackTrace();
 			}			

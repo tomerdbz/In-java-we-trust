@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+//import org.hibernate.Query;
+//import org.hibernate.Session;
+//import org.hibernate.SessionFactory;
+//import org.hibernate.cfg.AnnotationConfiguration;
 
 import presenter.Properties;
 import algorithms.demo.MazeAirDistance;
@@ -46,7 +46,7 @@ public class MyModel extends Observable implements Model{
 	//private ConcurrentLinkedQueue<Solution> solutionQueue=new ConcurrentLinkedQueue<Solution>();
 	public MyModel(Properties prop)
 	{
-			SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		/*	SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
 			Session session = factory.openSession();
 			DBMaze check=(DBMaze)session.get(DBMaze.class,"bobo");
 			SerializableMaze chk=check.getMaze();
@@ -61,12 +61,12 @@ public class MyModel extends Observable implements Model{
 				databaseNames.add(dbmaze.getName());
 				generatedMazes.put(dbmaze.getName(), dbmaze.getMaze());
 				cache.put(dbmaze.getMaze(), dbmaze.getSolution());
-			}
+			}*/
 			this.prop=prop;
 			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
 		
 	}
-	private AnnotationConfiguration getConfiguration()
+	/*private AnnotationConfiguration getConfiguration()
 	{
 		AnnotationConfiguration config=null;
 		try{
@@ -79,7 +79,7 @@ public class MyModel extends Observable implements Model{
 		}
 		return config;
 		
-	}
+	}*/
 	@Override
 	public void generateMaze(String name,int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal) {
@@ -207,7 +207,7 @@ public class MyModel extends Observable implements Model{
 	@Override
 	public void stop() {
 		System.out.println("stopping...");
-		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+	/*	SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		session.beginTransaction();
 		ConcurrentLinkedQueue<String> names=namesToWriteToDB();
@@ -220,6 +220,7 @@ public class MyModel extends Observable implements Model{
 			}
 		}
 		session.getTransaction().commit();
+		*/
 		executor.shutdown();
 	}
 	private ConcurrentLinkedQueue<String> namesToWriteToDB()

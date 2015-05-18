@@ -3,14 +3,15 @@ package view;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
 
-public class MyView extends Observable implements View {
-	MVPRunnableCli cl;
+public class MyView extends Observable implements View,Observer {
+	public MVPRunnableCli cl;
 	public String arguments;
 	public presenter.Presenter.Command c;
 	public MyView(BufferedReader in, PrintWriter out)
@@ -31,14 +32,12 @@ public class MyView extends Observable implements View {
 	}
 	
 	public void ChangeNotify(String arg){
-		System.out.println("WAT");
 		setChanged();
 		notifyObservers(arg);
 		
 	}
 	@Override
 	public void start() {
-		cl.SetView(this);
 		Thread t = new Thread(cl);
 	    t.start();
 		}
@@ -70,6 +69,15 @@ public class MyView extends Observable implements View {
 		setChanged();
 		notifyObservers();
 	
+	}
+	@Override
+	public void update(Observable o, Object arg) {
+		if(o==cl){
+			this.c = (presenter.Presenter.Command) arg;
+			setChanged();
+			notifyObservers(cl.args);
+		}
+		
 	}
 
 	
