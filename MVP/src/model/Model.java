@@ -3,7 +3,7 @@ package model;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
-/**
+/**	MVP Model interface
  * @author Tomer
  *
  */

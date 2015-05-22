@@ -12,7 +12,8 @@ import presenter.Presenter;
 import presenter.Properties;
 import view.MyView;
 
-/** Run WriteProperties first!
+/** ID'S: 208415513, 318507209 - Tomer Cabouly, Alon Orlovsky 
+ * Run WriteProperties and ConfigureDB FIRST!!!
  * @author Tomer
  *
  */
@@ -32,8 +33,12 @@ public class Run {
 		m.addObserver(p);
 		v.cl.addObserver(v);
 		v.start();
+		
 	
 	}
+	/** reads properties from the file that was created.
+	 * @return read Properties
+	 */
 	private static Properties readProperties()
 	{
 		XMLDecoder d;

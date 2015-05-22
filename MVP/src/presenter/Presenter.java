@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import model.Model;
 import view.View;
 
-/**NOTE!!! THIS CLASS IS COMPLETE. IT DOES NEED YOUR TOUCH HOWEVER. SEE UPDATE FOR MORE INFO.
- *  ALSO - ALL THE FUNCTIONS CALLING TO VIEW IN COMMANDS SHOULD BE COORELATED WITH YOURS - PLZ NOTICE.
+/*
  * @author Tomer
  *
  */
@@ -38,7 +37,13 @@ public class Presenter implements Observer {
 				if(flag==true)
 					m.generateMaze(arg, Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]), Integer.parseInt(parameters[4]), Integer.parseInt(parameters[5]));
 			}
+			else
+				v.Display("An Error Has Occured.");
 		}
+		/**
+		 * @param s - String that will be checked if represents a number
+		 * @return
+		 */
 		private boolean isInteger(String s)
 		{
 			if(s.isEmpty()) return false;
@@ -90,7 +95,13 @@ public class Presenter implements Observer {
 
 	}
 	
+	/** MVP View 
+	 * 
+	 */
 	private View v;
+	/**MVP Model
+	 * 
+	 */
 	private Model m;
 	
 	public Presenter(Model m,View v)
@@ -107,7 +118,8 @@ public class Presenter implements Observer {
 		v.setCommands(commandMap);
 		}
 	
-	/** FOR MODEL arg1 IS MAZE NAME. FOR VIEW DEFINE FOR YOURSELF....
+	/** FOR MODEL arg1 IS MAZE NAME. FOR VIEW arg1 is COMMAND ARGUMENTS.
+	 * 	NOTICE: IF ARG1 = "error" Presenter evaluates and knows there was something wrong. model and view doesn't think for themselves. 
 	 */
 	@Override
 	public void update(Observable o, Object arg1) {
@@ -115,31 +127,40 @@ public class Presenter implements Observer {
 		{
 			String name=null;
 			String Params=null;
-			if(arg1!=null)
+			if(arg1!=null && !arg1.toString().equals("error")) //by making sure the arg1 is not a reprentation of error we avoid errors
 			{
-				String data =(String)arg1;
-				data=data.substring(1);
-				name = data.split(" ")[0];
+				String data =(String)arg1; //we convert the data which is the arguments transfered to us to a String
+				data=data.substring(1); //we remove the first char which is a space
+				name = data.split(" ")[0]; //we split the array by spaces the first place is not the name
 				Params = "";
 				for(int i=1; i<data.split(" ").length;i++)
 				{
-					Params = Params +  data.split(" ")[i];
-				}
+					Params = Params +  data.split(" ")[i]; //we combine all the other arguments
+				} 
 			}	
-			v.getUserCommand().doCommand(name,Params);
+			if(v.getUserCommand()!=null) //we make sure that the command is valid and not null
+			v.getUserCommand().doCommand(name,Params); //we tell the presenter to handle the command now
+			else
+				v.Display("An Error Has Occurred."); //error managment
 		}
 		else if (o==m)
 		{
 			String name;
-			if(arg1!=null)
+			if(arg1!=null && !arg1.toString().equals("error"))
 			{
 				if((name=modelNotifiedGenerated(arg1.toString()))!=null)
 						v.displayMaze(m.getMaze(name));
 				else if((name=modelNotifiedSolved(arg1.toString()))!=null)
 					v.displaySolution(m.getSolution(name));
 			}
+			else
+				v.Display("An Error Has Occured.");
 		}
 	}
+	/** Helper for update - checks if Model notified solve
+	 * @param arg from the model
+	 * @return name of maze to solve if it notified solve, else null
+	 */
 	private String modelNotifiedSolved(String arg)
 	{
 		String[] args=arg.split(" ");
@@ -148,6 +169,10 @@ public class Presenter implements Observer {
 				return args[1];
 		return null;
 	}
+	/** Helper for update - checks if Model notified generated
+	 * @param arg from the model
+	 * @return name of maze to generate if it notified generated, else null
+	 */
 	private String modelNotifiedGenerated(String arg)
 	{
 		String[] args=arg.split(" ");

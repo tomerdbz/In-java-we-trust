@@ -6,6 +6,10 @@ import presenter.Presenter.Command;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
+/**	the interface defines what each View in this MVP architecture has to do!
+ * @author Alon
+ *
+ */
 public interface View {
 	void start();
 	void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands);
@@ -13,5 +17,5 @@ public interface View {
 	void Display(String s);
 	void displayMaze(Maze m);
 	void displaySolution(Solution s);
-	void exit();
+	//void exit();
 }

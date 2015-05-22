@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 import algorithms.search.Movement;
 
-/**
+/** This class contains all the properties one should desire to choose.
+ * This class implements Serializable since Properties are meant to be written and read and XML's are readable as well.
+ * NOTICE: SINCE I'VE USED ENUMS AND DUE TO A BUG (READ ABOUT IT..) XML IS BEING WRITTEN WEIRD - BUT IT WORKS IN THE MODEL LIKE CHARM.
+ * 	it will given to a good model who will give users the choice (you should try MyModel - it will give you that!)
  * @author Tomer
  *
  */
@@ -13,26 +16,55 @@ public class Properties implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**enum for readability - choose maze generator
+	 * @author Tomer
+	 *
+	 */
 	public enum MazeGenerator {
 		DFS,RANDOM
 	};
+	/**enum for readability - choose maze solver
+	 * @author Tomer
+	 *
+	 */
 	public enum MazeSolver {
 		MANHATTAN_DISTANCE_ASTAR,AIR_DISTANCE_ASTAR,BFS
 	};
+	/** Number of threads that will be executed simultaneously
+	 * 
+	 */
 	private int threadNumber;
+	/**	Which maze solver
+	 * 
+	 */
 	private MazeSolver mazeSolver;
+	/**which maze generator
+	 * 
+	 */
 	private MazeGenerator mazeGenerator;
+	/**	How should movement be allowed in the maze
+	 * 
+	 */
 	private Movement movement;
+	/**	Regular Movement cost
+	 * 
+	 */
 	private double movementCost;
+	/**	Diagonal movement cost
+	 * 
+	 */
 	private double diagonalMovementCost;
-	private int mazeRows;
-	private int mazeCols;
-	private int rowSource;
-	private int colSource;
-	private int rowGoal;
-	private int colGoal;
+	//private int mazeRows;
+	//private int mazeCols;
+	//private int rowSource;
+	//private int colSource;
+	//private int rowGoal;
+	//private int colGoal;
 	//tomorrow add generated maze rows, cols, source and dest
 	
+	/**	Default Ct'r - default Properties I have defined.
+	 * 
+	 */
 	public Properties()
 	{
 		this.threadNumber=16;
@@ -41,16 +73,23 @@ public class Properties implements Serializable {
 		this.movement=Movement.DIAGONAL;
 		this.movementCost=10;
 		this.diagonalMovementCost=15;
-		this.mazeRows=10;
-		this.mazeCols=10;
-		this.rowSource=0;
-		this.colSource=0;
-		this.rowGoal=9;
-		this.colGoal=9;
+		//this.mazeRows=10;
+		//this.mazeCols=10;
+		//this.rowSource=0;
+		//this.colSource=0;
+		//this.rowGoal=9;
+		//this.colGoal=9;
 		//more to come...
 	}
-	public Properties(MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost
-			,int mazeRows,int mazeCols,int rowSource,int colSource,int rowGoal,int colGoal)
+	/** give this Ct'r the params and he will do as you please.
+	 * @param mazeSolver
+	 * @param threadNumber
+	 * @param mazeGenerator
+	 * @param movement
+	 * @param movement cost
+	 * @param diagonal movement cost
+	 */
+	public Properties(MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost)
 	{
 		this.threadNumber=threadNumber;
 		this.mazeSolver=mazeSolver;
@@ -58,12 +97,12 @@ public class Properties implements Serializable {
 		this.movement=movement;
 		this.movementCost=mCost;
 		this.diagonalMovementCost=mdCost;
-		this.mazeRows=mazeRows;
-		this.mazeCols=mazeCols;
-		this.rowSource=rowSource;
-		this.colSource=colSource;
-		this.rowGoal=rowGoal;
-		this.colGoal=colGoal;
+		//this.mazeRows=mazeRows;
+		//this.mazeCols=mazeCols;
+		//this.rowSource=rowSource;
+		//this.colSource=colSource;
+		//this.rowGoal=rowGoal;
+		//this.colGoal=colGoal;
 		//more to come...
 	}
 
@@ -106,7 +145,7 @@ public class Properties implements Serializable {
 	public void setDiagonalMovementCost(double diagonalMovementCost) {
 		this.diagonalMovementCost = diagonalMovementCost;
 	}
-	public int getMazeRows() {
+	/*public int getMazeRows() {
 		return mazeRows;
 	}
 	public void setMazeRows(int mazeRows) {
@@ -141,5 +180,5 @@ public class Properties implements Serializable {
 	}
 	public void setColGoal(int colGoal) {
 		this.colGoal = colGoal;
-	}
+	}*/
 }
