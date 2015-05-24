@@ -49,7 +49,8 @@ public class MazeDisplay extends Composite {
 				mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				mazeData[i][j].setImage(cellImage(m,i,j));
 			}
-		redraw();
+		layout();
+		//redraw();
 	}
 	private void destructMaze()
 	{

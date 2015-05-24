@@ -5,6 +5,9 @@ public class Employee {
 	int id;
 	int age;
 	public Employee() {
+		name="";
+		id=0;
+		age=0;
 	}
 	@Override
 	public String toString() {

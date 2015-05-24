@@ -181,4 +181,5 @@ public class Properties implements Serializable {
 	public void setColGoal(int colGoal) {
 		this.colGoal = colGoal;
 	}*/
+	
 }
