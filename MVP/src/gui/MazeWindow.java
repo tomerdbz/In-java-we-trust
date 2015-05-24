@@ -1,11 +1,13 @@
 package gui;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+
+import algorithms.mazeGenerators.DFSMazeGenerator;
 
 public class MazeWindow extends BasicWindow {
 
@@ -23,13 +25,24 @@ public class MazeWindow extends BasicWindow {
 		generateButton.setText("Generate Maze");
 		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
 		
-		MazeDisplay maze=new MazeDisplay(shell, SWT.BORDER);
-		   maze.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,2));
+		MazeDisplay mazeDisplay=new MazeDisplay(shell, SWT.BORDER);
+		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,2));
 		   Button clueButton=new Button(shell,SWT.PUSH);
 		   clueButton.setText("Help me solve this!");
 		   clueButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
-		  // shell.open();
-
+		   generateButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+					mazeDisplay.displayMaze(new DFSMazeGenerator().generateMaze(4, 4, 0, 0, 3, 3));
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 }

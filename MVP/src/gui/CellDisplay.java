@@ -12,27 +12,29 @@ import org.eclipse.swt.widgets.Composite;
 public class CellDisplay extends Canvas{
 	int cellStyle;//SWT.RIGHT, SWT.LEFT, SWT.TOP, SWT.BOTTOM.
 	Image cellImage;
-	public CellDisplay(Composite parent, int style, Image cellImage) {//wanna get it from the outside
+	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style);
-		this.cellImage=cellImage;
+		//this.cellImage=cellImage;
+		//add
 		addPaintListener(new PaintListener() {
 			
 			@Override
 			public void paintControl(PaintEvent e) {
 				e.gc.setBackground(new Color(null,0,0,0));
-
 				int width=getSize().x;
 				int height=getSize().y;
-				//e.gc.drawImage("same image...save it maybe as a field", width, height);
+				e.gc.drawImage(cellImage, width, height);
 				
 			}
 		});
 		//Image i = new Image(getDisplay(),"\\mazeleft.jpg");// "\\" insted of "\" here.
 		
 	}
-	public void setCellStyle(int cellStyle)
+	public void setImage(Image image)
 	{
-		this.cellStyle=cellStyle;
+		if(this.cellImage!=null)
+			this.cellImage.dispose();
+		this.cellImage=image;
 		//change image
 		redraw();
 	}

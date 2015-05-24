@@ -5,6 +5,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -31,26 +32,41 @@ public class MazeDisplay extends Composite {
 	{
 		mazeRows=m.getRows();
 		mazeCols=m.getCols();
-		setLayoutData(new GridLayout(mazeCols,true));
+		GridLayout layout=new GridLayout(mazeCols, true);
+		layout.horizontalSpacing=0;
+		layout.verticalSpacing=0;
+		setLayoutData(layout);
 		mazeData=new CellDisplay[mazeRows][mazeCols];
 		for(int i=0;i<mazeRows;i++)
 			for(int j=0;j<mazeCols;j++)
 			{
-				mazeData[i][j]=new CellDisplay(this,SWT.NONE,cellImage(m.getCell(i, j)));
+				mazeData[i][j]=new CellDisplay(this,SWT.NONE);
+				mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				mazeData[i][j].setImage(cellImage(m.getCell(i, j)));
 			}
 	}
 	private Image cellImage(Cell c)
 	{
+		String temp="C:\\Users\\Tomer\\git\\In-java-we-trust\\MVP\\resources\\images\\";
 		String str="";
-		if(c.getHasTopWall())
-			str+="top";
-		if(c.getHasRightWall())
-			str+="right";
-		if(c.getHasBottomWall())
-			str+="bottom";
 		if(c.getHasLeftWall())
-			str+="left";
-		return new Image(getDisplay(),new ImageData(str));
+			str+="1";
+		else
+			str+="0";
+		if(c.getHasTopWall())
+			str+="1";
+		else
+			str+="0";
+		if(c.getHasRightWall())
+			str+="1";
+		else
+			str+="0";
+		if(c.getHasBottomWall())
+			str+="1";
+		else
+			str+="0";
+		str+=".jpg";
+		return new Image(getDisplay(),new ImageData(temp+str));
 		
 	}
 	
