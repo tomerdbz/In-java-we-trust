@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class PropertiesDialog<T> extends TitleAreaDialog {
 	
-	private T template;
+	private Class<T> template;
 	PropertyDescriptor[] descs;
   private Text txtFirstName;
   private Text lastNameText;
@@ -26,7 +26,7 @@ public class PropertiesDialog<T> extends TitleAreaDialog {
   private String lastName;
   HashMap<PropertyDescriptor,Text> txtMap=new HashMap<PropertyDescriptor,Text>();
 
-  public PropertiesDialog(Shell parentShell, T template) {
+  public PropertiesDialog(Shell parentShell, Class<T> template) {
     super(parentShell);
     this.template=template;
 	descs=PropertyUtils.getPropertyDescriptors(template);
@@ -113,9 +113,10 @@ public class PropertiesDialog<T> extends TitleAreaDialog {
 			//propDesc.getWriteMethod().invoke(template,txtMap.get(propDesc).getText());
 			propDesc.setValue(propDesc.getName(), txtMap.get(propDesc).getText());
 			System.out.println(propDesc.getValue(propDesc.getName())); //propDesc wasn't saved. check tomorrow what to do!
-			//} catch (IllegalAccessException e) {
+			T t=template.newInstance();
+			} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,6 +124,10 @@ public class PropertiesDialog<T> extends TitleAreaDialog {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		//}
+		catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
     //saveInput();
 	System.out.println(template.toString());

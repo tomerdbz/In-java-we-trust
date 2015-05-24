@@ -25,7 +25,7 @@ public class MazeWindow extends BasicWindow {
 		generateButton.setText("Generate Maze");
 		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
 		
-		MazeDisplay mazeDisplay=new MazeDisplay(shell, SWT.BORDER);
+		MazeDisplay mazeDisplay=new MazeDisplay(shell, SWT.NONE);
 		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,2));
 		   Button clueButton=new Button(shell,SWT.PUSH);
 		   clueButton.setText("Help me solve this!");

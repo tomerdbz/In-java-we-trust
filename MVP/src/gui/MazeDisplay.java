@@ -19,44 +19,71 @@ public class MazeDisplay extends Composite {
 	
 	public MazeDisplay(Composite parent, int style) {
 		super(parent, style);
-		setBackgroundImage(new Image(getDisplay(),new ImageData("C:\\Users\\Tomer\\git\\In-java-we-trust\\MVP\\resources\\images\\1demo.jpg")));
-		addPaintListener(new PaintListener() {
+		addPaintListener(new PaintListener() { //Presenter should give paintListeners. for debug only!
 			
 			@Override
 			public void paintControl(PaintEvent arg0) {
-				
+				if(mazeData!=null)
+					for(int i=0;i<mazeData.length;i++)
+						for(int j=0;j<mazeData[0].length;j++)
+							mazeData[i][j].redraw();
 			}
 		});
 	}
 	public void displayMaze(Maze m)
 	{
+		if(mazeData!=null) //wanna get rid of the old maze prior to displaying the new one.
+			destructMaze(); //presenter should choose what to do in the form of a listener. for debug only!
 		mazeRows=m.getRows();
 		mazeCols=m.getCols();
 		GridLayout layout=new GridLayout(mazeCols, true);
 		layout.horizontalSpacing=0;
 		layout.verticalSpacing=0;
-		setLayoutData(layout);
+		//setLayoutData(layout);
+		setLayout(layout);
 		mazeData=new CellDisplay[mazeRows][mazeCols];
 		for(int i=0;i<mazeRows;i++)
 			for(int j=0;j<mazeCols;j++)
 			{
 				mazeData[i][j]=new CellDisplay(this,SWT.NONE);
 				mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-				mazeData[i][j].setImage(cellImage(m.getCell(i, j)));
+				mazeData[i][j].setImage(cellImage(m,i,j));
+			}
+		redraw();
+	}
+	private void destructMaze()
+	{
+		for(int i=0;i<mazeData.length;i++)
+			for(int j=0;j<mazeData[0].length;j++)
+			{
+				mazeData[i][j].cellImage.dispose();
+				mazeData[i][j].dispose();
 			}
 	}
-	private Image cellImage(Cell c)
+	private Image cellImage(Maze m,int i,int j)
 	{
+		Cell c=m.getCell(i, j);
 		String temp="C:\\Users\\Tomer\\git\\In-java-we-trust\\MVP\\resources\\images\\";
 		String str="";
 		if(c.getHasLeftWall())
-			str+="1";
+		{
+			if(j==0 || !m.getCell(i, j-1).getHasRightWall())
+				str+="1";
+			else
+				str+="0";
+		}
 		else
 			str+="0";
 		if(c.getHasTopWall())
-			str+="1";
+		{
+			if(i==0 || !m.getCell(i-1, j).getHasBottomWall())
+				str+="1";
+			else
+				str+="0";
+		}	
 		else
 			str+="0";
+		//if(j==m.getRows()-1 || !m.getCell(i, j+1).getHasLeftWall())
 		if(c.getHasRightWall())
 			str+="1";
 		else
