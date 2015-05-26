@@ -145,6 +145,18 @@ public class Properties implements Serializable {
 	public void setDiagonalMovementCost(double diagonalMovementCost) {
 		this.diagonalMovementCost = diagonalMovementCost;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder str=new StringBuilder("");
+		str.append("Maze Generator: "+ mazeGenerator+"\n");
+		str.append("Maze Solver: " + mazeSolver +"\n");
+		str.append("Movement: " + movement +"\n");
+		str.append("Movement Cost: "+movementCost+"\n");
+		str.append("Diagonal Movement Cost: "+diagonalMovementCost + "\n");
+		str.append("Number of Threads: "+threadNumber + "\n");
+		return str.toString();
+	}
 	/*public int getMazeRows() {
 		return mazeRows;
 	}

@@ -1,9 +1,5 @@
 package gui;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
-import presenter.Properties;
 
 public class Demo {
 
@@ -24,7 +20,7 @@ public class Demo {
 		prop.open();
 		prop.
 		*/
-		 Display display = new Display();
+		/* Display display = new Display();
 		    Shell shell = new Shell(display);
 
 		    ClassInputDialog dlg = new ClassInputDialog(shell,Properties.class);
@@ -35,7 +31,8 @@ public class Demo {
 		      System.out.println(input.getMovement());
 		      System.out.println(input.getMazeGenerator());
 		      System.out.println(input.getMazeSolver());
-		    }
+		    }*/
+		new WritePropertiesGUI().writeProperties();
 
 		    /*while (!shell.isDisposed()) {
 		      if (!display.readAndDispatch()) {

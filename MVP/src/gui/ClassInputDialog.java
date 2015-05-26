@@ -38,7 +38,7 @@ public class ClassInputDialog extends Dialog {
 	    super(parent, style);
 	    this.template=template;
 		descs=PropertyUtils.getPropertyDescriptors(template);
-	    setText("Input Dialog");
+	    setText("Set Properties");
 	    setMessage("Please enter a value:");
 	  }
 
@@ -116,7 +116,6 @@ public class ClassInputDialog extends Dialog {
 						@Override
 						public void widgetSelected(SelectionEvent arg0) {
 							// TODO Auto-generated method stub
-							System.out.println(combo.getText());
 			    	        enumMap.put(propDesc, combo.getText());
 						}
 						
@@ -127,7 +126,6 @@ public class ClassInputDialog extends Dialog {
 						}
 					});
 		    	   
-	    			System.out.println(propDesc.getPropertyType().getEnumConstants()[0]);
 	    		}
 	    		
 	    	}
@@ -158,7 +156,6 @@ public class ClassInputDialog extends Dialog {
 		  				PropertyUtils.setNestedProperty(t, propDesc.getName(), Integer.parseInt(txtMap.get(propDesc).getText()));
 		  			else
 		  				PropertyUtils.setNestedProperty(t, propDesc.getName(), txtMap.get(propDesc).getText());
-		  			System.out.println(t);
 		  		}
 				for(PropertyDescriptor propDesc : enumMap.keySet())
 				{
@@ -197,7 +194,7 @@ public class ClassInputDialog extends Dialog {
 
 	    shell.setDefaultButton(ok);
 	  }
-	  public static boolean isNumeric(String str)
+	  private static boolean isNumeric(String str)
 	  {
 	    NumberFormat formatter = NumberFormat.getInstance();
 	    ParsePosition pos = new ParsePosition(0);
