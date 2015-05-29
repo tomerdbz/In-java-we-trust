@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
+//import org.eclipse.jface.dialogs.IMessageProvider;
+//import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class PropertiesDialog<T> extends TitleAreaDialog {
+//public class PropertiesDialog<T> extends TitleAreaDialog {
 	
-	private Class<T> template;
+/*	private Class<T> template;
 	PropertyDescriptor[] descs;
   private Text txtFirstName;
   private Text lastNameText;
@@ -141,4 +141,4 @@ public class PropertiesDialog<T> extends TitleAreaDialog {
   public String getLastName() {
     return lastName;
   }
-} 
+} */

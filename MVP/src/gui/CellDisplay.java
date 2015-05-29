@@ -1,5 +1,7 @@
 package gui;
 
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
@@ -9,9 +11,12 @@ import org.eclipse.swt.widgets.Composite;
 
 public class CellDisplay extends Canvas{
 	Image cellImage;
+	String imageName;
+	Image Hint=null;
+	Character ch = null;
+	Image goal =null;
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style);
-		//this.cellImage=cellImage;
 		addPaintListener(new PaintListener() {
 			
 			@Override
@@ -26,10 +31,23 @@ public class CellDisplay extends Canvas{
 					int height=getSize().y;
 			        //Rectangle rect = getParent().getBounds();
 			        ImageData data = cellImage.getImageData();
-			        
-			    
 			        e.gc.drawImage(cellImage,0,0,data.width,data.height,0,0,width,height);
-
+			       if(Hint!=null){
+			    	   ImageData data2=Hint.getImageData();
+			    	   e.gc.drawImage(Hint,0,0,data2.width,data2.height,0,0,width,height);
+			       }
+			       if(ch!=null){
+			    	   Image img= new Image(getDisplay(),ch.images[ch.frameIndex]);
+						ImageData data3= img.getImageData();
+						//img.setBackground(null);
+						e.gc.drawImage(img,0,0,data3.width,data3.height,15,15,getSize().x/ch.sizeFactor,getSize().y/ch.sizeFactor);
+			       }
+			       if(goal!=null){
+			    	   
+						ImageData data4= goal.getImageData();
+						//img.setBackground(null);
+						e.gc.drawImage(goal,0,0,data4.width,data4.height,0,0,width,height);
+			       }
 			        //cellImage.dispose();
 				
 			}
@@ -44,6 +62,15 @@ public class CellDisplay extends Canvas{
 		this.cellImage=image;
 		//change image
 		redraw();
+	}
+	public Image getCellImage(){
+		return cellImage;
+	}
+	public String getImageName() {
+		return imageName;
+	}
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 
 }
