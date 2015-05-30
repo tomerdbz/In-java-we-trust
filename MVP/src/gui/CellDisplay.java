@@ -30,8 +30,10 @@ public class CellDisplay extends Canvas{
 					int width=getSize().x;
 					int height=getSize().y;
 			        //Rectangle rect = getParent().getBounds();
+					if(cellImage!=null){
 			        ImageData data = cellImage.getImageData();
 			        e.gc.drawImage(cellImage,0,0,data.width,data.height,0,0,width,height);
+					}
 			       if(Hint!=null){
 			    	   ImageData data2=Hint.getImageData();
 			    	   e.gc.drawImage(Hint,0,0,data2.width,data2.height,0,0,width,height);

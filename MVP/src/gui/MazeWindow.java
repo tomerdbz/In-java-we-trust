@@ -14,8 +14,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -45,6 +47,21 @@ public class MazeWindow extends BasicWindow implements View {
 
 	@Override
 	void initWidgets() {
+		shell.addListener(SWT.Close,new Listener(){
+
+			@Override
+			public void handleEvent(Event arg0) {
+				timer.cancel();
+				closeCorrect();
+				shell.dispose();
+				LastUserCommand= commands.get("exit");
+				setChanged();
+				notifyObservers();
+				System.out.println("been here");
+				
+			}
+			
+		});
 		// TODO Auto-generated method stub
 		shell.setBackgroundImage(new Image(display,"White.jpg"));
 		shell.setLayout(new GridLayout(2,false));
@@ -252,7 +269,7 @@ public class MazeWindow extends BasicWindow implements View {
 						
 						@Override
 						public void run() {
-							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed()){
+							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed() ){
 							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length;
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length;
 							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);
@@ -267,7 +284,6 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			timer = new Timer();
 			timer.scheduleAtFixedRate(timerTask, 0, 100);
-			
 	}
 
 	@Override
@@ -299,17 +315,51 @@ public class MazeWindow extends BasicWindow implements View {
 
 	@Override
 	public void displayMaze(Maze m) {//you made mazeDisplay a data member
-			
-		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,2));
+		
+		if(mazeDisplay.mazeData!=null){
+			for(int i=0;i<mazeDisplay.mazeData.length;i++)
+			{
+				
+				for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
+				{		 
+					mazeDisplay.mazeData[i][j].dispose();
+				}
+			}
+		}
 		   mazeDisplay.displayMaze(m);
 		   mazeDisplay.Ch = new Character(mazeDisplay.mazeData[0][0],SWT.FILL);
 			mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
 			mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch;
 			mazeDisplay.mazeData[0][0].redraw();
-			mazeDisplay.redraw();
+			mazeDisplay.layout();
 			mazeDisplay.forceFocus();
 			
+			
 		
+	}
+	public void closeCorrect(){
+		if(mazeDisplay.mazeData!=null){
+		for(int i=0;i<mazeDisplay.mazeData.length;i++)
+		{
+			for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
+			{	
+				 if(mazeDisplay.mazeData[i][j].cellImage!=null)
+					 mazeDisplay.mazeData[i][j].cellImage.dispose();
+				 if(mazeDisplay.mazeData[i][j].goal!=null)
+					 mazeDisplay.mazeData[i][j].goal.dispose();
+				 if(mazeDisplay.mazeData[i][j].Hint!=null)
+					 mazeDisplay.mazeData[i][j].Hint.dispose();
+				 if(mazeDisplay.mazeData[i][j].ch!=null)
+					 mazeDisplay.mazeData[i][j].ch.dispose();
+				
+				 if(mazeDisplay.Ch!=null)
+					 mazeDisplay.Ch.dispose();
+					 
+				 mazeDisplay.mazeData[i][j].dispose();
+			}
+		}
+		}
+		mazeDisplay.dispose();
 	}
 
 	@Override

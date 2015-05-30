@@ -178,14 +178,12 @@ public class MazeDisplay extends Composite {
 	}
 	public void displayMaze(Maze m)
 	{
-		if(mazeData!=null) //wanna get rid of the old maze prior to displaying the new one.
-			destructMaze(); //presenter should choose what to do in the form of a listener. for debug only!
+		
 		mazeRows=m.getRows();
 		mazeCols=m.getCols();
 		GridLayout layout=new GridLayout(mazeCols, true);
 		layout.horizontalSpacing=0;
 		layout.verticalSpacing=0;
-		//setLayoutData(layout);
 		setLayout(layout);
 		mazeData=new CellDisplay[mazeRows][mazeCols];
 		for(int i=0;i<mazeRows;i++)
