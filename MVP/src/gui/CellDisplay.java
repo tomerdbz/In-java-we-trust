@@ -49,7 +49,7 @@ public class CellDisplay extends Canvas{
 					if(ch!=null && Hint!=null){
 						Hint=null;
 						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File("ring.mp3"));
+					    player.addToPlayList(new File(".\\resources\\sounds\\ring.mp3"));
 					    player.play();
 
 					}

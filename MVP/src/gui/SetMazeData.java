@@ -90,7 +90,7 @@ public class SetMazeData extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")||!isNumeric(rows.getText())||!isNumeric(cols.getText())||Integer.parseInt(rows.getText())<=0||Integer.parseInt(cols.getText())<0){
 					MessageBox messageBox = new MessageBox(shell,SWT.ERROR|SWT.OK);
@@ -133,7 +133,7 @@ public class SetMazeData extends Dialog {
 	    cancel.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  MP3Player player = new MP3Player();
-			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 	        input = null;
 	    

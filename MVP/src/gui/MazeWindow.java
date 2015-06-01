@@ -53,6 +53,7 @@ public class MazeWindow extends BasicWindow implements View {
 	int rows =0;
 	Timer timer;
 	TimerTask timerTask;
+	boolean dataRecieved=false;
 	public MazeWindow(String title, int width, int height) {
 		super(title, width, height);
 		// TODO Auto-generated constructor stub
@@ -77,7 +78,7 @@ public class MazeWindow extends BasicWindow implements View {
 		});
 		
 		// TODO Auto-generated method stub
-		shell.setBackgroundImage(new Image(display,"White.jpg"));
+		shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
 		shell.setLayout(new GridLayout(2,false));
 		shell.setText("Maze Generations");
 		
@@ -269,7 +270,7 @@ public class MazeWindow extends BasicWindow implements View {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				isHint=true;
@@ -298,16 +299,22 @@ public class MazeWindow extends BasicWindow implements View {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				ArrayList<Object> mazearrayData = new SetMazeData(shell).open();
 				if(mazearrayData!=null){
 				MazeWindow.this.mazeName= (String)mazearrayData.get(0);
-				MazeWindow.this.rows =(Integer)mazearrayData.get(1);
-				MazeWindow.this.cols=(Integer)mazearrayData.get(2);
+				//MazeWindow.this.rows =(Integer)mazearrayData.get(1);
+				//MazeWindow.this.cols=(Integer)mazearrayData.get(2);
 				}
-				//When combinded with tomeriko check if maaze has existed
-				if(MazeWindow.this.mazeName!=null){
+				LastUserCommand= commands.get("maze exists");
+			    setChanged();
+				notifyObservers(MazeWindow.this.mazeName);
+				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved){
+					MazeWindow.this.rows =(Integer)mazearrayData.get(1);
+					MazeWindow.this.cols=(Integer)mazearrayData.get(2);
+					mazeDisplay.setVisible(true);
+					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
 				LastUserCommand= commands.get("generate maze");
 				setChanged();
 				String mazeData= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
@@ -317,7 +324,7 @@ public class MazeWindow extends BasicWindow implements View {
 				else{
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
-			        messageBox.setMessage("No maze to generate enter data below");
+			        messageBox.setMessage("An error has occureed");
 					messageBox.open();
 				}
 				
@@ -341,7 +348,7 @@ public class MazeWindow extends BasicWindow implements View {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				LastUserCommand= commands.get("solve maze");
@@ -500,7 +507,7 @@ public class MazeWindow extends BasicWindow implements View {
 	public void displaySolution(Solution s) {
 		String Solution = s.toString().substring(9);
 		String []path = Solution.split("	");
-		Image img = new Image(display,"ring.png");
+		Image img = new Image(display,".\\resources\\images\\ring.png");
 		if(!isHint){
 		for(int i=0;i<path.length-1;i++){
 			String []indexes = path[i].split(",");
@@ -562,13 +569,13 @@ public class MazeWindow extends BasicWindow implements View {
 				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
 					 mazeDisplay.won=true;
 					 mazeDisplay.redraw();
-					 shell.setBackgroundImage(new Image(display,"winnericon.png"));
-					 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-				        messageBox.setText("Winner");
-				        messageBox.setMessage("You're the winner! This song is for you <3");
-						messageBox.open();
+					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
+				//	 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+				  //      messageBox.setText("Winner");
+				     //   messageBox.setMessage("You're the winner! This song is for you <3");
+					//	messageBox.open();
 						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File("win.mp3"));
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 					    player.play();
 						
 				 }
@@ -588,13 +595,13 @@ public class MazeWindow extends BasicWindow implements View {
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
-						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
-						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					        messageBox.setText("Winner");
-					        messageBox.setMessage("You're the winner! This song is for you <3");
-							messageBox.open();
+						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
+						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					     //   messageBox.setText("Winner");
+					       // messageBox.setMessage("You're the winner! This song is for you <3");
+							//messageBox.open();
 							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File("win.mp3"));
+						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 						    player.play();
 							
 					 }
@@ -613,13 +620,14 @@ public class MazeWindow extends BasicWindow implements View {
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
-						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
-						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					        messageBox.setText("Winner");
-					        messageBox.setMessage("You're the winner! This song is for you <3");
-							messageBox.open();
+						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
+						 
+						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					       // messageBox.setText("Winner");
+					       // messageBox.setMessage("You're the winner! This song is for you <3");
+							//messageBox.open();
 							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File("win.mp3"));
+						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 						    player.play();
 							
 					 }
@@ -639,13 +647,13 @@ public class MazeWindow extends BasicWindow implements View {
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
-						shell.setBackgroundImage(new Image(display,"winnericon.png"));
-						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					        messageBox.setText("Winner");
-					        messageBox.setMessage("You're the winner! This song is for you <3");
-							messageBox.open();
+						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
+						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					       // messageBox.setText("Winner");
+					       // messageBox.setMessage("You're the winner! This song is for you <3");
+							//messageBox.open();
 							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File("win.mp3"));
+						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 						    player.play();
 							
 					 }
@@ -675,11 +683,11 @@ public class MazeWindow extends BasicWindow implements View {
 	public void receiveData(String data) {
 		if(data==null)
 		{
-			
+			this.dataRecieved= true;
 		}
 		else
 		{
-			
+			this.dataRecieved= false;
 		}
 	}
 

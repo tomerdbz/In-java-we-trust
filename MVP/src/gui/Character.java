@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class Character extends Canvas {
 	   ImageLoader gifs=new ImageLoader();
-	   ImageData[] images = gifs.load("UpAndDown.gif");
+	   ImageData[] images = gifs.load(".\\resources\\images\\UpAndDown.gif");
 	   int frameIndex=0;
 	   int sizeFactor=2;
 	   int currentCellX=0;

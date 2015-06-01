@@ -221,8 +221,8 @@ public class MyModel extends Observable implements Model{
 		Maze m;
 		if((m=generatedMazes.get(name))==null)
 		{
-			setChanged();
-			notifyObservers("error");
+			//setChanged();
+			//notifyObservers("error");
 			return null;
 		}
 		return m;

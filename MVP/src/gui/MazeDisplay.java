@@ -5,13 +5,9 @@ import jaco.mp3.player.MP3Player;
 import java.io.File;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -21,7 +17,6 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.MessageBox;
 
 import algorithms.mazeGenerators.Cell;
 import algorithms.mazeGenerators.Maze;
@@ -45,18 +40,20 @@ public class MazeDisplay extends Composite {
 				if(mazeData==null && won==false){
 					int width=parent.getSize().x;
 					int height=parent.getSize().y;
-					ImageData data = new ImageData("Wallpaper.png");
-					arg0.gc.drawImage(new Image(getDisplay(),"Wallpaper.png"),0,0,data.width,data.height,0,0,width,height);
+					ImageData data = new ImageData(".\\resources\\images\\Wallpaper.png");
+					arg0.gc.drawImage(new Image(getDisplay(),".\\resources\\images\\Wallpaper.png"),0,0,data.width,data.height,0,0,width,height);
 				}
-				else if(mazeData==null && won==true)
+				else if(won==true)
 				{
+					setVisible(false);
 					won=false;
+					//won=false;
 					int width=parent.getSize().x;
 					int height=parent.getSize().y;
-					ImageData data = new ImageData("sonicwon.png");
-					arg0.gc.drawImage(new Image(getDisplay(),"sonicwon"),0,0,data.width,data.height,0,0,width,height);
+					/*ImageData data = new ImageData(".\\resources\\images\\sonicwon.png");
+					arg0.gc.drawImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"),0,0,data.width,data.height,0,0,width,height);*/
 				}
-				if(mazeData!=null)
+				else if(mazeData!=null)
 					for(int i=0;i<mazeData.length;i++)
 						for(int j=0;j<mazeData[0].length;j++)
 							mazeData[i][j].redraw();
@@ -153,13 +150,13 @@ public class MazeDisplay extends Composite {
 				 if(Ch.currentCellX== mazeData.length-1 && Ch.currentCellY == mazeData[0].length-1 && mazeData!=null){
 					 won=true;
 					 redraw();
-					 getShell().setBackgroundImage(new Image(getDisplay(),"winnericon.png"));
-					 MessageBox messageBox = new MessageBox(getShell(),SWT.ICON_INFORMATION|SWT.OK);
-				        messageBox.setText("Winner");
-				        messageBox.setMessage("You're the winner! This song is for you <3");
-						messageBox.open();
+					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
+					// MessageBox messageBox = new MessageBox(getShell(),SWT.ICON_INFORMATION|SWT.OK);
+				       // messageBox.setText("Winner");
+				       // messageBox.setMessage("You're the winner! This song is for you <3");
+						//messageBox.open();
 						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File("win.mp3"));
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 					    player.play();
 						
 						
@@ -234,7 +231,7 @@ public class MazeDisplay extends Composite {
 	private Image cellImage(Maze m,int i,int j)
 	{
 		Cell c=m.getCell(i, j);
-		String temp="C:\\Users\\Alon\\git\\In-java-we-trustnow\\MVP\\resources\\images\\";
+		String temp=".\\resources\\images\\";
 		String str="";
 		if(c.getHasLeftWall())
 		{

@@ -124,7 +124,7 @@ public class MyView extends Observable implements View,Observer {
 	}
 	@Override
 	public void receiveData(String data) {
-		// TODO Auto-generated method stub
+		return;
 		
 	}
 	@Override
