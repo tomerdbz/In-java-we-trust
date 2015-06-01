@@ -20,11 +20,11 @@ public class WritePropertiesGUI {
 	/**	Writes the properties after prompting a window to submit them.
 	 * 
 	 */
-	public void writeProperties()
+	public void writeProperties(Display display, Shell shell)
 	{
 		XMLEncoder e;
-		Display display = new Display();
-	    Shell shell = new Shell(display);
+		//Display display = new Display();
+	    //Shell shell = new Shell(display);
 
 	    ClassInputDialog dlg = new ClassInputDialog(shell,Properties.class);
 	    Properties input = (Properties) dlg.open();

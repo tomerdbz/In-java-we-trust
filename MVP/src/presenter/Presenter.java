@@ -135,6 +135,8 @@ public class Presenter implements Observer {
 		commandMap.put("solve maze",new SolveMazeCommand());
 		commandMap.put("display solution",new DisplaySolutionCommand());
 		commandMap.put("exit",new ExitCommand());
+		commandMap.put("properties", new WritePropertiesCommand());
+		commandMap.put("maze exists", new MazeExistsCommand());
 		v.setCommands(commandMap);
 		}
 	

@@ -1,49 +1,35 @@
 package boot;
 
 import gui.MazeWindow;
+import gui.WritePropertiesGUI;
 
 import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import model.Model;
 import model.MyModel;
 import presenter.Presenter;
 import presenter.Properties;
 import view.MyView;
+import view.View;
 
 public class GuiMvpDemo {
 
-	public static void main(String[] args) {
-		MazeWindow v=new MazeWindow("Check the Sonic Maze Runner Edition", 600, 600);
+	public void startProgram(Properties properties) {
+		MyView v=new MyView(new BufferedReader(new InputStreamReader(System.in)),new PrintWriter(System.out));
 		MyModel m;
-		Properties prop;
-		if((prop=readProperties())!=null)
-			m=new MyModel(prop);
-		else
-			m=new MyModel(new Properties());
+		m=new MyModel(properties);
 		Presenter p=new Presenter(m,v);
 		v.addObserver(p);
 		m.addObserver(p);
+		v.cl.addObserver(v);
 		v.start();
-
-}
-	private static Properties readProperties()
-	{
-		XMLDecoder d;
-		Properties p=null;
-		try {
-			FileInputStream in=new FileInputStream("properties.xml");
-			d=new XMLDecoder(in);
-			p=(Properties)d.readObject();
-			d.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return p;
 	}
-}
+	}

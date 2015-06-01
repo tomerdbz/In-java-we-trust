@@ -3,7 +3,14 @@ package gui;
 import gui.CellDisplay.Direction;
 import jaco.mp3.player.MP3Player;
 
+import java.beans.XMLDecoder;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,8 +30,13 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
+import boot.GuiMvpDemo;
+import boot.Run;
+import boot.RunGui;
 import presenter.Presenter.Command;
+import presenter.Presenter;
 import presenter.Properties;
+import view.MyView;
 import view.View;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
@@ -34,6 +46,7 @@ public class MazeWindow extends BasicWindow implements View {
 	protected ConcurrentHashMap<String, presenter.Presenter.Command>  commands;
 	protected Command LastUserCommand =null;
 	MazeDisplay mazeDisplay;
+	Properties properties;
 	Boolean isHint;
 	String mazeName=null;
 	int cols=0;
@@ -53,7 +66,7 @@ public class MazeWindow extends BasicWindow implements View {
 			public void handleEvent(Event arg0) {
 				timer.cancel();
 				closeCorrect();
-				shell.dispose();
+				display.dispose();
 				LastUserCommand= commands.get("exit");
 				setChanged();
 				notifyObservers();
@@ -75,10 +88,7 @@ public class MazeWindow extends BasicWindow implements View {
         Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
         cascadeFileMenu.setMenu(fileMenu);
         
-        MenuItem cascadeLoadMenu = new MenuItem(menuBar, SWT.CASCADE);
-        cascadeLoadMenu.setText("&Load");
-        Menu LoadMenu = new Menu(shell, SWT.DROP_DOWN);
-        cascadeLoadMenu.setMenu(LoadMenu);
+ 
         
         MenuItem cascadeHelpMenu = new MenuItem(menuBar, SWT.CASCADE);
         cascadeHelpMenu.setText("&Help");
@@ -101,15 +111,99 @@ public class MazeWindow extends BasicWindow implements View {
 				FileDialog fd=new FileDialog(shell,SWT.OPEN);
 				fd.setText("open");
 				fd.setFilterPath("C:\\");
-				String[] filterExt = { ".xml"};
+				String[] filterExt = { "*.xml"};
 				fd.setFilterExtensions(filterExt);
-				fd.open();
-				setChanged();
-				notifyObservers("properties");
-				
+				String filename=fd.open();
+				if(filename!=null){
+					setProperties(filename);
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							switch(properties.getUi())
+							{
+								case CLI:
+									timer.cancel();
+									closeCorrect();
+									display.dispose();
+									LastUserCommand= commands.get("exit");
+									setChanged();
+									notifyObservers();
+									GuiMvpDemo demo=new GuiMvpDemo();
+									demo.startProgram(getProperties());
+									break;
+								case GUI:
+									timer.cancel();
+									closeCorrect();
+									display.dispose();
+									LastUserCommand = commands.get("exit");
+									setChanged();
+									notifyObservers();
+									RunGui demoG = new RunGui();
+									demoG.start(getProperties());
+									break;
+								default:
+									return;	
+							}
+							
+						}
+					});
+				}
 			}
 	    	
 	    });
+			item = new MenuItem(fileMenu, SWT.PUSH);
+			item.setText("Write Properties");
+			item.addSelectionListener(new SelectionListener(){
+				
+				@Override
+				public void widgetDefaultSelected(SelectionEvent arg0) {
+					
+					
+					
+				}
+				
+				@Override
+				public void widgetSelected(SelectionEvent arg0) {
+					display.asyncExec(new Runnable() {
+						
+						@Override
+						public void run() {
+							WritePropertiesGUI guiProp=new WritePropertiesGUI();
+							guiProp.writeProperties(display,shell);	
+							properties=Run.readProperties();
+							switch(properties.getUi())
+							{
+								case CLI:
+									timer.cancel();
+									closeCorrect();
+									display.dispose();
+									LastUserCommand= commands.get("exit");
+									setChanged();
+									notifyObservers();
+									GuiMvpDemo demo=new GuiMvpDemo();
+									demo.startProgram(getProperties());
+									break;
+								case GUI:
+									timer.cancel();
+									closeCorrect();
+									display.dispose();
+									LastUserCommand = commands.get("exit");
+									setChanged();
+									notifyObservers();
+									RunGui demoG = new RunGui();
+									demoG.start(getProperties());
+									break;
+								default:
+									return;	
+							}
+							
+						}
+					});
+				
+					
+				}
+				
+			});
 			 item = new MenuItem(fileMenu, SWT.PUSH);
 			    item.setText("Exit");
 			    item.addSelectionListener(new SelectionListener(){
@@ -122,10 +216,13 @@ public class MazeWindow extends BasicWindow implements View {
 
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
+						timer.cancel();
+						closeCorrect();
+						shell.dispose();
 						LastUserCommand= commands.get("exit");
-						if(LastUserCommand==null)
 						setChanged();
 						notifyObservers();
+						
 						
 					}
 			    	
@@ -171,6 +268,9 @@ public class MazeWindow extends BasicWindow implements View {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				MP3Player player = new MP3Player();
+			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				isHint=true;
 				LastUserCommand= commands.get("solve maze");
@@ -197,6 +297,9 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				MP3Player player = new MP3Player();
+			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.play();
 				ArrayList<Object> mazearrayData = new SetMazeData(shell).open();
 				if(mazearrayData!=null){
 				MazeWindow.this.mazeName= (String)mazearrayData.get(0);
@@ -237,6 +340,9 @@ public class MazeWindow extends BasicWindow implements View {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				MP3Player player = new MP3Player();
+			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				LastUserCommand= commands.get("solve maze");
 				isHint =false;
@@ -292,6 +398,22 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			timer = new Timer();
 			timer.scheduleAtFixedRate(timerTask, 0, 50);
+	}
+
+	protected void setProperties(String filename) {
+		
+		FileInputStream in;
+		try {
+			XMLDecoder d;
+			in = new FileInputStream(filename);
+			d=new XMLDecoder(in);
+			properties=(Properties)d.readObject();
+			d.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override
@@ -559,8 +681,7 @@ public class MazeWindow extends BasicWindow implements View {
 
 	@Override
 	public Properties getProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		return properties;
 	}
 }
 	

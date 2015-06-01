@@ -2,13 +2,19 @@
 <java version="1.8.0_40" class="java.beans.XMLDecoder">
  <object class="presenter.Properties">
   <void property="diagonalMovementCost">
-   <double>31.0</double>
+   <double>21.0</double>
   </void>
   <void property="movementCost">
-   <double>12.0</double>
+   <double>21.0</double>
   </void>
   <void property="threadNumber">
-   <int>11</int>
+   <int>12</int>
+  </void>
+  <void property="ui">
+   <object class="java.lang.Enum" method="valueOf">
+    <class>presenter.Properties$UI</class>
+    <string>GUI</string>
+   </object>
   </void>
  </object>
 </java>

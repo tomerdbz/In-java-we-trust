@@ -1,5 +1,8 @@
 package gui;
+import jaco.mp3.player.MP3Player;
+
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -86,6 +89,9 @@ public class SetMazeData extends Dialog {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				MP3Player player = new MP3Player();
+			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.play();
 				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")||!isNumeric(rows.getText())||!isNumeric(cols.getText())||Integer.parseInt(rows.getText())<=0||Integer.parseInt(cols.getText())<0){
 					MessageBox messageBox = new MessageBox(shell,SWT.ERROR|SWT.OK);
 			        messageBox.setText("Error");
@@ -126,6 +132,9 @@ public class SetMazeData extends Dialog {
 	    cancel.setLayoutData(dataCancel);
 	    cancel.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
+	    	  MP3Player player = new MP3Player();
+			    player.addToPlayList(new File("menuselect.mp3"));
+			    player.play();
 	        input = null;
 	    
 	        shell.dispose();
