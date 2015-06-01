@@ -29,6 +29,7 @@ import algorithms.mazeGenerators.Maze;
 public class MazeDisplay extends Composite {
 	int mazeRows;
 	int mazeCols;
+	boolean won=false;
 	CellDisplay[][] mazeData;
 	Character Ch=null;
 	ImageLoader gifs=new ImageLoader(); 
@@ -41,11 +42,19 @@ public class MazeDisplay extends Composite {
 			
 			@Override
 			public void paintControl(PaintEvent arg0) {
-				if(mazeData==null){
+				if(mazeData==null && won==false){
 					int width=parent.getSize().x;
 					int height=parent.getSize().y;
 					ImageData data = new ImageData("Wallpaper.png");
 					arg0.gc.drawImage(new Image(getDisplay(),"Wallpaper.png"),0,0,data.width,data.height,0,0,width,height);
+				}
+				else if(mazeData==null && won==true)
+				{
+					won=false;
+					int width=parent.getSize().x;
+					int height=parent.getSize().y;
+					ImageData data = new ImageData("sonicwon.png");
+					arg0.gc.drawImage(new Image(getDisplay(),"sonicwon"),0,0,data.width,data.height,0,0,width,height);
 				}
 				if(mazeData!=null)
 					for(int i=0;i<mazeData.length;i++)
@@ -142,7 +151,8 @@ public class MazeDisplay extends Composite {
 						 }
 			    }
 				 if(Ch.currentCellX== mazeData.length-1 && Ch.currentCellY == mazeData[0].length-1 && mazeData!=null){
-					 
+					 won=true;
+					 redraw();
 					 getShell().setBackgroundImage(new Image(getDisplay(),"winnericon.png"));
 					 MessageBox messageBox = new MessageBox(getShell(),SWT.ICON_INFORMATION|SWT.OK);
 				        messageBox.setText("Winner");

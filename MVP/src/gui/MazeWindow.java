@@ -560,7 +560,8 @@ public class MazeWindow extends BasicWindow implements View {
 				mazeDisplay.Ch.frameIndex=0;
 				mazeDisplay.mazeData[x-1][y+1].ch=mazeDisplay.Ch;
 				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
-					 
+					 mazeDisplay.won=true;
+					 mazeDisplay.redraw();
 					 shell.setBackgroundImage(new Image(display,"winnericon.png"));
 					 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 				        messageBox.setText("Winner");
@@ -585,7 +586,8 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.Ch.frameIndex=0;
 					mazeDisplay.mazeData[x-1][y-1].ch=mazeDisplay.Ch;
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
-						 
+						 mazeDisplay.won=true;
+						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
 						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 					        messageBox.setText("Winner");
@@ -609,7 +611,8 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.Ch.frameIndex=0;
 					mazeDisplay.mazeData[x+1][y-1].ch=mazeDisplay.Ch;
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
-						 
+						 mazeDisplay.won=true;
+						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
 						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 					        messageBox.setText("Winner");
@@ -634,8 +637,9 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.Ch.frameIndex=0;
 					mazeDisplay.mazeData[x+1][y+1].ch=mazeDisplay.Ch;
 					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
-						 
-						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
+						 mazeDisplay.won=true;
+						 mazeDisplay.redraw();
+						shell.setBackgroundImage(new Image(display,"winnericon.png"));
 						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 					        messageBox.setText("Winner");
 					        messageBox.setMessage("You're the winner! This song is for you <3");
