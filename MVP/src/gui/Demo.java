@@ -1,5 +1,10 @@
 package gui;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import algorithms.mazeGenerators.Cell;
+
 
 public class Demo {
 
@@ -18,28 +23,28 @@ public class Demo {
 		/*Employee e=new Employee();
 		PropertiesDialog<Employee> prop=new PropertiesDialog(shell,e.getClass());
 		prop.open();
-		prop.
+		prop
 		*/
-		/* Display display = new Display();
+		 Display display = new Display();
 		    Shell shell = new Shell(display);
 
-		    ClassInputDialog dlg = new ClassInputDialog(shell,Properties.class);
-		    Properties input = (Properties) dlg.open();
+		    ClassInputDialog dlg = new ClassInputDialog(shell,Cell.class);
+		    Cell input = (Cell) dlg.open();
 		    if (input != null) {
 		      // User clicked OK; set the text into the label
 		      System.out.println(input);
-		      System.out.println(input.getMovement());
-		      System.out.println(input.getMazeGenerator());
-		      System.out.println(input.getMazeSolver());
-		    }*/
+		      //System.out.println(input.getMovement());
+		      //System.out.println(input.getMazeGenerator());
+		      //System.out.println(input.getMazeSolver());
+		    }
 		new WritePropertiesGUI().writeProperties();
 
-		    /*while (!shell.isDisposed()) {
+		    while (!shell.isDisposed()) {
 		      if (!display.readAndDispatch()) {
 		        display.sleep();
 		      }
 		    }
-		    display.dispose();*/
+		    display.dispose();
 		
 	}
 

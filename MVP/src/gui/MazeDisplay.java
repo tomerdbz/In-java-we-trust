@@ -19,10 +19,21 @@ public class MazeDisplay extends Composite {
 	
 	public MazeDisplay(Composite parent, int style) {
 		super(parent, style);
+		mazeData=null;
 		addPaintListener(new PaintListener() { //Presenter should give paintListeners. for debug only!
 			
 			@Override
-			public void paintControl(PaintEvent arg0) {
+			public void paintControl(PaintEvent e) {
+				if(mazeData==null)
+				{
+					int width=getSize().x;
+					int height=getSize().y;
+			        //Rectangle rect = getParent().getBounds();
+			        ImageData data = new ImageData("C:\\Users\\Tomer\\git\\In-java-we-trust\\MVP\\resources\\images\\sonic.png");
+			        e.gc.drawImage(new Image(getDisplay(),data),0,0,data.width,data.height,0,0,width,height);
+
+					
+				}
 				if(mazeData!=null)
 					for(int i=0;i<mazeData.length;i++)
 						for(int j=0;j<mazeData[0].length;j++)

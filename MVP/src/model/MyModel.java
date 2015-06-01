@@ -54,7 +54,7 @@ public class MyModel extends Observable implements Model{
 	/**	Properties defined. see Properties class for more info.
 	 * 
 	 */
-	private Properties prop;
+	private Properties properties;
 	/** Guava Library class - this service allows registered Callables and Runs to define What should be performed once a thread has succeeded. (or failed)
 	 * 
 	 */
@@ -71,74 +71,81 @@ public class MyModel extends Observable implements Model{
 	 * @param prop - Properties for the model. calcs and actions may vary based on this parameter.
 	 * @author Tomer, Alon 
 	 */
+	public MyModel()
+	{
+		loadFromDatabase();
+	}
 	public MyModel(Properties prop)
 	{
-			SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
-			Session session = factory.openSession();
-			Query query = session.createQuery("from model.DBMaze");
-
-			@SuppressWarnings("unchecked")
-			List <DBMaze>list = query.list();
-			Iterator<DBMaze> it=list.iterator();
-			DBMaze dbmaze;
-			while(it.hasNext())
-			{
-				dbmaze=it.next();
-				databaseNames.add(dbmaze.getName());
-				
-				try {
-					byte[] mazeBytes;
-					Blob bMaze=dbmaze.getMaze();
-					int bMazeLength=(int)bMaze.length();
-					mazeBytes=bMaze.getBytes(1, bMazeLength);
-					if(bMazeLength!=bMaze.length())//data loss for really really big mazes - we will get one byte array and then another - then merge.
-					{
-						int diff=(int)(bMaze.length()-(long)bMazeLength);//long= 2*int - will only need to do this once!
-						byte[] mazeBytes2=bMaze.getBytes(bMazeLength, diff);
-						ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-						try {
-							outputStream.write( mazeBytes);
-							outputStream.write( mazeBytes2 );
-							mazeBytes = outputStream.toByteArray( );
-						} catch (IOException e) {
-							setChanged();
-							notifyObservers("error");
-						}
-						
-					}
-					Maze maze = ((SerializableMaze) (SerializationHelper.deserialize(mazeBytes))).getOriginalMaze();
-					generatedMazes.put(dbmaze.getName(), maze);
-					Blob bSolution=dbmaze.getSolution();
-					int bSolutionLength=(int)bSolution.length();
-					byte[] solutionBytes=bSolution.getBytes(1, bSolutionLength);
-					if(bSolutionLength!=bSolution.length())//data loss for really really big mazes - we will get one byte array and then another - then merge.
-					{
-						int diff=(int)(bSolution.length()-(long)bSolutionLength);//long= 2*int - will only need to do this once!
-						byte[] solutionBytes2=bSolution.getBytes(bSolutionLength, diff);
-						
-						ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-						try {
-							outputStream.write( solutionBytes);
-							outputStream.write( solutionBytes2 );
-							solutionBytes = outputStream.toByteArray( );
-						} catch (IOException e) {
-							setChanged();
-							notifyObservers("exit");
-						}
-						
-					}
-					SerializableSolution sol=(SerializableSolution)SerializationHelper.deserialize(solutionBytes);
-					cache.put(maze, sol.getOriginalSolution());
-				} catch (Exception e1) {
-					setChanged();
-					notifyObservers("error");
-				} 
-			}
-			this.prop=prop;
+			loadFromDatabase();
+			this.properties=prop;
 			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
 		
 	}
-	
+	private void loadFromDatabase()
+	{
+		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		Session session = factory.openSession();
+		Query query = session.createQuery("from model.DBMaze");
+
+		@SuppressWarnings("unchecked")
+		List <DBMaze>list = query.list();
+		Iterator<DBMaze> it=list.iterator();
+		DBMaze dbmaze;
+		while(it.hasNext())
+		{
+			dbmaze=it.next();
+			databaseNames.add(dbmaze.getName());
+			
+			try {
+				byte[] mazeBytes;
+				Blob bMaze=dbmaze.getMaze();
+				int bMazeLength=(int)bMaze.length();
+				mazeBytes=bMaze.getBytes(1, bMazeLength);
+				if(bMazeLength!=bMaze.length())//data loss for really really big mazes - we will get one byte array and then another - then merge.
+				{
+					int diff=(int)(bMaze.length()-(long)bMazeLength);//long= 2*int - will only need to do this once!
+					byte[] mazeBytes2=bMaze.getBytes(bMazeLength, diff);
+					ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+					try {
+						outputStream.write( mazeBytes);
+						outputStream.write( mazeBytes2 );
+						mazeBytes = outputStream.toByteArray( );
+					} catch (IOException e) {
+						setChanged();
+						notifyObservers("error");
+					}
+					
+				}
+				Maze maze = ((SerializableMaze) (SerializationHelper.deserialize(mazeBytes))).getOriginalMaze();
+				generatedMazes.put(dbmaze.getName(), maze);
+				Blob bSolution=dbmaze.getSolution();
+				int bSolutionLength=(int)bSolution.length();
+				byte[] solutionBytes=bSolution.getBytes(1, bSolutionLength);
+				if(bSolutionLength!=bSolution.length())//data loss for really really big mazes - we will get one byte array and then another - then merge.
+				{
+					int diff=(int)(bSolution.length()-(long)bSolutionLength);//long= 2*int - will only need to do this once!
+					byte[] solutionBytes2=bSolution.getBytes(bSolutionLength, diff);
+					
+					ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+					try {
+						outputStream.write( solutionBytes);
+						outputStream.write( solutionBytes2 );
+						solutionBytes = outputStream.toByteArray( );
+					} catch (IOException e) {
+						setChanged();
+						notifyObservers("exit");
+					}
+					
+				}
+				SerializableSolution sol=(SerializableSolution)SerializationHelper.deserialize(solutionBytes);
+				cache.put(maze, sol.getOriginalSolution());
+			} catch (Exception e1) {
+				setChanged();
+				notifyObservers("error");
+			} 
+		}
+	}
 	/** This method generates a maze! of course, it checks if the maze name was not asked before - don't try to fool it.
 	 * generating algorithm will be based on the one given at Ct'r by Property.
 	 * @param name - the Maze name given.
@@ -152,10 +159,16 @@ public class MyModel extends Observable implements Model{
 	@Override
 	public void generateMaze(String name,int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal) {
+		if(this.properties==null)
+		{
+			setChanged();
+			notifyObservers("Properties are not set");
+			return;
+		}
 		if(generatedMazes.containsKey(name))
 			return;
 		ListenableFuture<Maze> futureMaze=null;
-		switch(prop.getMazeGenerator()) 
+		switch(properties.getMazeGenerator()) 
 		{
 		case DFS:
 			futureMaze=	executor.submit(new Callable<Maze>() {
@@ -220,6 +233,12 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public void solveMaze(String mazeName) {
+		if(this.properties==null)
+		{
+			setChanged();
+			notifyObservers("Properties are not set");
+			return;
+		}
 		Maze m=generatedMazes.get(mazeName);
 		if(m==null)
 		{
@@ -235,14 +254,14 @@ public class MyModel extends Observable implements Model{
 			return;
 		}
 		ListenableFuture<Solution> futureSolution=null;
-		switch(prop.getMazeSolver())
+		switch(properties.getMazeSolver())
 		{
 		case BFS:
 			futureSolution=executor.submit(new Callable<Solution>() {
 
 				@Override
 				public Solution call() throws Exception {
-					return new BFS().search(new MazeSearch(m,prop.getMovement(),prop.getMovementCost(),prop.getDiagonalMovementCost()));
+					return new BFS().search(new MazeSearch(m,properties.getMovement(),properties.getMovementCost(),properties.getDiagonalMovementCost()));
 				}
 			});
 			break;
@@ -251,7 +270,7 @@ public class MyModel extends Observable implements Model{
 
 				@Override
 				public Solution call() throws Exception {
-					return new AStar(new MazeAirDistance(m.getRowGoal(),m.getColGoal(),prop.getMovementCost())).search(new MazeSearch(m,prop.getMovement(),prop.getMovementCost(),prop.getDiagonalMovementCost()));
+					return new AStar(new MazeAirDistance(m.getRowGoal(),m.getColGoal(),properties.getMovementCost())).search(new MazeSearch(m,properties.getMovement(),properties.getMovementCost(),properties.getDiagonalMovementCost()));
 				}
 			});
 			break;
@@ -260,7 +279,7 @@ public class MyModel extends Observable implements Model{
 
 				@Override
 				public Solution call() throws Exception {
-					return new AStar(new MazeManhattanDistance(m.getRowGoal(),m.getColGoal(),prop.getMovementCost())).search(new MazeSearch(m,prop.getMovement(),prop.getMovementCost(),prop.getDiagonalMovementCost()));
+					return new AStar(new MazeManhattanDistance(m.getRowGoal(),m.getColGoal(),properties.getMovementCost())).search(new MazeSearch(m,properties.getMovement(),properties.getMovementCost(),properties.getDiagonalMovementCost()));
 				}
 			});
 			break;
@@ -336,5 +355,13 @@ public class MyModel extends Observable implements Model{
 		}
 		return names;
 	}
+	public Properties getProperties() {
+		return properties;
+	}
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+		executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(properties.getThreadNumber()));
+	}
+
 
 }

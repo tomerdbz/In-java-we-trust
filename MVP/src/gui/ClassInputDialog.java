@@ -21,34 +21,55 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**	BONUS! A generic Dialog which supplies a form to submit data of every given class - even compatible with classes that contain enums as combo boxes
+ * 	upon pressing ok in the window an instance of the same class that was supplied will be returned 
+ * @author Tomer
+ *
+ */
 public class ClassInputDialog extends Dialog {
+	/**	the generic class
+	 * 
+	 */
 	private Class template;
+	/**	Property Descriptors give me the ability to see what properties the class contains - and has generic functionalities for setters and getters for fields!
+	 * 
+	 */
 	PropertyDescriptor[] descs;
+	/**	I wanna have a robust connection between a property to a text box - that way upon pressing OK I could know what class property was written in it.
+	 * 
+	 */
 	HashMap<PropertyDescriptor,Text> txtMap=new HashMap<PropertyDescriptor,Text>();
+	/**	The bonus demanded that this dialog will support all given classes
+	 * 	but what happens when a class has an enum? a whole new story with combo-boxes and once again I wanna have a connection between the class field enum to the String that was selected in the form.
+	 * 
+	 */
 	HashMap<PropertyDescriptor,String> enumMap=new HashMap<PropertyDescriptor,String>();
-	private String message;
 
-	  private Object input;
+	  /**	This is the reference of the instance I will return.
+	 * 
+	 */
+	private Object input;
 
-	  public ClassInputDialog(Shell parent,Class template) {
+	  /**	Ct'r for people that don't know a thing about SWT.
+	 * @param parent - Shell
+	 * @param template - The Class to create form to
+	 */
+	public ClassInputDialog(Shell parent,Class template) {
 		    this(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL,template);
 		  }
 
-	  public ClassInputDialog(Shell parent, int style,Class template) {
+	  /** Ct'r with SWT style
+	 * @param parent - Shell
+	 * @param style - SWT style
+	 * @param template - The Class to create form to
+	 */
+	public ClassInputDialog(Shell parent, int style,Class template) {
 	    super(parent, style);
 	    this.template=template;
 		descs=PropertyUtils.getPropertyDescriptors(template);
 	    setText("Set Properties");
-	    setMessage("Please enter a value:");
 	  }
 
-	  public String getMessage() {
-	    return message;
-	  }
-
-	  public void setMessage(String message) {
-	    this.message = message;
-	  }
 
 	  public Object getInput() {
 	    return input;
@@ -58,7 +79,10 @@ public class ClassInputDialog extends Dialog {
 	    this.input = input;
 	  }
 
-	  public Object open() {
+	  /**	Here the window layout is set and the main loop event happens. When window closes User's input is returned.
+	 * @return The user's input
+	 */
+	public Object open() {
 	    Shell shell = new Shell(getParent(), getStyle());
 	    shell.setText(getText());
 	    createContents(shell);
@@ -74,7 +98,10 @@ public class ClassInputDialog extends Dialog {
 	    return input;
 	  }
 
-	  private void createContents(final Shell shell) {
+	  /**	Creates Window content and layout - sets Labels, Text boxes and combo boxes nicely.
+	 * @param shell - window's parent
+	 */
+	private void createContents(final Shell shell) {
 	    shell.setLayout(new GridLayout(2, true));
 	    
 	    for(PropertyDescriptor propDesc: descs)
@@ -194,7 +221,11 @@ public class ClassInputDialog extends Dialog {
 
 	    shell.setDefaultButton(ok);
 	  }
-	  private static boolean isNumeric(String str)
+	  /**Helper to know if the text box has a number 
+	 * @param str - The string in the text box.
+	 * @return
+	 */
+	private static boolean isNumeric(String str)
 	  {
 	    NumberFormat formatter = NumberFormat.getInstance();
 	    ParsePosition pos = new ParsePosition(0);

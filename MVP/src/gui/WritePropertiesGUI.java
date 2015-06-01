@@ -12,7 +12,14 @@ import org.eclipse.swt.widgets.Shell;
 
 import presenter.Properties;
 
+/** This class is reponsible to write Properties in a GUI UI.
+ * @author Tomer
+ *
+ */
 public class WritePropertiesGUI {
+	/**	Writes the properties after prompting a window to submit them.
+	 * 
+	 */
 	public void writeProperties()
 	{
 		XMLEncoder e;
@@ -34,7 +41,7 @@ public class WritePropertiesGUI {
 			}
 			
 	    }
-	    
+	    /*
 	  //A check - for debug only!
 
 		XMLDecoder d;
@@ -48,6 +55,6 @@ public class WritePropertiesGUI {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
+	     */
 	}
 }
