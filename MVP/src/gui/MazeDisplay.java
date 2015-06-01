@@ -1,11 +1,17 @@
 package gui;
 
+import jaco.mp3.player.MP3Player;
+
+import java.io.File;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -47,7 +53,7 @@ public class MazeDisplay extends Composite {
 							mazeData[i][j].redraw();
 			}
 		});
-		//Alon
+	
 		this.addKeyListener(new KeyListener(){	
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -142,7 +148,10 @@ public class MazeDisplay extends Composite {
 				        messageBox.setText("Winner");
 				        messageBox.setMessage("You're the winner! This song is for you <3");
 						messageBox.open();
-						//mazeData=null;
+						MP3Player player = new MP3Player();
+					    player.addToPlayList(new File("win.mp3"));
+					    player.play();
+						
 						
 				 }
 				
@@ -178,22 +187,29 @@ public class MazeDisplay extends Composite {
 	}
 	public void displayMaze(Maze m)
 	{
+		MazeDisplay a =this;
+		getDisplay().syncExec(new Runnable() {
+			   public void run() {
+				   if(mazeData!=null)
+				   a.destructMaze();
+				   mazeRows=m.getRows();
+				   mazeCols=m.getCols();
+				   GridLayout layout=new GridLayout(mazeCols, true);
+				   layout.horizontalSpacing=0;
+				   layout.verticalSpacing=0;
+				   setLayout(layout);
+				   mazeData=new CellDisplay[mazeRows][mazeCols];
+				   for(int i=0;i<mazeRows;i++)
+					   for(int j=0;j<mazeCols;j++)
+					   {
+						   mazeData[i][j]=new CellDisplay(a,SWT.NONE);
+						   mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+						   mazeData[i][j].setImage(cellImage(m,i,j));
+					   }
+				   getShell().layout();
+			   }
+			}); 
 		
-		mazeRows=m.getRows();
-		mazeCols=m.getCols();
-		GridLayout layout=new GridLayout(mazeCols, true);
-		layout.horizontalSpacing=0;
-		layout.verticalSpacing=0;
-		setLayout(layout);
-		mazeData=new CellDisplay[mazeRows][mazeCols];
-		for(int i=0;i<mazeRows;i++)
-			for(int j=0;j<mazeCols;j++)
-			{
-				mazeData[i][j]=new CellDisplay(this,SWT.NONE);
-				mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-				mazeData[i][j].setImage(cellImage(m,i,j));
-			}
-		getShell().layout();
 	}
 	//was private
 	public void destructMaze()
@@ -242,6 +258,38 @@ public class MazeDisplay extends Composite {
 		mazeData[i][j].setImageName(str);
 		return new Image(getDisplay(),new ImageData(temp+str));
 		
+	}
+	boolean HasPathRight(int Row,int Col){
+		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(2)=='0';
+		 boolean cond2 =mazeData[Row][Col+1].getImageName().charAt(0)=='0';
+	if(cond1&&cond2)
+		return true;
+	return false;
+		
+	}
+	boolean HasPathLeft(int Row,int Col){
+		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(0)=='0';
+		 boolean cond2 =mazeData[Row][Col-1].getImageName().charAt(2)=='0';
+	if(cond1&&cond2)
+		return true;
+	
+		return false;
+	}
+	boolean HasPathUp(int Row,int Col){
+		
+		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(1)=='0';
+		 boolean cond2 =mazeData[Row-1][Col].getImageName().charAt(3)=='0';
+		 	if(cond1 && cond2)
+		 		return true;
+		return false;
+	}
+	boolean HasPathDown(int Row,int Col){
+		
+		boolean cond1 = mazeData[Row][Col].getImageName().charAt(3)=='0';
+		 boolean cond2 =mazeData[Row+1][Col].getImageName().charAt(1)=='0';	
+		 if(cond1&&cond2)
+			 return true;
+		return false;
 	}
 	//void SetCharacter(Character Ch){
 	//	this.Ch=Ch;

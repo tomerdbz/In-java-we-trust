@@ -68,6 +68,7 @@ public class Presenter implements Observer {
 		}
 
 	}
+	
 	public class SolveMazeCommand implements Command {
 
 		@Override
@@ -86,6 +87,26 @@ public class Presenter implements Observer {
 		}
 
 	}
+	public class MazeExistsCommand implements Command {
+
+		@Override
+		public void doCommand(String arg, String params) {
+			if(m.getMaze(arg)==null)
+				v.receiveData(null);
+			else
+				v.receiveData("1");
+		}
+
+	}
+	public class WritePropertiesCommand implements Command {
+
+		@Override
+		public void doCommand(String arg, String params) {
+			m.setProperties(v.getProperties());
+		}
+
+	}
+	
 	public class ExitCommand implements Command {
 
 		@Override
@@ -114,7 +135,6 @@ public class Presenter implements Observer {
 		commandMap.put("solve maze",new SolveMazeCommand());
 		commandMap.put("display solution",new DisplaySolutionCommand());
 		commandMap.put("exit",new ExitCommand());
-
 		v.setCommands(commandMap);
 		}
 	
@@ -154,7 +174,10 @@ public class Presenter implements Observer {
 					v.displaySolution(m.getSolution(name));
 			}
 			else
-				v.Display("An Error Has Occured.");
+				if(arg1!=null)
+					v.Display("Error: " + arg1.toString());
+				else
+					v.Display("An Error Has Occured.");
 		}
 	}
 	/** Helper for update - checks if Model notified solve

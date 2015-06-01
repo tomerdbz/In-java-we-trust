@@ -1,5 +1,6 @@
 package model;
 
+import presenter.Properties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
@@ -12,5 +13,6 @@ public interface Model {
 	Maze getMaze(String mazeName);
 	void solveMaze(String mazeName);
 	Solution getSolution(String mazeName);
+	void setProperties(Properties prop);
 	void stop();
 }

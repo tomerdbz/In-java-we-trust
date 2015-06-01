@@ -23,6 +23,9 @@ public class Properties implements Serializable {
 	public enum MazeGenerator {
 		DFS,RANDOM
 	};
+	public enum UI{
+		CLI,GUI
+	};
 	/**enum for readability - choose maze solver
 	 * @author Tomer
 	 *
@@ -33,6 +36,7 @@ public class Properties implements Serializable {
 	/** Number of threads that will be executed simultaneously
 	 * 
 	 */
+	private UI ui;
 	private int threadNumber;
 	/**	Which maze solver
 	 * 
@@ -67,6 +71,7 @@ public class Properties implements Serializable {
 	 */
 	public Properties()
 	{
+		this.ui=UI.CLI;
 		this.threadNumber=16;
 		this.mazeSolver=MazeSolver.MANHATTAN_DISTANCE_ASTAR;
 		this.mazeGenerator=MazeGenerator.DFS;
@@ -89,8 +94,9 @@ public class Properties implements Serializable {
 	 * @param movement cost
 	 * @param diagonal movement cost
 	 */
-	public Properties(MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost)
+	public Properties(UI ui, MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost)
 	{
+		this.ui=ui;
 		this.threadNumber=threadNumber;
 		this.mazeSolver=mazeSolver;
 		this.mazeGenerator=mazeGenerator;
@@ -145,6 +151,18 @@ public class Properties implements Serializable {
 	public void setDiagonalMovementCost(double diagonalMovementCost) {
 		this.diagonalMovementCost = diagonalMovementCost;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder str=new StringBuilder("");
+		str.append("Maze Generator: "+ mazeGenerator+"\n");
+		str.append("Maze Solver: " + mazeSolver +"\n");
+		str.append("Movement: " + movement +"\n");
+		str.append("Movement Cost: "+movementCost+"\n");
+		str.append("Diagonal Movement Cost: "+diagonalMovementCost + "\n");
+		str.append("Number of Threads: "+threadNumber + "\n");
+		return str.toString();
+	}
 	/*public int getMazeRows() {
 		return mazeRows;
 	}
@@ -181,4 +199,11 @@ public class Properties implements Serializable {
 	public void setColGoal(int colGoal) {
 		this.colGoal = colGoal;
 	}*/
+	public UI getUi() {
+		return ui;
+	}
+	public void setUi(UI ui) {
+		this.ui = ui;
+	}
+	
 }

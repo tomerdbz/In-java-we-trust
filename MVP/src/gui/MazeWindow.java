@@ -1,13 +1,15 @@
 package gui;
 
+import gui.CellDisplay.Direction;
+import jaco.mp3.player.MP3Player;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -16,16 +18,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Text;
 
 import presenter.Presenter.Command;
+import presenter.Properties;
 import view.View;
-import algorithms.mazeGenerators.DFSMazeGenerator;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
@@ -62,6 +62,7 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			
 		});
+		
 		// TODO Auto-generated method stub
 		shell.setBackgroundImage(new Image(display,"White.jpg"));
 		shell.setLayout(new GridLayout(2,false));
@@ -100,10 +101,11 @@ public class MazeWindow extends BasicWindow implements View {
 				FileDialog fd=new FileDialog(shell,SWT.OPEN);
 				fd.setText("open");
 				fd.setFilterPath("C:\\");
-				String[] filterExt = { ".xml", "*.*" };
+				String[] filterExt = { ".xml"};
 				fd.setFilterExtensions(filterExt);
 				fd.open();
-
+				setChanged();
+				notifyObservers("properties");
 				
 			}
 	    	
@@ -201,6 +203,7 @@ public class MazeWindow extends BasicWindow implements View {
 				MazeWindow.this.rows =(Integer)mazearrayData.get(1);
 				MazeWindow.this.cols=(Integer)mazearrayData.get(2);
 				}
+				//When combinded with tomeriko check if maaze has existed
 				if(MazeWindow.this.mazeName!=null){
 				LastUserCommand= commands.get("generate maze");
 				setChanged();
@@ -273,7 +276,12 @@ public class MazeWindow extends BasicWindow implements View {
 							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length;
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length;
 							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);
-							 mazeDisplay.redraw();
+							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw();
+							 System.out.println(rows+" "+ cols);
+							 mazeDisplay.mazeData[rows-1][cols-1].redraw();
+							 
+							 //mazeDisplay.redraw();
+							 HasBeenDragged();
 							}
 							
 						}
@@ -283,7 +291,7 @@ public class MazeWindow extends BasicWindow implements View {
 			};
 			
 			timer = new Timer();
-			timer.scheduleAtFixedRate(timerTask, 0, 100);
+			timer.scheduleAtFixedRate(timerTask, 0, 50);
 	}
 
 	@Override
@@ -316,7 +324,7 @@ public class MazeWindow extends BasicWindow implements View {
 	@Override
 	public void displayMaze(Maze m) {//you made mazeDisplay a data member
 		
-		if(mazeDisplay.mazeData!=null){
+		/*if(mazeDisplay.mazeData!=null){
 			for(int i=0;i<mazeDisplay.mazeData.length;i++)
 			{
 				
@@ -325,15 +333,19 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.mazeData[i][j].dispose();
 				}
 			}
-		}
-		   mazeDisplay.displayMaze(m);
-		   mazeDisplay.Ch = new Character(mazeDisplay.mazeData[0][0],SWT.FILL);
-			mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-			mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch;
-			mazeDisplay.mazeData[0][0].redraw();
-			mazeDisplay.layout();
-			mazeDisplay.forceFocus();
-			
+		}*/
+		display.syncExec(new Runnable() {
+			   public void run() {
+				   mazeDisplay.displayMaze(m);
+				   mazeDisplay.Ch = new Character(mazeDisplay.mazeData[0][0],SWT.FILL);
+				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
+				   mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch;
+				   mazeDisplay.mazeData[0][0].redraw();
+				   mazeDisplay.layout();
+				   mazeDisplay.forceFocus();
+			    
+			   }
+			}); 
 			
 		
 	}
@@ -393,11 +405,165 @@ public class MazeWindow extends BasicWindow implements View {
 				}
 			}
 			mazeDisplay.mazeData[x][y].Hint=img;
+			/*if(mazeDisplay.mazeData!=null){
+			for(int i=0;i<mazeDisplay.mazeData.length;i++)
+				for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
+					mazeDisplay.mazeData[i][j].redraw();
+			}*/
+			
 		}
+		display.syncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				mazeDisplay.redraw();
 				
+			}
+		});
+			
+		
+			
+		}
+	public void HasBeenDragged(){
+		if(mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].ch==null){
+			Direction dir = mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].dir;
+			int x = mazeDisplay.Ch.currentCellX;
+			int y = mazeDisplay.Ch.currentCellY;
+			if(dir == Direction.UpRight){
+				if(x-1 >=0 && y+1<= mazeDisplay.mazeData[0].length-1)
+				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y)))
+				{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x-1][y+1],SWT.FILL);
+		    	mazeDisplay.Ch.currentCellX=x-1;
+		    	mazeDisplay.Ch.currentCellY=y+1;
+				mazeDisplay.Ch.frameIndex=0;
+				mazeDisplay.mazeData[x-1][y+1].ch=mazeDisplay.Ch;
+				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+					 
+					 shell.setBackgroundImage(new Image(display,"winnericon.png"));
+					 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+				        messageBox.setText("Winner");
+				        messageBox.setMessage("You're the winner! This song is for you <3");
+						messageBox.open();
+						MP3Player player = new MP3Player();
+					    player.addToPlayList(new File("win.mp3"));
+					    player.play();
+						
+				 }
+				return;
+				}
+			}
+			else
+				
+			if(dir == Direction.UpLeft){
+					if(x-1 >=0 && y-1>=0)
+					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathUp(x, y-1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathLeft(x-1, y)))
+					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x-1][y-1],SWT.FILL);
+			    	mazeDisplay.Ch.currentCellX=x-1;
+			    	mazeDisplay.Ch.currentCellY=y-1;
+					mazeDisplay.Ch.frameIndex=0;
+					mazeDisplay.mazeData[x-1][y-1].ch=mazeDisplay.Ch;
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+						 
+						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
+						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					        messageBox.setText("Winner");
+					        messageBox.setMessage("You're the winner! This song is for you <3");
+							messageBox.open();
+							MP3Player player = new MP3Player();
+						    player.addToPlayList(new File("win.mp3"));
+						    player.play();
+							
+					 }
+					return;
+					}
+			}
+			else
+			if(dir == Direction.DownLeft){
+				if(x+1 <=mazeDisplay.mazeData.length-1 && y-1>=0)
+					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathDown(x, y-1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathLeft(x+1, y)))
+					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x+1][y-1],SWT.FILL);
+			    	mazeDisplay.Ch.currentCellX=x+1;
+			    	mazeDisplay.Ch.currentCellY=y-1;
+					mazeDisplay.Ch.frameIndex=0;
+					mazeDisplay.mazeData[x+1][y-1].ch=mazeDisplay.Ch;
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+						 
+						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
+						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					        messageBox.setText("Winner");
+					        messageBox.setMessage("You're the winner! This song is for you <3");
+							messageBox.open();
+							MP3Player player = new MP3Player();
+						    player.addToPlayList(new File("win.mp3"));
+						    player.play();
+							
+					 }
+					return;
+					}
+				
+			}
+			else
+			if(dir == Direction.DownRight){
+				if(x+1 <=mazeDisplay.mazeData.length-1 && y+1<=mazeDisplay.mazeData[0].length-1)
+					if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathDown(x, y+1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathRight(x+1, y)))
+					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x+1][y+1],SWT.FILL);
+			    	mazeDisplay.Ch.currentCellX=x+1;
+			    	mazeDisplay.Ch.currentCellY=y+1;
+					mazeDisplay.Ch.frameIndex=0;
+					mazeDisplay.mazeData[x+1][y+1].ch=mazeDisplay.Ch;
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+						 
+						 shell.setBackgroundImage(new Image(display,"winnericon.png"));
+						 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+					        messageBox.setText("Winner");
+					        messageBox.setMessage("You're the winner! This song is for you <3");
+							messageBox.open();
+							MP3Player player = new MP3Player();
+						    player.addToPlayList(new File("win.mp3"));
+						    player.play();
+							
+					 }
+					return;
+					}
+			}
+			
+				mazeDisplay.mazeData[x][y].ch=mazeDisplay.Ch;
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 		}
 	}
+
+	@Override
+	public void receiveData(String data) {
+		if(data==null)
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
+
+	@Override
+	public Properties getProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+	
 	
 
 

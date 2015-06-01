@@ -5,6 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import presenter.Properties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 
@@ -120,6 +121,16 @@ public class MyView extends Observable implements View,Observer {
 			}
 		}
 		
+	}
+	@Override
+	public void receiveData(String data) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public Properties getProperties() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

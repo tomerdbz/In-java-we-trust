@@ -54,14 +54,14 @@ public class Character extends Canvas {
 		
 		
 		
-		this.addDragDetectListener(new DragDetectListener(){
+		/*this.addDragDetectListener(new DragDetectListener(){
 
 			@Override
 			public void dragDetected(DragDetectEvent arg0) {
 			
 					System.out.println("what");
 			}	
-			});
+			});*/
 		
 		
 		/*this.addMouseWheelListener(new MouseWheelListener(){
@@ -160,12 +160,12 @@ public class Character extends Canvas {
 	*/
 	}
 
-	protected void removeall() {
+	/*protected void removeall() {
 		if(Redraw){
 		this.redraw();
 		this.update();
 		}
 		
-	}
+	}*/
 	
 }

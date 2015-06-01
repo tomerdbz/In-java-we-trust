@@ -86,7 +86,7 @@ public class SetMazeData extends Dialog {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")){
+				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")||!isNumeric(rows.getText())||!isNumeric(cols.getText())||Integer.parseInt(rows.getText())<=0||Integer.parseInt(cols.getText())<0){
 					MessageBox messageBox = new MessageBox(shell,SWT.ERROR|SWT.OK);
 			        messageBox.setText("Error");
 			        messageBox.setMessage("Maze data has  not been accepted!");
@@ -133,5 +133,12 @@ public class SetMazeData extends Dialog {
 	    });
 
 	 
+	  }
+	  private  boolean isNumeric(String str)
+	  {
+	    NumberFormat formatter = NumberFormat.getInstance();
+	    ParsePosition pos = new ParsePosition(0);
+	    formatter.parse(str, pos);
+	    return str.length() == pos.getIndex();
 	  }
 }
