@@ -25,6 +25,7 @@ public class MyView extends Observable implements View,Observer {
 	public MyView(BufferedReader in, PrintWriter out)
 	{
 		this.cl=new MVPRunnableCli(in,out);
+		cl.addObserver(this);
 	}
 	/**
 	 * This funcion sets the HashMap that links between names of commands

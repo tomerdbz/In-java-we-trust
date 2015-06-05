@@ -1,11 +1,10 @@
-package gui;
+package boot;
 
-import java.beans.XMLDecoder;
+import gui.ClassInputDialog;
+
 import java.beans.XMLEncoder;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;

@@ -1,15 +1,11 @@
 package gui;
 import jaco.mp3.player.MP3Player;
 
-import java.beans.PropertyDescriptor;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,54 +13,67 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
+/**
+ * 
+ * @author Tomer,Alon
+ * a class in which we will enter data about the maze
+ * extends Dialog
+ *
+ */
 public class SetMazeData extends Dialog {
-
-	  private ArrayList<Object> input; //instead of object write the type you want to return
+		/**
+		 * conatins information about the maze
+		 */
+	  private ArrayList<Object> input; 
 
 	  public SetMazeData(Shell parent) {
 		    this(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		  }
-
+	  /**
+	   * constructor
+	   */
 	  public SetMazeData(Shell parent, int style) {
 	    super(parent, style);
 	  }
 
-
+	  /**
+	   * getter
+	   * @return returs data about maze
+	   */
 	  public ArrayList<Object> getInput() {
 	    return input;
 	  }
-
+	  /**
+	   * setter of the mazedata
+	   * @param input data about the maze
+	   */
 	  public void setInput(ArrayList<Object> input) {
 	    this.input = input;
 	  }
 
 	  public ArrayList<Object> open() {
 	    Shell shell = new Shell(getParent(), getStyle());
-	    shell.setText("Maze Generations");
+	    shell.setText("Maze Generations"); //create the window and its text
 	    createContents(shell);
 	    shell.pack();
 	    shell.open();
 	    Display display = getParent().getDisplay();
-	    while (!shell.isDisposed()) {
+	    while (!shell.isDisposed()) { //same idea as basic window
 	      if (!display.readAndDispatch()) {
 	        display.sleep();
 	      }
 	    }
-	    //display.dispose();
 	    return input;
 	  }
 
-	  private void createContents(final Shell shell) {
-	    shell.setLayout(new GridLayout(2, true));
-	    //set text boxes and labels below. example as a comment.    
+	  private void createContents(final Shell shell) { //text boxes for data
+	    shell.setLayout(new GridLayout(2, true));    
 	    Label nameL = new Label(shell, SWT.NONE);
 		nameL.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,2,1));
 	    nameL.setText("Name of maze");
@@ -90,15 +99,15 @@ public class SetMazeData extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
-			    player.play();
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3")); //play sound
+			    player.play(); //checks if data is not ok
 				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")||!isNumeric(rows.getText())||!isNumeric(cols.getText())||Integer.parseInt(rows.getText())<=0||Integer.parseInt(cols.getText())<0){
 					MessageBox messageBox = new MessageBox(shell,SWT.ERROR|SWT.OK);
 			        messageBox.setText("Error");
 			        messageBox.setMessage("Maze data has  not been accepted!");
 					messageBox.open();
 				}
-				else{
+				else{ //if data is ok
 					input = new ArrayList<Object>();
 				input.add(name.getText());
 				input.add(Integer.parseInt(rows.getText()));
@@ -113,19 +122,7 @@ public class SetMazeData extends Dialog {
 			}
 			   
 		   });
-	  /*  Button ok = new Button(shell, SWT.PUSH);
-	    ok.setText("OK");
-	    GridData dataOK = new GridData(GridData.FILL_HORIZONTAL);
-	    ok.setLayoutData(dataOK);
-	    ok.addSelectionListener(new SelectionAdapter() {
-	      public void widgetSelected(SelectionEvent event) {
-	        //what should happen when pressing ok
-		input=//get text boxes data gather and save here.
-	  		
-	        shell.close();
-	      }
-	    });*/
-
+	   //cancel insertion of data
 	    Button cancel = new Button(shell, SWT.PUSH);
 	    cancel.setText("Cancel");
 	    GridData dataCancel = new GridData(GridData.FILL_HORIZONTAL);
@@ -133,7 +130,7 @@ public class SetMazeData extends Dialog {
 	    cancel.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  MP3Player player = new MP3Player();
-			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3")); //play audio
 			    player.play();
 	        input = null;
 	    
@@ -143,6 +140,11 @@ public class SetMazeData extends Dialog {
 
 	 
 	  }
+	  /**'
+	   * 
+	   * @param str a string of some sort
+	   * @return true if numeric if not false
+	   */
 	  private  boolean isNumeric(String str)
 	  {
 	    NumberFormat formatter = NumberFormat.getInstance();

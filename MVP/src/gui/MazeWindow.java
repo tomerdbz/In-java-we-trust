@@ -4,13 +4,9 @@ import gui.CellDisplay.Direction;
 import jaco.mp3.player.MP3Player;
 
 import java.beans.XMLDecoder;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,33 +26,76 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
-import boot.GuiMvpDemo;
-import boot.Run;
-import boot.RunGui;
 import presenter.Presenter.Command;
-import presenter.Presenter;
 import presenter.Properties;
-import view.MyView;
 import view.View;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
-
+import boot.RunCLI;
+import boot.Run;
+import boot.RunGUI;
+import boot.WritePropertiesGUI;
+/**
+ * 
+ * @author Alon,Tomer
+ * This class is an extension of the basic windows and is the main window of the program
+ * it is also an implementation of the view as part of the MVP system
+ *
+ */
 public class MazeWindow extends BasicWindow implements View {
-
+	/**
+	 * a hash map which is safe to work with threads containing string
+	 * and there matching command
+	 */
 	protected ConcurrentHashMap<String, presenter.Presenter.Command>  commands;
+	/**
+	 * last command that has been used in the mvp system
+	 */
 	protected Command LastUserCommand =null;
+	/**
+	 * an instance of mazeDisplay which represents the maze
+	 */
 	MazeDisplay mazeDisplay;
+	/**
+	 * properties of the maze
+	 * Thread pools Random maze generator or dfs and so...
+	 */
 	Properties properties;
+	/**
+	 * True if we request a hint
+	 * False if we request a full solution
+	 */
 	Boolean isHint;
+	/**
+	 * name of the maze
+	 */
 	String mazeName=null;
+	/**
+	 * number of cols in the maze
+	 */
 	int cols=0;
+	/**
+	 * number of rows in the maze
+	 */
 	int rows =0;
+	/**
+	 * Represents a timer
+	 */
 	Timer timer;
+	/**
+	 * timer task for the thread that will render our animation
+	 */
 	TimerTask timerTask;
-	boolean dataRecieved=false;
+	/**
+	 * 
+	 */
+	/**
+	 * true if the data we sent already exists in the database
+	 */
+	boolean dataRecieved=false; 
 	public MazeWindow(String title, int width, int height) {
 		super(title, width, height);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
@@ -71,33 +110,31 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("exit");
 				setChanged();
 				notifyObservers();
-				System.out.println("been here");
 				
 			}
 			
 		});
-		
-		// TODO Auto-generated method stub
+		//sets the background image to white
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
-		shell.setLayout(new GridLayout(2,false));
-		shell.setText("Maze Generations");
-		
+		shell.setLayout(new GridLayout(3,false));
+		shell.setText("Maze Generations"); //sets the text of window
+		//creates a tool bar
 		Menu menuBar = new Menu(shell, SWT.BAR);
-		
+		//creates a file category in toolbar
         MenuItem cascadeFileMenu = new MenuItem(menuBar, SWT.CASCADE);
         cascadeFileMenu.setText("&File");
         Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
         cascadeFileMenu.setMenu(fileMenu);
         
  
-        
+        //creates a help category in toolbar
         MenuItem cascadeHelpMenu = new MenuItem(menuBar, SWT.CASCADE);
         cascadeHelpMenu.setText("&Help");
         Menu HelpMenu = new Menu(shell, SWT.DROP_DOWN);
         cascadeHelpMenu.setMenu(HelpMenu);
         
       
-        
+        //add item to file menu open properties
 		MenuItem item = new MenuItem(fileMenu, SWT.PUSH);
 			item.setText("Open Properties");
 			item.addSelectionListener(new SelectionListener(){
@@ -109,12 +146,12 @@ public class MazeWindow extends BasicWindow implements View {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				FileDialog fd=new FileDialog(shell,SWT.OPEN);
+				FileDialog fd=new FileDialog(shell,SWT.OPEN); //opens a dialog box in which we can select a xml file and load it
 				fd.setText("open");
 				fd.setFilterPath("C:\\");
 				String[] filterExt = { "*.xml"};
 				fd.setFilterExtensions(filterExt);
-				String filename=fd.open();
+				String filename=fd.open(); //choose the file
 				if(filename!=null){
 					setProperties(filename);
 					display.asyncExec(new Runnable() {
@@ -122,24 +159,24 @@ public class MazeWindow extends BasicWindow implements View {
 						public void run() {
 							switch(properties.getUi())
 							{
-								case CLI:
-									timer.cancel();
-									closeCorrect();
-									display.dispose();
+								case CLI: //if the properties calls for CLI
+									timer.cancel(); //cancel the timer task
+									closeCorrect(); //dispose all data
+									display.dispose(); //dispose display
 									LastUserCommand= commands.get("exit");
 									setChanged();
-									notifyObservers();
-									GuiMvpDemo demo=new GuiMvpDemo();
+									notifyObservers();//exit correctly
+									RunCLI demo=new RunCLI(); //call for a function that works with cli
 									demo.startProgram(getProperties());
 									break;
 								case GUI:
-									timer.cancel();
-									closeCorrect();
+									timer.cancel(); //if the properties call for gui
+									closeCorrect();// dispose all and close timer task
 									display.dispose();
-									LastUserCommand = commands.get("exit");
+									LastUserCommand = commands.get("exit"); 
 									setChanged();
-									notifyObservers();
-									RunGui demoG = new RunGui();
+									notifyObservers();//exit correctly
+									RunGUI demoG = new RunGUI(); //calls for a function that recreates a gui window
 									demoG.start(getProperties());
 									break;
 								default:
@@ -152,6 +189,7 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 	    	
 	    });
+			//new item to file menu
 			item = new MenuItem(fileMenu, SWT.PUSH);
 			item.setText("Write Properties");
 			item.addSelectionListener(new SelectionListener(){
@@ -168,7 +206,7 @@ public class MazeWindow extends BasicWindow implements View {
 					display.asyncExec(new Runnable() {
 						
 						@Override
-						public void run() {
+						public void run() {//this function works on the same basis as open Properties the only difference is the source of the Properties data here we recieve it directly from the user
 							WritePropertiesGUI guiProp=new WritePropertiesGUI();
 							guiProp.writeProperties(display,shell);	
 							properties=Run.readProperties();
@@ -181,7 +219,7 @@ public class MazeWindow extends BasicWindow implements View {
 									LastUserCommand= commands.get("exit");
 									setChanged();
 									notifyObservers();
-									GuiMvpDemo demo=new GuiMvpDemo();
+									RunCLI demo=new RunCLI();
 									demo.startProgram(getProperties());
 									break;
 								case GUI:
@@ -191,7 +229,7 @@ public class MazeWindow extends BasicWindow implements View {
 									LastUserCommand = commands.get("exit");
 									setChanged();
 									notifyObservers();
-									RunGui demoG = new RunGui();
+									RunGUI demoG = new RunGUI();
 									demoG.start(getProperties());
 									break;
 								default:
@@ -205,6 +243,7 @@ public class MazeWindow extends BasicWindow implements View {
 				}
 				
 			});
+			//new item for file menu
 			 item = new MenuItem(fileMenu, SWT.PUSH);
 			    item.setText("Exit");
 			    item.addSelectionListener(new SelectionListener(){
@@ -217,7 +256,7 @@ public class MazeWindow extends BasicWindow implements View {
 
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
-						timer.cancel();
+						timer.cancel(); //exits correctly out of the program
 						closeCorrect();
 						shell.dispose();
 						LastUserCommand= commands.get("exit");
@@ -228,6 +267,7 @@ public class MazeWindow extends BasicWindow implements View {
 					}
 			    	
 			    });
+			    //a new item in the help menu prints a msg box telling the user some details about us:)
 			    item = new MenuItem(HelpMenu, SWT.PUSH);
 			    item.setText("About");
 			    item.addSelectionListener(new SelectionListener(){
@@ -247,18 +287,16 @@ public class MazeWindow extends BasicWindow implements View {
 			    });
 			shell.setMenuBar(menuBar);
 	    
-	   
-		//Character a = new Character(this.shell,SWT.FILL);
-	//	a.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,2,2));
+	   //buttons for generate maze
 		Button generateButton=new Button(shell,SWT.PUSH);
 		generateButton.setText("Generate Maze");
 		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
-		
-		//MazeDisplay mazeDisplay=new MazeDisplay(shell, SWT.NONE);
-		 //  mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,2));
+			//button that solves the maze
 		   Button clueButton=new Button(shell,SWT.PUSH);
 		   clueButton.setText("Help me solve this!");
 		   clueButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
+		   Button solveMaze = new Button (shell ,SWT.PUSH);
+		   solveMaze.setText("Solve the maze I give up");
 		   clueButton.addSelectionListener(new SelectionListener(){
 
 			@Override
@@ -269,13 +307,13 @@ public class MazeWindow extends BasicWindow implements View {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				MP3Player player = new MP3Player();
+				MP3Player player = new MP3Player(); //selected button music starts playing
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
-				isHint=true;
+				isHint=true; //telling us its only a hint
 				LastUserCommand= commands.get("solve maze");
-				setChanged();
+				setChanged(); //mvp solve maze
 				notifyObservers(MazeWindow.this.mazeName);
 				for(int i=0; i<mazeDisplay.mazeRows;i++)
 					for(int j=0;j<mazeDisplay.mazeCols;j++){
@@ -284,7 +322,7 @@ public class MazeWindow extends BasicWindow implements View {
 				mazeDisplay.redraw();
 				mazeDisplay.forceFocus();
 				}
-				else{
+				else{ //if there is no maze to be solved error
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("No maze to solve");
@@ -298,30 +336,28 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MP3Player player = new MP3Player();
+				MP3Player player = new MP3Player(); //play sound
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
-				ArrayList<Object> mazearrayData = new SetMazeData(shell).open();
-				if(mazearrayData!=null){
-				MazeWindow.this.mazeName= (String)mazearrayData.get(0);
-				//MazeWindow.this.rows =(Integer)mazearrayData.get(1);
-				//MazeWindow.this.cols=(Integer)mazearrayData.get(2);
+				ArrayList<Object> mazearrayData = new SetMazeData(shell).open(); //set Data of maze in a different window
+				if(mazearrayData!=null){ //if data has been accepted 
+				MazeWindow.this.mazeName= (String)mazearrayData.get(0); //take the name of the maze
 				}
 				LastUserCommand= commands.get("maze exists");
-			    setChanged();
-				notifyObservers(MazeWindow.this.mazeName);
-				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved){
-					MazeWindow.this.rows =(Integer)mazearrayData.get(1);
-					MazeWindow.this.cols=(Integer)mazearrayData.get(2);
-					mazeDisplay.setVisible(true);
-					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
+			    setChanged(); //check if maze already exists
+				notifyObservers(MazeWindow.this.mazeName); 
+				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved){ //if maze doesnt exist create a new one
+					MazeWindow.this.rows =(Integer)mazearrayData.get(1); //takes the info about rows
+					MazeWindow.this.cols=(Integer)mazearrayData.get(2); //takes the info about cols
+					mazeDisplay.setVisible(true); //makes sure the mazeDisplay is visible
+					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg")); //sets Background images
 				LastUserCommand= commands.get("generate maze");
 				setChanged();
 				String mazeData= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
 				System.out.println(mazeData);
-				notifyObservers(mazeData);
+				notifyObservers(mazeData); //passses data to generate maze in MVP System
 				}
-				else{
+				else{ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("An error has occureed");
@@ -336,8 +372,8 @@ public class MazeWindow extends BasicWindow implements View {
 				
 			}
 		});
-		   Button solveMaze = new Button (shell ,SWT.PUSH);
-		   solveMaze.setText("Solve the maze I give up");
+		   //new button that solves the entire maze same concept as hint
+		   
 		   solveMaze.addSelectionListener(new SelectionListener(){
 
 			@Override
@@ -348,21 +384,21 @@ public class MazeWindow extends BasicWindow implements View {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
+			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3")); //play sound
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				LastUserCommand= commands.get("solve maze");
 				isHint =false;
-				setChanged();
+				setChanged(); //solve the maze
 				notifyObservers(MazeWindow.this.mazeName);
 				for(int i=0; i<mazeDisplay.mazeRows;i++)
 					for(int j=0;j<mazeDisplay.mazeCols;j++){
 						mazeDisplay.mazeData[i][j].redraw();
 					}
-				mazeDisplay.redraw();
+				mazeDisplay.redraw(); //redraw maze
 				mazeDisplay.forceFocus();
 				}
-				else{
+				else{ //if there is no maze to solve
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("No maze to solve");
@@ -371,11 +407,12 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			   
 		   });
+		   //creates an instance of mazeDisplay
 		   mazeDisplay=new MazeDisplay(shell, SWT.NONE);
-		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,2,2));
+		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,3,1));
 			//mazeDisplay.setVisible(false);
 		
-		   
+		   //timer task to render 
 		  timerTask = new TimerTask() {
 				
 				@Override
@@ -386,15 +423,12 @@ public class MazeWindow extends BasicWindow implements View {
 						@Override
 						public void run() {
 							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed() ){
-							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length;
-							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length;
+							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length; //next frame in gifs
+							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);
-							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw();
-							 System.out.println(rows+" "+ cols);
-							 mazeDisplay.mazeData[rows-1][cols-1].redraw();
-							 
-							 //mazeDisplay.redraw();
-							 HasBeenDragged();
+							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
+							 mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell
+							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
 						}
@@ -404,10 +438,10 @@ public class MazeWindow extends BasicWindow implements View {
 			};
 			
 			timer = new Timer();
-			timer.scheduleAtFixedRate(timerTask, 0, 50);
+			timer.scheduleAtFixedRate(timerTask, 0, 50); //ever 0.05 seconds render display
 	}
 
-	protected void setProperties(String filename) {
+	protected void setProperties(String filename) {//sets properties from a certain file
 		
 		FileInputStream in;
 		try {
@@ -422,25 +456,37 @@ public class MazeWindow extends BasicWindow implements View {
 		}
 		
 	}
-
+	/**
+	 * starts the MVP system
+	 */
 	@Override
-	public void start() {
+	public void start() { 
 		
 		this.run();
 		
 	}
-
+	/**
+	 * 
+	 * @param commands a hash map with all the commands
+	 * initialize our hash map with the commands
+	 */
 	@Override
 	public void setCommands(ConcurrentHashMap<String, Command> commands) {
 		this.commands=commands;
 		
 	}
-
+	/**
+	 * 
+	 * @return last user Command we used
+	 */
 	@Override
 	public Command getUserCommand() {
 		return this.LastUserCommand;
 	}
-
+	/**
+	 * display string s
+	 * @param s string
+ 	 */
 	@Override
 	public void Display(String s) {
 		MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
@@ -449,28 +495,21 @@ public class MazeWindow extends BasicWindow implements View {
 		messageBox.open();
 		
 	}
-
+	/**
+	 * display a maze in a gui way
+	 * @param m
+	 */
 	@Override
-	public void displayMaze(Maze m) {//you made mazeDisplay a data member
-		
-		/*if(mazeDisplay.mazeData!=null){
-			for(int i=0;i<mazeDisplay.mazeData.length;i++)
-			{
-				
-				for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
-				{		 
-					mazeDisplay.mazeData[i][j].dispose();
-				}
-			}
-		}*/
+	public void displayMaze(Maze m) {
+	
 		display.syncExec(new Runnable() {
 			   public void run() {
 				   mazeDisplay.displayMaze(m);
 				   mazeDisplay.Ch = new Character(mazeDisplay.mazeData[0][0],SWT.FILL);
 				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-				   mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch;
+				   mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch; //set character to the begining of the maze
 				   mazeDisplay.mazeData[0][0].redraw();
-				   mazeDisplay.layout();
+				   mazeDisplay.layout(); //draw all the things needed
 				   mazeDisplay.forceFocus();
 			    
 			   }
@@ -478,6 +517,9 @@ public class MazeWindow extends BasicWindow implements View {
 			
 		
 	}
+	/**
+	 * disposes all data of the maze
+	 */
 	public void closeCorrect(){
 		if(mazeDisplay.mazeData!=null){
 		for(int i=0;i<mazeDisplay.mazeData.length;i++)
@@ -502,43 +544,52 @@ public class MazeWindow extends BasicWindow implements View {
 		}
 		mazeDisplay.dispose();
 	}
-
+	/**
+	 * display solution
+	 * @param s is the solution
+	 * we can either show a full solution or just a hint
+	 */
 	@Override
 	public void displaySolution(Solution s) {
 		String Solution = s.toString().substring(9);
 		String []path = Solution.split("	");
-		Image img = new Image(display,".\\resources\\images\\ring.png");
+		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
 		if(!isHint){
 		for(int i=0;i<path.length-1;i++){
 			String []indexes = path[i].split(",");
 			int xt=Integer.parseInt(indexes[0]);
 			int yt=Integer.parseInt(indexes[1]);	
-				mazeDisplay.mazeData[xt][yt].Hint=img;
+				mazeDisplay.mazeData[xt][yt].Hint=img; //put hints all over the solutions path
 			}
 	}
 		else{
-			int min=(Math.abs(mazeDisplay.Ch.currentCellX-(path[0].charAt(0)-48)) + Math.abs(mazeDisplay.Ch.currentCellY-(path[0].charAt(2)-48)));
+			int min=(Math.abs(mazeDisplay.Ch.currentCellX) + Math.abs(mazeDisplay.Ch.currentCellY));
 			String []indexes;
 			int x=0;
-			int y=0;
-			for(int i=0;i<path.length-1;i++){
+			int y=0; //puts hints on the maze
+			for(int i=0;i<path.length-2;i++){
 				indexes = path[i].split(",");
 				int xt=Integer.parseInt(indexes[0]);
 				int yt=Integer.parseInt(indexes[1]);
-				int temp=(Math.abs(mazeDisplay.Ch.currentCellX-(xt)) + Math.abs(mazeDisplay.Ch.currentCellY-(yt)));
-				if(temp<min){
+				int temp=(Math.abs(mazeDisplay.Ch.currentCellX-(xt)) + Math.abs(mazeDisplay.Ch.currentCellY-(yt))); //caclulates minimal differnce between a hint and the character
+				if(temp!=0 && temp<min){
 					temp= min;
 					x=xt;
-					y=yt;;
+					y=yt;
 					
 				}
 			}
-			mazeDisplay.mazeData[x][y].Hint=img;
-			/*if(mazeDisplay.mazeData!=null){
-			for(int i=0;i<mazeDisplay.mazeData.length;i++)
-				for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
-					mazeDisplay.mazeData[i][j].redraw();
-			}*/
+			final int dx=x;
+			final int dy=y;
+			display.asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					mazeDisplay.mazeData[dx][dy].Hint=img;
+					mazeDisplay.mazeData[dx][dy].redraw(); //redraw the hint
+				}
+			});
+			
 			
 		}
 		display.syncExec(new Runnable() {
@@ -553,29 +604,29 @@ public class MazeWindow extends BasicWindow implements View {
 		
 			
 		}
+	/**
+	 * Checks if character has been dragged by mouse and handles it
+	 */
 	public void HasBeenDragged(){
-		if(mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].ch==null){
-			Direction dir = mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].dir;
-			int x = mazeDisplay.Ch.currentCellX;
-			int y = mazeDisplay.Ch.currentCellY;
-			if(dir == Direction.UpRight){
-				if(x-1 >=0 && y+1<= mazeDisplay.mazeData[0].length-1)
-				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y)))
+		if(mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].ch==null){ //if it has been dragged
+			Direction dir = mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].dir; //get direction of drag
+			int x = mazeDisplay.Ch.currentCellX; //currenct row
+			int y = mazeDisplay.Ch.currentCellY; //current col 
+			//all ifs are alike so there will be one example 
+			if(dir == Direction.UpRight){ //direction upright
+				if(x-1 >=0 && y+1<= mazeDisplay.mazeData[0].length-1) //not out of bounds
+				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y))) //check if we have path to that location
 				{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x-1][y+1],SWT.FILL);
-		    	mazeDisplay.Ch.currentCellX=x-1;
+		    	mazeDisplay.Ch.currentCellX=x-1;// if yes we put the character in that new location
 		    	mazeDisplay.Ch.currentCellY=y+1;
 				mazeDisplay.Ch.frameIndex=0;
 				mazeDisplay.mazeData[x-1][y+1].ch=mazeDisplay.Ch;
-				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
-					 mazeDisplay.won=true;
-					 mazeDisplay.redraw();
-					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
-				//	 MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-				  //      messageBox.setText("Winner");
-				     //   messageBox.setMessage("You're the winner! This song is for you <3");
-					//	messageBox.open();
+				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){ //if we have reached goal
+					 mazeDisplay.won=true; //signal we won
+					 mazeDisplay.redraw(); 
+					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png")); //background for winning
 						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3")); //play sound
 					    player.play();
 						
 				 }
@@ -660,7 +711,7 @@ public class MazeWindow extends BasicWindow implements View {
 					return;
 					}
 			}
-			
+				
 				mazeDisplay.mazeData[x][y].ch=mazeDisplay.Ch;
 			
 			
@@ -678,7 +729,10 @@ public class MazeWindow extends BasicWindow implements View {
 			
 		}
 	}
-
+	/**
+	 * 
+	 * @param data checks if data exists in database true if not false if yes
+	 */
 	@Override
 	public void receiveData(String data) {
 		if(data==null)
@@ -690,7 +744,10 @@ public class MazeWindow extends BasicWindow implements View {
 			this.dataRecieved= false;
 		}
 	}
-
+	/**
+	 * getter
+	 * @return properties
+	 */
 	@Override
 	public Properties getProperties() {
 		return properties;

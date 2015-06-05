@@ -73,11 +73,11 @@ public class MyModel extends Observable implements Model{
 	 */
 	public MyModel()
 	{
-		//loadFromDatabase();
+		loadFromDatabase();
 	}
 	public MyModel(Properties prop)
 	{
-			//loadFromDatabase();
+			loadFromDatabase();
 			this.properties=prop;
 			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
 		
@@ -325,7 +325,7 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public void stop() {
-		/*SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		session.beginTransaction();
 		ConcurrentLinkedQueue<String> names=namesToWriteToDB();
@@ -339,7 +339,7 @@ public class MyModel extends Observable implements Model{
 				session.save(data);//add flush every once in a while - 20?
 			}
 		}
-		session.getTransaction().commit();*/
+		session.getTransaction().commit();
 		executor.shutdown();
 	}
 	/**Helper to stop - to know based on the field databaseNames what mazes should be written to DB. (don't wanna write them again)

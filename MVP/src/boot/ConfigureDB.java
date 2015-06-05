@@ -1,4 +1,6 @@
-package model;
+package boot;
+
+import model.DBMaze;
 
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;

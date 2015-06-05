@@ -4,8 +4,14 @@
   <void property="diagonalMovementCost">
    <double>21.0</double>
   </void>
+  <void property="mazeSolver">
+   <object class="java.lang.Enum" method="valueOf">
+    <class>presenter.Properties$MazeSolver</class>
+    <string>BFS</string>
+   </object>
+  </void>
   <void property="movementCost">
-   <double>21.0</double>
+   <double>12.0</double>
   </void>
   <void property="threadNumber">
    <int>12</int>

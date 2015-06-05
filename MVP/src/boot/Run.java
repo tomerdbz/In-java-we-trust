@@ -1,28 +1,27 @@
 package boot;
 
 import gui.MazeWindow;
-import gui.WritePropertiesGUI;
 
 import java.beans.XMLDecoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import model.MyModel;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import model.MyModel;
 import presenter.Presenter;
 import presenter.Properties;
 import view.MyView;
 
 /** ID'S: 208415513, 318507209 - Tomer Cabouly, Alon Orlovsky 
- * Run WriteProperties and ConfigureDB FIRST!!!
- * @author Tomer
- *
+ * Run ConfigureDB FIRST!!!
+ * @author Tomer,Alon
+ *	the main program 
  */
 public class Run {
 	public static void main(String []args)
@@ -48,7 +47,7 @@ public class Run {
 							v.start();
 							break;
 						case GUI:
-							MazeWindow vMaze=new MazeWindow("Maze Generations", 600, 600);
+							MazeWindow vMaze=new MazeWindow("Maze Generations", 1300, 700);
 							Presenter pMaze=new Presenter(m,vMaze);
 							vMaze.addObserver(pMaze);
 							m.addObserver(pMaze);
