@@ -325,7 +325,7 @@ public class MyModel extends Observable implements Model{
 		{
 			//solutionQueue.add(cache.get(m));
 			setChanged();
-			notifyObservers("maze " + mazeName+ " solved");
+			notifyObservers("maze solved display "+mazeName);
 			return;
 		}
 		ListenableFuture<Solution> futureSolution=null;

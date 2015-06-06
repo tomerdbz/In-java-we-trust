@@ -387,12 +387,6 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("solve maze");
 				setChanged(); //solve the maze
 				notifyObservers(" "+MazeWindow.this.mazeName);
-				for(int i=0; i<mazeDisplay.mazeRows;i++)
-					for(int j=0;j<mazeDisplay.mazeCols;j++){
-						mazeDisplay.mazeData[i][j].redraw();
-					}
-				mazeDisplay.redraw(); //redraw maze
-				mazeDisplay.forceFocus();
 				}
 				else{ //if there is no maze to solve
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
@@ -561,7 +555,7 @@ public class MazeWindow extends BasicWindow implements View {
 				mazeDisplay.mazeData[xt][yt].Hint=img; //put hints all over the solutions path
 			}
 	
-			
+		
 			/*final int dx=x;
 			final int dy=y;
 			display.asyncExec(new Runnable() {
@@ -577,8 +571,12 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			@Override
 			public void run() {
-				mazeDisplay.redraw();
-				
+				for(int i=0; i<mazeDisplay.mazeRows;i++)
+					for(int j=0;j<mazeDisplay.mazeCols;j++){
+						mazeDisplay.mazeData[i][j].redraw();
+					}
+				mazeDisplay.redraw(); //redraw maze
+				mazeDisplay.forceFocus();	
 			}
 		});
 			
