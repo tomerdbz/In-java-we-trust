@@ -343,7 +343,7 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("maze exists");
 			    setChanged(); //check if maze already exists
 				notifyObservers(MazeWindow.this.mazeName); 
-				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved){ //if maze doesnt exist create a new one
+				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved && mazearrayData!=null){ //if maze doesnt exist create a new one
 					MazeWindow.this.rows =(Integer)mazearrayData.get(1); //takes the info about rows
 					MazeWindow.this.cols=(Integer)mazearrayData.get(2); //takes the info about cols
 					mazeDisplay.setVisible(true); //makes sure the mazeDisplay is visible
@@ -354,7 +354,7 @@ public class MazeWindow extends BasicWindow implements View {
 				System.out.println(mazeData);
 				notifyObservers(" "+ mazeData); //passses data to generate maze in MVP System
 				}
-				else{ //if error has occureed 
+				else if(mazearrayData!=null){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("An error has occureed");
