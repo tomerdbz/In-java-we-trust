@@ -308,7 +308,7 @@ public class MazeWindow extends BasicWindow implements View {
 				MP3Player player = new MP3Player(); //selected button music starts playing
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
-				if(MazeWindow.this.mazeName!=null){
+				if(MazeWindow.this.mazeName!=null && !mazeDisplay.won){
 				LastUserCommand= commands.get("calculate hint");
 				setChanged(); //mvp solve maze
 				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.Ch.currentCellX+","+ mazeDisplay.Ch.currentCellY);
@@ -344,6 +344,7 @@ public class MazeWindow extends BasicWindow implements View {
 			    setChanged(); //check if maze already exists
 				notifyObservers(MazeWindow.this.mazeName); 
 				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved && mazearrayData!=null){ //if maze doesnt exist create a new one
+					MazeWindow.this.mazeDisplay.won=false;
 					MazeWindow.this.rows =(Integer)mazearrayData.get(1); //takes the info about rows
 					MazeWindow.this.cols=(Integer)mazearrayData.get(2); //takes the info about cols
 					mazeDisplay.setVisible(true); //makes sure the mazeDisplay is visible
@@ -383,7 +384,7 @@ public class MazeWindow extends BasicWindow implements View {
 				MP3Player player = new MP3Player();
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3")); //play sound
 			    player.play();
-				if(MazeWindow.this.mazeName!=null){
+				if(MazeWindow.this.mazeName!=null && !mazeDisplay.won){
 				LastUserCommand= commands.get("solve maze");
 				setChanged(); //solve the maze
 				notifyObservers(" "+MazeWindow.this.mazeName);
@@ -412,7 +413,7 @@ public class MazeWindow extends BasicWindow implements View {
 						
 						@Override
 						public void run() {
-							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed() ){
+							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed()){
 							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length; //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);

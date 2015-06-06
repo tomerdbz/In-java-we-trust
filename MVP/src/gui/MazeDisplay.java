@@ -79,7 +79,7 @@ public class MazeDisplay extends Composite {
 				else if(won==true)
 				{
 					setVisible(false);
-					won=false;
+					//won=false;
 					//won=false;
 
 					/*ImageData data = new ImageData(".\\resources\\images\\sonicwon.png");
