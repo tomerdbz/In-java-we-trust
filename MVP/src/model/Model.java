@@ -10,12 +10,12 @@ import algorithms.search.State;
  *
  */
 public interface Model {
-	void generateMaze(String name,int rows, int cols,int rowSource,int colSource,int rowGoal ,int colGoal);
+	void generateMaze(String name,int rows, int cols,int rowSource,int colSource,int rowGoal ,int colGoal,String notifyArgument);
 	Maze getMaze(String mazeName);
-	void solveMaze(String mazeName, boolean displayAfterSolving);
+	void solveMaze(String mazeName, String notifyArgument);
 	Solution getSolution(String mazeName);
 	State getHint(String mazeName);
-	void calculateHint(String mazeName, int row, int col);
+	void calculateHint(String mazeName, int row, int col,String notifyArgument);
 	void setProperties(Properties prop);
 	void stop();
 }

@@ -35,7 +35,7 @@ public class Presenter implements Observer {
 				for(String s : parameters)
 					flag&=isInteger(s);
 				if(flag==true)
-					m.generateMaze(arg, Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]), Integer.parseInt(parameters[4]), Integer.parseInt(parameters[5]));
+					m.generateMaze(arg, Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]), Integer.parseInt(parameters[4]), Integer.parseInt(parameters[5]),"maze generated display");
 			}
 			else
 				v.Display("An Error Has Occured.");
@@ -74,7 +74,7 @@ public class Presenter implements Observer {
 		@Override
 		public void doCommand(String arg, String params) {
 			
-			m.solveMaze(arg,true);
+			m.solveMaze(arg,"maze solved display");
 		}
 
 	}
@@ -92,7 +92,6 @@ public class Presenter implements Observer {
 
 		@Override
 		public void doCommand(String arg, String params) {
-			m.calculateHint(arg, Integer.parseInt(params.split(",")[0]), Integer.parseInt(params.split(",")[1]));
 			v.displayHint(m.getHint(arg));
 		}
 
@@ -101,8 +100,7 @@ public class Presenter implements Observer {
 
 		@Override
 		public void doCommand(String name, String params) {
-			m.calculateHint(name, Integer.parseInt(params.split(",")[0]), Integer.parseInt(params.split(",")[1]));
-			
+			m.calculateHint(name, Integer.parseInt(params.split(",")[0]), Integer.parseInt(params.split(",")[1]),"hint calculated display");
 		}
 		
 		
@@ -191,12 +189,17 @@ public class Presenter implements Observer {
 			String name;
 			if(arg1!=null && !arg1.toString().equals("error"))
 			{
-				if((name=modelNotifiedGenerated(arg1.toString()))!=null)
-						v.displayMaze(m.getMaze(name));
+				if((name=modelNotifiedGeneratedWithDisplay(arg1.toString()))!=null)
+						new DisplayMazeCommand().doCommand(name,null);//v.displayMaze(m.getMaze(name));
 				else if((name=modelNotifiedSolvedWithDisplay(arg1.toString()))!=null)
-					v.displaySolution(m.getSolution(name));
-				else if((name=modelNotifiedHint(arg1.toString()))!=null)
-					v.displayHint(m.getHint(name));
+					new DisplaySolutionCommand().doCommand(name, null);//v.displaySolution(m.getSolution(name));
+				else if((name=modelNotifiedCalculateHint(arg1.toString()))!=null)
+				{
+					String [] values=name.split(" ");
+					new CalculateHintCommand().doCommand(values[1], values[0]);
+				}
+				else if((name=modelNotifiedDisplayHint(arg1.toString()))!=null)
+					new DisplayHintCommand().doCommand(name, null);
 			}
 			else
 				if(arg1!=null)
@@ -211,31 +214,42 @@ public class Presenter implements Observer {
 	 */
 	private String modelNotifiedSolvedWithDisplay(String arg)
 	{
-		String[] args=arg.split(" ");
+		if(arg.startsWith("maze solved display") && !arg.contains("hint"))
+			return arg.split(" ")[3];
+		/*String[] args=arg.split(" ");
 		if(args.length==4)
 			if(args[2].equals("solved") && args[3].equals("display"))
-				return args[1];
+				return args[1];*/
 		return null;
 	}
 	/** Helper for update - checks if Model notified generated
 	 * @param arg from the model
 	 * @return name of maze to generate if it notified generated, else null
 	 */
-	private String modelNotifiedGenerated(String arg)
+	private String modelNotifiedGeneratedWithDisplay(String arg)
 	{
-		String[] args=arg.split(" ");
+		if(arg.startsWith("maze generated display"))
+			return arg.split(" ")[3];
+		/*String[] args=arg.split(" ");
 		if(args.length==3)
 			if(args[2].equals("generated"))
-				return args[1];
+				return args[1];*/
 		return null;
 	}
-	
-	private String modelNotifiedHint(String arg)
+	private String modelNotifiedCalculateHint(String arg)
 	{
-		String[] args=arg.split(" ");
+		if(arg.startsWith("hint") && !arg.contains("display"))
+			return arg.substring(5);//get rid of "hint "
+		/*String[] args=arg.split(" ");
 		if(args.length==3)
-			if(args[2].equals("hint"))
-				return args[1];
+			if(args[2].equals("generated"))
+				return args[1];*/
+		return null;
+	}
+	private String modelNotifiedDisplayHint(String arg)
+	{
+		if(arg.startsWith("hint calculated display"))
+			return arg.split(" ")[3];
 		return null;
 	}
 	

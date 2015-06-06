@@ -163,7 +163,7 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public void generateMaze(String name,int rows, int cols, int rowSource, int colSource,
-			int rowGoal, int colGoal) {
+			int rowGoal, int colGoal,String notifyArgument) {
 		if(this.properties==null)
 		{
 			setChanged();
@@ -211,7 +211,7 @@ public class MyModel extends Observable implements Model{
 					//mazeQueue.add(arg0);
 					generatedMazes.put(name, arg0);
 					setChanged();
-					notifyObservers("maze " + name+  " generated");
+					notifyObservers(notifyArgument+" " +name);
 				}
 			
 			});
@@ -233,7 +233,7 @@ public class MyModel extends Observable implements Model{
 		return m;
 	}
 	@Override
-	public void calculateHint(String mazeName, int row, int col)
+	public void calculateHint(String mazeName, int row, int col,String notifyArgument)
 	{
 		Maze m;
 		if((m=generatedMazes.get(mazeName))==null)
@@ -249,24 +249,17 @@ public class MyModel extends Observable implements Model{
 			public void run() {
 				if(cache.get(m)==null)
 				{
-					executor.submit(new Runnable() {
-
-						@Override
-						public void run() {
-							solveMaze(mazeName,false);
-							solutionToHint(mazeName,cache.get(generatedMazes.get(mazeName)),row,col);
-						}
-					});	
+					solveMaze(mazeName,"hint "+row+","+col);	
 				}
 				else
-					solutionToHint(mazeName,cache.get(m),row,col);
+					solutionToHint(mazeName,cache.get(m),row,col,notifyArgument);
 				
 			}
 			
 		});
 		
 	}
-	private void solutionToHint(String mazeName, Solution sol,int row,int col)
+	private void solutionToHint(String mazeName, Solution sol,int row,int col,String notifyArgument)
 	{
 		Maze m=generatedMazes.get(mazeName);
 		int min=m.getRows()+m.getCols();//mazeDisplay.Ch.currentCellX) + Math.abs(mazeDisplay.Ch.currentCellY));
@@ -274,23 +267,29 @@ public class MyModel extends Observable implements Model{
 		int x=0;
 		int y=0; //puts hints on the maze
 		int solSize=sol.getPath().size();
+		State lastState = null;
 		ArrayList<State> path=sol.getPath();
 		for(int i=0;i<solSize-2;i++){
 			System.out.println(path.get(i).getState().toString());
 			indexes = path.get(i).getState().toString().split(",");
 			int xt=Integer.parseInt(indexes[0]); //t stands for temp
 			int yt=Integer.parseInt(indexes[1]);
-			int temp=(Math.abs(row-(xt)) + Math.abs(col-(yt))); //caclulates minimal differnce between a hint and the character
-			if(temp!=0 && temp<min){
-				temp= min;
+			double temp=Math.sqrt(Math.pow(row-xt,2) + Math.pow(col-yt,2)); //caclulates minimal differnce between a hint and the character
+			if(temp!=0 &&  min>=temp && path.indexOf(path.get(i))>path.indexOf(lastState) ){
+				min= (int)temp;
 				x=xt;
 				y=yt;
-				
+				lastState=path.get(i);
 			}
 		}
+		lastState=path.get(path.indexOf(lastState)+3);
+		indexes = lastState.getState().toString().split(",");
+		x=Integer.parseInt(indexes[0]); //t stands for temp
+		y=Integer.parseInt(indexes[1]);
+		
 		this.hints.put(mazeName,new State(""+x+","+y));
 		setChanged();
-		notifyObservers("maze "+ mazeName+ " hint");
+		notifyObservers(notifyArgument+" "+ mazeName);
 	}
 	@Override
 	public State getHint(String mazeName)
@@ -308,7 +307,7 @@ public class MyModel extends Observable implements Model{
 	 * @param - mazeName - maze name to solve.
 	 */
 	@Override
-	public void solveMaze(String mazeName,boolean displayAfterSolving) {
+	public void solveMaze(String mazeName,String notifyArgument) {
 		if(this.properties==null)
 		{
 			setChanged();
@@ -376,10 +375,7 @@ public class MyModel extends Observable implements Model{
 					//solutionQueue.add(arg0);
 					cache.put(m, arg0);
 					setChanged();
-					if(displayAfterSolving==false)
-						notifyObservers("maze " + mazeName + " solved");
-					else if(displayAfterSolving==true)
-						notifyObservers("maze " + mazeName + " solved display");
+					notifyObservers(notifyArgument+" "+mazeName);
 				}
 			
 			});
