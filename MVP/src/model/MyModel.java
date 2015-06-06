@@ -3,6 +3,7 @@ package model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -11,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
-import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,6 +28,7 @@ import algorithms.mazeGenerators.RandomMazeGenerator;
 import algorithms.search.AStar;
 import algorithms.search.BFS;
 import algorithms.search.Solution;
+import algorithms.search.State;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -47,6 +48,10 @@ public class MyModel extends Observable implements Model{
 	 * 
 	 */
 	private ConcurrentHashMap<Maze,Solution> cache=new ConcurrentHashMap<Maze,Solution>();
+	/**	Temporary variable for Hint calculation. after calculating a hint - the hint will be saved here as a State for the Presenter to pick him up.
+	 * 
+	 */
+	private ConcurrentHashMap<String,State> hints=new ConcurrentHashMap<String,State>();
 	/**	databaseNames will contain names of mazes which were brought from the database. when we'll write back at the end we won't write them again..
 	 * 
 	 */
@@ -73,11 +78,11 @@ public class MyModel extends Observable implements Model{
 	 */
 	public MyModel()
 	{
-		loadFromDatabase();
+		//loadFromDatabase();
 	}
 	public MyModel(Properties prop)
 	{
-			loadFromDatabase();
+			//loadFromDatabase();
 			this.properties=prop;
 			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
 		
@@ -218,8 +223,8 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public Maze getMaze(String name) {
-		Maze m;
-		if((m=generatedMazes.get(name))==null)
+		Maze m=null;
+		if(name!=null && (m=generatedMazes.get(name))==null)
 		{
 			//setChanged();
 			//notifyObservers("error");
@@ -227,12 +232,83 @@ public class MyModel extends Observable implements Model{
 		}
 		return m;
 	}
+	@Override
+	public void calculateHint(String mazeName, int row, int col)
+	{
+		Maze m;
+		if((m=generatedMazes.get(mazeName))==null)
+		{
+			setChanged();
+			notifyObservers("error");
+			return;
+		}
+		
+		executor.submit(new Runnable() {
 
+			@Override
+			public void run() {
+				if(cache.get(m)==null)
+				{
+					executor.submit(new Runnable() {
+
+						@Override
+						public void run() {
+							solveMaze(mazeName,false);
+							solutionToHint(mazeName,cache.get(generatedMazes.get(mazeName)),row,col);
+						}
+					});	
+				}
+				else
+					solutionToHint(mazeName,cache.get(m),row,col);
+				
+			}
+			
+		});
+		
+	}
+	private void solutionToHint(String mazeName, Solution sol,int row,int col)
+	{
+		Maze m=generatedMazes.get(mazeName);
+		int min=m.getRows()+m.getCols();//mazeDisplay.Ch.currentCellX) + Math.abs(mazeDisplay.Ch.currentCellY));
+		String []indexes;
+		int x=0;
+		int y=0; //puts hints on the maze
+		int solSize=sol.getPath().size();
+		ArrayList<State> path=sol.getPath();
+		for(int i=0;i<solSize-2;i++){
+			System.out.println(path.get(i).getState().toString());
+			indexes = path.get(i).getState().toString().split(",");
+			int xt=Integer.parseInt(indexes[0]); //t stands for temp
+			int yt=Integer.parseInt(indexes[1]);
+			int temp=(Math.abs(row-(xt)) + Math.abs(col-(yt))); //caclulates minimal differnce between a hint and the character
+			if(temp!=0 && temp<min){
+				temp= min;
+				x=xt;
+				y=yt;
+				
+			}
+		}
+		this.hints.put(mazeName,new State(""+x+","+y));
+		setChanged();
+		notifyObservers("maze "+ mazeName+ " hint");
+	}
+	@Override
+	public State getHint(String mazeName)
+	{
+		if(hints.get(mazeName)==null)
+		{
+			setChanged();
+			notifyObservers("error");
+			return null;
+		}
+		return hints.get(mazeName);
+		
+	}
 	/** solves a generated maze. upon solving - saves in cache.
 	 * @param - mazeName - maze name to solve.
 	 */
 	@Override
-	public void solveMaze(String mazeName) {
+	public void solveMaze(String mazeName,boolean displayAfterSolving) {
 		if(this.properties==null)
 		{
 			setChanged();
@@ -300,7 +376,10 @@ public class MyModel extends Observable implements Model{
 					//solutionQueue.add(arg0);
 					cache.put(m, arg0);
 					setChanged();
-					notifyObservers("maze " + mazeName + " solved");
+					if(displayAfterSolving==false)
+						notifyObservers("maze " + mazeName + " solved");
+					else if(displayAfterSolving==true)
+						notifyObservers("maze " + mazeName + " solved display");
 				}
 			
 			});
@@ -311,6 +390,7 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public Solution getSolution(String name) {
+		System.out.println(generatedMazes.containsKey(name));
 		if(!generatedMazes.containsKey(name))
 		{
 			setChanged();
@@ -325,7 +405,7 @@ public class MyModel extends Observable implements Model{
 	 */
 	@Override
 	public void stop() {
-		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		/*SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		session.beginTransaction();
 		ConcurrentLinkedQueue<String> names=namesToWriteToDB();
@@ -339,7 +419,7 @@ public class MyModel extends Observable implements Model{
 				session.save(data);//add flush every once in a while - 20?
 			}
 		}
-		session.getTransaction().commit();
+		session.getTransaction().commit();*/
 		executor.shutdown();
 	}
 	/**Helper to stop - to know based on the field databaseNames what mazes should be written to DB. (don't wanna write them again)
@@ -362,6 +442,7 @@ public class MyModel extends Observable implements Model{
 		this.properties = properties;
 		executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(properties.getThreadNumber()));
 	}
+
 
 
 }

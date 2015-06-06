@@ -74,7 +74,7 @@ public class Presenter implements Observer {
 		@Override
 		public void doCommand(String arg, String params) {
 			
-			m.solveMaze(arg);
+			m.solveMaze(arg,true);
 		}
 
 	}
@@ -83,9 +83,29 @@ public class Presenter implements Observer {
 		@Override
 		public void doCommand(String arg, String params) {
 			
+			System.out.println(m.getSolution(arg));
 			v.displaySolution(m.getSolution(arg));
 		}
 
+	}
+	public class DisplayHintCommand implements Command {
+
+		@Override
+		public void doCommand(String arg, String params) {
+			m.calculateHint(arg, Integer.parseInt(params.split(",")[0]), Integer.parseInt(params.split(",")[1]));
+			v.displayHint(m.getHint(arg));
+		}
+
+	}
+	public class CalculateHintCommand implements Command{
+
+		@Override
+		public void doCommand(String name, String params) {
+			m.calculateHint(name, Integer.parseInt(params.split(",")[0]), Integer.parseInt(params.split(",")[1]));
+			
+		}
+		
+		
 	}
 	public class MazeExistsCommand implements Command {
 
@@ -134,13 +154,14 @@ public class Presenter implements Observer {
 		commandMap.put("display maze",new DisplayMazeCommand());
 		commandMap.put("solve maze",new SolveMazeCommand());
 		commandMap.put("display solution",new DisplaySolutionCommand());
+		commandMap.put("calculate hint",new CalculateHintCommand());
 		commandMap.put("exit",new ExitCommand());
 		commandMap.put("properties", new WritePropertiesCommand());
 		commandMap.put("maze exists", new MazeExistsCommand());
 		v.setCommands(commandMap);
 		}
 	
-	/** FOR MODEL arg1 IS MAZE NAME. FOR VIEW arg1 is COMMAND ARGUMENTS.
+	/** FOR MODEL arg1 IS "maze generated" or "maze solved" or "calculated hint". FOR VIEW arg1 is COMMAND ARGUMENTS.
 	 * 	NOTICE: IF ARG1 = "error" Presenter evaluates and knows there was something wrong. model and view doesn't think for themselves. 
 	 */
 	@Override
@@ -172,8 +193,10 @@ public class Presenter implements Observer {
 			{
 				if((name=modelNotifiedGenerated(arg1.toString()))!=null)
 						v.displayMaze(m.getMaze(name));
-				else if((name=modelNotifiedSolved(arg1.toString()))!=null)
+				else if((name=modelNotifiedSolvedWithDisplay(arg1.toString()))!=null)
 					v.displaySolution(m.getSolution(name));
+				else if((name=modelNotifiedHint(arg1.toString()))!=null)
+					v.displayHint(m.getHint(name));
 			}
 			else
 				if(arg1!=null)
@@ -186,11 +209,11 @@ public class Presenter implements Observer {
 	 * @param arg from the model
 	 * @return name of maze to solve if it notified solve, else null
 	 */
-	private String modelNotifiedSolved(String arg)
+	private String modelNotifiedSolvedWithDisplay(String arg)
 	{
 		String[] args=arg.split(" ");
-		if(args.length==3)
-			if(args[2].equals("solved"))
+		if(args.length==4)
+			if(args[2].equals("solved") && args[3].equals("display"))
 				return args[1];
 		return null;
 	}
@@ -206,5 +229,15 @@ public class Presenter implements Observer {
 				return args[1];
 		return null;
 	}
+	
+	private String modelNotifiedHint(String arg)
+	{
+		String[] args=arg.split(" ");
+		if(args.length==3)
+			if(args[2].equals("hint"))
+				return args[1];
+		return null;
+	}
+	
 	
 }

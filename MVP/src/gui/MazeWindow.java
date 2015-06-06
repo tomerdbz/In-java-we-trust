@@ -7,6 +7,8 @@ import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,8 +33,9 @@ import presenter.Properties;
 import view.View;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
-import boot.RunCLI;
+import algorithms.search.State;
 import boot.Run;
+import boot.RunCLI;
 import boot.RunGUI;
 import boot.WritePropertiesGUI;
 /**
@@ -61,11 +64,6 @@ public class MazeWindow extends BasicWindow implements View {
 	 * Thread pools Random maze generator or dfs and so...
 	 */
 	Properties properties;
-	/**
-	 * True if we request a hint
-	 * False if we request a full solution
-	 */
-	Boolean isHint;
 	/**
 	 * name of the maze
 	 */
@@ -311,10 +309,9 @@ public class MazeWindow extends BasicWindow implements View {
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
-				isHint=true; //telling us its only a hint
-				LastUserCommand= commands.get("solve maze");
+				LastUserCommand= commands.get("calculate hint");
 				setChanged(); //mvp solve maze
-				notifyObservers(MazeWindow.this.mazeName);
+				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.Ch.currentCellX+","+ mazeDisplay.Ch.currentCellY);
 				for(int i=0; i<mazeDisplay.mazeRows;i++)
 					for(int j=0;j<mazeDisplay.mazeCols;j++){
 						mazeDisplay.mazeData[i][j].redraw();
@@ -325,7 +322,7 @@ public class MazeWindow extends BasicWindow implements View {
 				else{ //if there is no maze to be solved error
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
-			        messageBox.setMessage("No maze to solve");
+			        messageBox.setMessage("No hint to show");
 					messageBox.open();
 				}
 				
@@ -355,7 +352,7 @@ public class MazeWindow extends BasicWindow implements View {
 				setChanged();
 				String mazeData= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
 				System.out.println(mazeData);
-				notifyObservers(mazeData); //passses data to generate maze in MVP System
+				notifyObservers(" "+ mazeData); //passses data to generate maze in MVP System
 				}
 				else{ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
@@ -388,9 +385,8 @@ public class MazeWindow extends BasicWindow implements View {
 			    player.play();
 				if(MazeWindow.this.mazeName!=null){
 				LastUserCommand= commands.get("solve maze");
-				isHint =false;
 				setChanged(); //solve the maze
-				notifyObservers(MazeWindow.this.mazeName);
+				notifyObservers(" "+MazeWindow.this.mazeName);
 				for(int i=0; i<mazeDisplay.mazeRows;i++)
 					for(int j=0;j<mazeDisplay.mazeCols;j++){
 						mazeDisplay.mazeData[i][j].redraw();
@@ -427,7 +423,10 @@ public class MazeWindow extends BasicWindow implements View {
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);
 							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
-							 mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell
+							// System.out.println(rows+" " + cols+" "+ mazeDisplay.mazeData.length+" "+ mazeDisplay.mazeData[0].length);
+							// if( rows== mazeDisplay.mazeData.length && cols == mazeDisplay.mazeData[0].length )
+							 mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell - bug
+							
 							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
@@ -551,35 +550,19 @@ public class MazeWindow extends BasicWindow implements View {
 	 */
 	@Override
 	public void displaySolution(Solution s) {
+		System.out.println(s);
 		String Solution = s.toString().substring(9);
 		String []path = Solution.split("	");
 		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
-		if(!isHint){
 		for(int i=0;i<path.length-1;i++){
 			String []indexes = path[i].split(",");
 			int xt=Integer.parseInt(indexes[0]);
 			int yt=Integer.parseInt(indexes[1]);	
 				mazeDisplay.mazeData[xt][yt].Hint=img; //put hints all over the solutions path
 			}
-	}
-		else{
-			int min=(Math.abs(mazeDisplay.Ch.currentCellX) + Math.abs(mazeDisplay.Ch.currentCellY));
-			String []indexes;
-			int x=0;
-			int y=0; //puts hints on the maze
-			for(int i=0;i<path.length-2;i++){
-				indexes = path[i].split(",");
-				int xt=Integer.parseInt(indexes[0]);
-				int yt=Integer.parseInt(indexes[1]);
-				int temp=(Math.abs(mazeDisplay.Ch.currentCellX-(xt)) + Math.abs(mazeDisplay.Ch.currentCellY-(yt))); //caclulates minimal differnce between a hint and the character
-				if(temp!=0 && temp<min){
-					temp= min;
-					x=xt;
-					y=yt;
-					
-				}
-			}
-			final int dx=x;
+	
+			
+			/*final int dx=x;
 			final int dy=y;
 			display.asyncExec(new Runnable() {
 				
@@ -588,10 +571,8 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.mazeData[dx][dy].Hint=img;
 					mazeDisplay.mazeData[dx][dy].redraw(); //redraw the hint
 				}
-			});
+			});*/
 			
-			
-		}
 		display.syncExec(new Runnable() {
 			
 			@Override
@@ -752,6 +733,31 @@ public class MazeWindow extends BasicWindow implements View {
 	public Properties getProperties() {
 		return properties;
 	}
+
+	@Override
+	public void displayHint(State h) {
+		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
+		final String[] coordinates=h.getState().split(",");
+		if(isNumeric(coordinates[0]) && isNumeric(coordinates[1]))
+		{
+			mazeDisplay.mazeData[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].Hint=img; //put hints all over the solutions path
+			display.asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					mazeDisplay.mazeData[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].redraw(); //redraw the hint
+				}
+			});
+		}
+		
+	}
+	private static boolean isNumeric(String str)
+	  {
+	    NumberFormat formatter = NumberFormat.getInstance();
+	    ParsePosition pos = new ParsePosition(0);
+	    formatter.parse(str, pos);
+	    return str.length() == pos.getIndex();
+	  }
 }
 	
 	

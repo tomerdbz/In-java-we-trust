@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import presenter.Properties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
+import algorithms.search.State;
 
 /**
  * 
@@ -132,6 +133,11 @@ public class MyView extends Observable implements View,Observer {
 	public Properties getProperties() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	@Override
+	public void displayHint(State h) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
