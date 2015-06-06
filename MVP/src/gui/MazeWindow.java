@@ -425,8 +425,8 @@ public class MazeWindow extends BasicWindow implements View {
 							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
 							// System.out.println(rows+" " + cols+" "+ mazeDisplay.mazeData.length+" "+ mazeDisplay.mazeData[0].length);
 							// if( rows== mazeDisplay.mazeData.length && cols == mazeDisplay.mazeData[0].length )
-							 mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell - bug
-							
+							 //mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell - bug
+							mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].redraw(); //redraw the goal cell
 							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
