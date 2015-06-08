@@ -33,7 +33,7 @@ public class CellDisplay extends Canvas{
 	/**
 	 * a represenation of character if not null the character is in the cell
 	 */
-	Character ch = null; 
+	Character ch = null; //DELETE!!!!!!! hasCharacter instead!!!!! 
 	/**
 	 * does the tile represent the goal or not
 	 */
@@ -46,8 +46,7 @@ public class CellDisplay extends Canvas{
 	 * 
 	 * @author Alon
 	 *enum that represnsets the direction of the drag
-	 */
-	public enum Direction {UpRight,UpLeft,DownRight,DownLeft}; 
+	 */ 
 	/**
 	 * an instance of the enum above
 	 */

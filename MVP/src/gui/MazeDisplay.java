@@ -26,23 +26,13 @@ import algorithms.mazeGenerators.Maze;
  *	this is a represenation of the maze which extends Composite
  *
  */
-public class MazeDisplay extends Composite {
-	/**
-	 * number of rows in the maze
-	 */
-	int mazeRows; 
-	/**
-	 * number of cols in the maze
-	 */
-	int mazeCols;
+public class MazeDisplay extends CommonBoard {
+	
 	/**
 	 * Gives true if we beat the maze
 	 */
 	boolean won=false;
-	/**
-	 * a 2 dimension array which represents the cells in the maze
-	 */
-	CellDisplay[][] mazeData;
+	
 	/**
 	 * representation of the character in the maze
 	 */
@@ -70,7 +60,7 @@ public class MazeDisplay extends Composite {
 			
 			@Override
 			public void paintControl(PaintEvent arg0) {
-				if(mazeData==null && won==false){ //displays the photo in the begining of the program as an intro
+				if(board==null && won==false){ //displays the photo in the begining of the program as an intro
 					int width=parent.getSize().x;
 					int height=parent.getSize().y;
 					ImageData data = new ImageData(".\\resources\\images\\Wallpaper.png");
@@ -85,10 +75,10 @@ public class MazeDisplay extends Composite {
 					/*ImageData data = new ImageData(".\\resources\\images\\sonicwon.png");
 					arg0.gc.drawImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"),0,0,data.width,data.height,0,0,width,height);*/
 				}
-				else if(mazeData!=null)
-					for(int i=0;i<mazeData.length;i++)
-						for(int j=0;j<mazeData[0].length;j++)
-							mazeData[i][j].redraw();
+				else if(board!=null)
+					for(int i=0;i<board.length;i++)
+						for(int j=0;j<board[0].length;j++)
+							board[i][j].redraw();
 			}
 		});
 	
@@ -96,81 +86,81 @@ public class MazeDisplay extends Composite {
 			@Override
 			public void keyPressed(KeyEvent e) { //each of those codes represenets a key on the keyboard in our case up down right left arrows
 				 if (e.keyCode == 16777217 && Ch.currentCellX!=0 ){
-					 boolean cond1 = mazeData[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(1)=='0';
-					 boolean cond2 =mazeData[Ch.currentCellX-1][Ch.currentCellY].getImageName().charAt(3)=='0'; //check if a path is possible
+					 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(1)=='0';
+					 boolean cond2 =board[Ch.currentCellX-1][Ch.currentCellY].getImageName().charAt(3)=='0'; //check if a path is possible
 					 	if(cond1 && cond2){ //if so redraws the character in the new location
 						int row=Ch.currentCellX;
 				    	int col = Ch.currentCellY;
-				    	mazeData[row][col].ch=null;
+				    	board[row][col].ch=null;
 				    	Ch.setVisible(false);
-				    	Ch = new Character(mazeData[row-1][col],SWT.FILL);
+				    	Ch = new Character(board[row-1][col],SWT.FILL);
 				    	Ch.currentCellX=row-1;
 				    	Ch.currentCellY=col;
 						Ch.frameIndex=0;
-						mazeData[row-1][col].ch=Ch;
-						mazeData[Ch.currentCellX+1][Ch.currentCellY].redraw();
-						mazeData[Ch.currentCellX][Ch.currentCellY].redraw();
+						board[row-1][col].ch=Ch;
+						board[Ch.currentCellX+1][Ch.currentCellY].redraw();
+						board[Ch.currentCellX][Ch.currentCellY].redraw();
 					 //up
 					 	}
 			    } 
 				 else 
-					 if (e.keyCode == 16777220 && Ch.currentCellY!=mazeData[0].length-1) {
-						 boolean cond1 = mazeData[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(2)=='0';
-						 boolean cond2 =mazeData[Ch.currentCellX][Ch.currentCellY+1].getImageName().charAt(0)=='0';
+					 if (e.keyCode == 16777220 && Ch.currentCellY!=board[0].length-1) {
+						 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(2)=='0';
+						 boolean cond2 =board[Ch.currentCellX][Ch.currentCellY+1].getImageName().charAt(0)=='0';
 					if(cond1&&cond2){
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	mazeData[row][col].ch=null;
+			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(mazeData[row][col+1],SWT.FILL);
+			    	Ch = new Character(board[row][col+1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col+1;
 					Ch.frameIndex=0;
-					mazeData[row][col+1].ch=Ch;
-					mazeData[Ch.currentCellX][Ch.currentCellY-1].redraw();
-					mazeData[Ch.currentCellX][Ch.currentCellY].redraw();
+					board[row][col+1].ch=Ch;
+					board[Ch.currentCellX][Ch.currentCellY-1].redraw();
+					board[Ch.currentCellX][Ch.currentCellY].redraw();
 			    	//right
 						 }
 			    } 
 					else 
 					if (e.keyCode == 16777219 && Ch.currentCellY!=0) {
-						 boolean cond1 = mazeData[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(0)=='0';
-						 boolean cond2 =mazeData[Ch.currentCellX][Ch.currentCellY-1].getImageName().charAt(2)=='0';
+						 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(0)=='0';
+						 boolean cond2 =board[Ch.currentCellX][Ch.currentCellY-1].getImageName().charAt(2)=='0';
 					if(cond1&&cond2){	 
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	mazeData[row][col].ch=null;
+			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(mazeData[row][col-1],SWT.FILL);
+			    	Ch = new Character(board[row][col-1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col-1;
 					Ch.frameIndex=0;
-					mazeData[row][col-1].ch=Ch;
-					mazeData[Ch.currentCellX][Ch.currentCellY+1].redraw();
-					mazeData[Ch.currentCellX][Ch.currentCellY].redraw();
+					board[row][col-1].ch=Ch;
+					board[Ch.currentCellX][Ch.currentCellY+1].redraw();
+					board[Ch.currentCellX][Ch.currentCellY].redraw();
 			    	//left
 					}
 			    } 
 					else
-					if (e.keyCode == 16777218 &&Ch.currentCellX!= mazeData.length-1) {
-						 boolean cond1 = mazeData[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(3)=='0';
-						 boolean cond2 =mazeData[Ch.currentCellX+1][Ch.currentCellY].getImageName().charAt(1)=='0';	
+					if (e.keyCode == 16777218 &&Ch.currentCellX!= board.length-1) {
+						 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(3)=='0';
+						 boolean cond2 =board[Ch.currentCellX+1][Ch.currentCellY].getImageName().charAt(1)=='0';	
 						 if(cond1&&cond2){
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	mazeData[row][col].ch=null;
+			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(mazeData[row+1][col],SWT.FILL);
+			    	Ch = new Character(board[row+1][col],SWT.FILL);
 			    	Ch.currentCellX=row+1;
 			    	Ch.currentCellY=col;
 					Ch.frameIndex=0;
-					mazeData[row+1][col].ch=Ch;
-					mazeData[Ch.currentCellX-1][Ch.currentCellY].redraw();
-					mazeData[Ch.currentCellX][Ch.currentCellY].redraw();
+					board[row+1][col].ch=Ch;
+					board[Ch.currentCellX-1][Ch.currentCellY].redraw();
+					board[Ch.currentCellX][Ch.currentCellY].redraw();
 			    	//down
 						 }
 			    } //if we have reached the destination
-				 if(Ch.currentCellX== mazeData.length-1 && Ch.currentCellY == mazeData[0].length-1 && mazeData!=null){
+				 if(Ch.currentCellX== board.length-1 && Ch.currentCellY == board[0].length-1 && board!=null){
 					 won=true; 
 					 redraw(); //play a sound :)
 					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
@@ -219,21 +209,21 @@ public class MazeDisplay extends Composite {
 		MazeDisplay a =this; //for our convenience
 		getDisplay().syncExec(new Runnable() {
 			   public void run() {
-				   if(mazeData!=null)
+				   if(board!=null)
 				   a.destructMaze(); // destory previous maze if exists 
-				   mazeRows=m.getRows(); //gets maze rows and cols
-				   mazeCols=m.getCols();
-				   GridLayout layout=new GridLayout(mazeCols, true); //defines the grid layout
+				   boardRows=m.getRows(); //gets maze rows and cols
+				   boardCols=m.getCols();
+				   GridLayout layout=new GridLayout(boardCols, true); //defines the grid layout
 				   layout.horizontalSpacing=0;
 				   layout.verticalSpacing=0;
 				   setLayout(layout); //sets the layout
-				   mazeData=new CellDisplay[mazeRows][mazeCols]; //creates a new maze array
-				   for(int i=0;i<mazeRows;i++)
-					   for(int j=0;j<mazeCols;j++)
+				   board=new CellDisplay[boardRows][boardCols]; //creates a new maze array
+				   for(int i=0;i<boardRows;i++)
+					   for(int j=0;j<boardCols;j++)
 					   {
-						   mazeData[i][j]=new CellDisplay(a,SWT.NONE);
-						   mazeData[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-						   mazeData[i][j].setImage(cellImage(m,i,j)); //creates a cell and sets the correct image
+						   board[i][j]=new CellDisplay(a,SWT.NONE);
+						   board[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+						   board[i][j].setImage(cellImage(m,i,j)); //creates a cell and sets the correct image
 					   }
 				   getShell().layout();
 			   }
@@ -245,11 +235,11 @@ public class MazeDisplay extends Composite {
 	 */
 	public void destructMaze()
 	{
-		for(int i=0;i<mazeData.length;i++)
-			for(int j=0;j<mazeData[0].length;j++)
+		for(int i=0;i<board.length;i++)
+			for(int j=0;j<board[0].length;j++)
 			{
-				mazeData[i][j].cellImage.dispose();
-				mazeData[i][j].dispose();
+				board[i][j].cellImage.dispose();
+				board[i][j].dispose();
 			}
 	}
 	/**
@@ -293,22 +283,22 @@ public class MazeDisplay extends Composite {
 			str+="0";
 		str+=".jpg";
 		
-		mazeData[i][j].setImageName(str); //sets the image name
+		board[i][j].setImageName(str); //sets the image name
 		return new Image(getDisplay(),new ImageData(temp+str)); //returns the image
 		
 	}
 	// a function to calculate if cell has a right wall
 	boolean HasPathRight(int Row,int Col){
-		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(2)=='0';
-		 boolean cond2 =mazeData[Row][Col+1].getImageName().charAt(0)=='0';
+		 boolean cond1 = board[Row][Col].getImageName().charAt(2)=='0';
+		 boolean cond2 =board[Row][Col+1].getImageName().charAt(0)=='0';
 	if(cond1&&cond2)
 		return true;
 	return false;
 		
 	}// a function to calculate if cell has a left wall
 	boolean HasPathLeft(int Row,int Col){
-		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(0)=='0';
-		 boolean cond2 =mazeData[Row][Col-1].getImageName().charAt(2)=='0';
+		 boolean cond1 = board[Row][Col].getImageName().charAt(0)=='0';
+		 boolean cond2 =board[Row][Col-1].getImageName().charAt(2)=='0';
 	if(cond1&&cond2)
 		return true;
 	
@@ -317,8 +307,8 @@ public class MazeDisplay extends Composite {
 	// a function to calculate if cell has a up wall
 	boolean HasPathUp(int Row,int Col){
 		
-		 boolean cond1 = mazeData[Row][Col].getImageName().charAt(1)=='0';
-		 boolean cond2 =mazeData[Row-1][Col].getImageName().charAt(3)=='0';
+		 boolean cond1 = board[Row][Col].getImageName().charAt(1)=='0';
+		 boolean cond2 =board[Row-1][Col].getImageName().charAt(3)=='0';
 		 	if(cond1 && cond2)
 		 		return true;
 		return false;
@@ -326,8 +316,8 @@ public class MazeDisplay extends Composite {
 	// a function to calculate if cell has a down wall
 	boolean HasPathDown(int Row,int Col){
 		
-		boolean cond1 = mazeData[Row][Col].getImageName().charAt(3)=='0';
-		 boolean cond2 =mazeData[Row+1][Col].getImageName().charAt(1)=='0';	
+		boolean cond1 = board[Row][Col].getImageName().charAt(3)=='0';
+		 boolean cond2 =board[Row+1][Col].getImageName().charAt(1)=='0';	
 		 if(cond1&&cond2)
 			 return true;
 		return false;
