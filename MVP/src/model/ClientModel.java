@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
 
+import presenter.ClientModelProperties;
 import presenter.Properties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;

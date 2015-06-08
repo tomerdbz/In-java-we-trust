@@ -61,7 +61,7 @@ public class MazeDisplay extends Composite {
 	int frameIndex=0;
 	
 	public MazeDisplay(Composite parent, int style) {
-		super(parent, style);
+		super(parent, style | SWT.DOUBLE_BUFFERED);
 		MP3Player player = new MP3Player();
 	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
 	    player.play();
