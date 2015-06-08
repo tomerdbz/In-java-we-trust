@@ -18,6 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.util.SerializationHelper;
 
+import presenter.MyModelProperties;
 import presenter.Properties;
 import algorithms.demo.MazeAirDistance;
 import algorithms.demo.MazeManhattanDistance;

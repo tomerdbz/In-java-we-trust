@@ -20,6 +20,15 @@ public class Properties implements Serializable {
 	 * @author Tomer
 	 *
 	 */
+	
+	/**	Server to connect IP address
+	 * 
+	 */
+	private String serverIP;
+	/**Server to connect Port
+	 * 
+	 */
+	private int serverPort;
 	public enum MazeGenerator {
 		DFS,RANDOM
 	};
@@ -204,6 +213,18 @@ public class Properties implements Serializable {
 	}
 	public void setUi(UI ui) {
 		this.ui = ui;
+	}
+	public String getServerIP() {
+		return serverIP;
+	}
+	public void setServerIP(String serverIP) {
+		this.serverIP = serverIP;
+	}
+	public int getServerPort() {
+		return serverPort;
+	}
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
 	}
 	
 }

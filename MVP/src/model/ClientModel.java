@@ -7,23 +7,34 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
 
-import presenter.ClientModelProperties;
 import presenter.Properties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
 public class ClientModel extends Observable implements Model {
-	private ClientModelProperties properties;
-	public ClientModel(ClientModelProperties properties) {
+	private Properties properties;
+	private Socket myServer;
+	private InputStream inFromServer;
+	private OutputStream outToServer;
+	public ClientModel(Properties properties) {
 		this.properties=properties;
-		Object[] objs=new Object[2];
-		objs[0]="properties";
-		objs[1]=properties;
-		queryServer(objectToInputStream(objs), inFromServer, outToServer)
+		try {
+			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
+			inFromServer=myServer.getInputStream();
+			outToServer=myServer.getOutputStream();
+			Object[] objs=new Object[2];
+			objs[0]="properties";
+			objs[1]=properties;
+			queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	private InputStream objectToInputStream(Object[] objs)
 	{
@@ -50,8 +61,9 @@ public class ClientModel extends Observable implements Model {
 	@Override
 	public void generateMaze(String name, int rows, int cols, int rowSource,
 			int colSource, int rowGoal, int colGoal, String notifyArgument) {
-		Object[] objs=new Object[1];
-		objs[0]=notifyArgument+" "+ name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
+		Object[] objs=new Object[2];
+		objs[0]=notifyArgument;
+		objs[1]=name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
 		queryServer(objectToInputStream(objs), inFromServer, outToServer);
 	}
 
@@ -63,8 +75,9 @@ public class ClientModel extends Observable implements Model {
 
 	@Override
 	public void solveMaze(String mazeName, String notifyArgument) {
-		Object[] objs=new Object[1];
-		objs[0]=notifyArgument+" "+ mazeName;
+		Object[] objs=new Object[2];
+		objs[0]=notifyArgument; 
+		objs[1]=mazeName;;
 		queryServer(objectToInputStream(objs), inFromServer, outToServer);
 		
 	}
@@ -89,14 +102,15 @@ public class ClientModel extends Observable implements Model {
 	}
 
 	@Override
-	public void setProperties(MyModelProperties prop) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
+		try {
+			inFromServer.close();
+			outToServer.close();
+			myServer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
