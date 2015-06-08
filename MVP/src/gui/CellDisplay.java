@@ -4,6 +4,7 @@ import jaco.mp3.player.MP3Player;
 
 import java.io.File;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -52,7 +53,7 @@ public class CellDisplay extends Canvas{
 	 */
 	Direction dir; 
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
-		super(parent, style);
+		super(parent, style | SWT.DOUBLE_BUFFERED);
 		addPaintListener(new PaintListener() {
 			
 			@Override

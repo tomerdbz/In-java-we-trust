@@ -14,7 +14,7 @@ import algorithms.search.Movement;
  * @author Tomer
  *
  */
-public class ClientModelProperties implements Serializable {
+public class ClientModelProperties extends Properties implements Serializable {
 	/**
 	 * 
 	 */
@@ -22,51 +22,12 @@ public class ClientModelProperties implements Serializable {
 	/**	Server to connect IP address
 	 * 
 	 */
-	private int serverIP;
+	private String serverIP;
 	/**Server to connect Port
 	 * 
 	 */
 	private int serverPort;
-	/**enum for readability - choose maze generator
-	 * @author Tomer
-	 *
-	 */
-	public enum MazeGenerator {
-		DFS,RANDOM
-	};
-	public enum UI{
-		CLI,GUI
-	};
-	/**enum for readability - choose maze solver
-	 * @author Tomer
-	 *
-	 */
-	public enum MazeSolver {
-		MANHATTAN_DISTANCE_ASTAR,AIR_DISTANCE_ASTAR,BFS
-	};
-	/** User interface - GUI or CLI
-	 */
-	private UI ui;
-	/**	Which maze solver
-	 * 
-	 */
-	private MazeSolver mazeSolver;
-	/**which maze generator
-	 * 
-	 */
-	private MazeGenerator mazeGenerator;
-	/**	How should movement be allowed in the maze
-	 * 
-	 */
-	private Movement movement;
-	/**	Regular Movement cost
-	 * 
-	 */
-	private double movementCost;
-	/**	Diagonal movement cost
-	 * 
-	 */
-	private double diagonalMovementCost;
+	
 	//private int mazeRows;
 	//private int mazeCols;
 	//private int rowSource;
@@ -207,6 +168,18 @@ public class ClientModelProperties implements Serializable {
 	}
 	public void setUi(UI ui) {
 		this.ui = ui;
+	}
+	public String getServerIP() {
+		return serverIP;
+	}
+	public void setServerIP(String serverIP) {
+		this.serverIP = serverIP;
+	}
+	public int getServerPort() {
+		return serverPort;
+	}
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
 	}
 	
 }
