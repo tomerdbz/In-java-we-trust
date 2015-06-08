@@ -34,7 +34,7 @@ public class CellDisplay extends Canvas{
 	/**
 	 * a represenation of character if not null the character is in the cell
 	 */
-	Character ch = null; //DELETE!!!!!!! hasCharacter instead!!!!! 
+	MazeCharacter ch = null; //DELETE!!!!!!! hasCharacter instead!!!!! 
 	/**
 	 * does the tile represent the goal or not
 	 */

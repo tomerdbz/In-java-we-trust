@@ -499,7 +499,7 @@ public class MazeWindow extends BasicWindow implements View {
 		display.syncExec(new Runnable() {
 			   public void run() {
 				   mazeDisplay.displayMaze(m);
-				   mazeDisplay.Ch = new Character(mazeDisplay.mazeData[0][0],SWT.FILL);
+				   mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[0][0],SWT.FILL);
 				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
 				   mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch; //set character to the begining of the maze
 				   mazeDisplay.mazeData[0][0].redraw();
@@ -596,7 +596,7 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.UpRight){ //direction upright
 				if(x-1 >=0 && y+1<= mazeDisplay.mazeData[0].length-1) //not out of bounds
 				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y))) //check if we have path to that location
-				{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x-1][y+1],SWT.FILL);
+				{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x-1][y+1],SWT.FILL);
 		    	mazeDisplay.Ch.currentCellX=x-1;// if yes we put the character in that new location
 		    	mazeDisplay.Ch.currentCellY=y+1;
 				mazeDisplay.Ch.frameIndex=0;
@@ -618,7 +618,7 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.UpLeft){
 					if(x-1 >=0 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathUp(x, y-1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathLeft(x-1, y)))
-					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x-1][y-1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x-1][y-1],SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x-1;
 			    	mazeDisplay.Ch.currentCellY=y-1;
 					mazeDisplay.Ch.frameIndex=0;
@@ -643,7 +643,7 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.DownLeft){
 				if(x+1 <=mazeDisplay.mazeData.length-1 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathDown(x, y-1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathLeft(x+1, y)))
-					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x+1][y-1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x+1][y-1],SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x+1;
 			    	mazeDisplay.Ch.currentCellY=y-1;
 					mazeDisplay.Ch.frameIndex=0;
@@ -670,7 +670,7 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.DownRight){
 				if(x+1 <=mazeDisplay.mazeData.length-1 && y+1<=mazeDisplay.mazeData[0].length-1)
 					if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathDown(x, y+1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathRight(x+1, y)))
-					{mazeDisplay.Ch = new Character(mazeDisplay.mazeData[x+1][y+1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x+1][y+1],SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x+1;
 			    	mazeDisplay.Ch.currentCellY=y+1;
 					mazeDisplay.Ch.frameIndex=0;

@@ -36,7 +36,7 @@ public class MazeDisplay extends CommonBoard {
 	/**
 	 * representation of the character in the maze
 	 */
-	Character Ch=null;
+	MazeCharacter Ch=null;
 	/**
 	 * Helps load gif to single images
 	 */
@@ -93,7 +93,7 @@ public class MazeDisplay extends CommonBoard {
 				    	int col = Ch.currentCellY;
 				    	board[row][col].ch=null;
 				    	Ch.setVisible(false);
-				    	Ch = new Character(board[row-1][col],SWT.FILL);
+				    	Ch = new MazeCharacter(board[row-1][col],SWT.FILL);
 				    	Ch.currentCellX=row-1;
 				    	Ch.currentCellY=col;
 						Ch.frameIndex=0;
@@ -112,7 +112,7 @@ public class MazeDisplay extends CommonBoard {
 			    	int col = Ch.currentCellY;
 			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(board[row][col+1],SWT.FILL);
+			    	Ch = new MazeCharacter(board[row][col+1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col+1;
 					Ch.frameIndex=0;
@@ -131,7 +131,7 @@ public class MazeDisplay extends CommonBoard {
 			    	int col = Ch.currentCellY;
 			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(board[row][col-1],SWT.FILL);
+			    	Ch = new MazeCharacter(board[row][col-1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col-1;
 					Ch.frameIndex=0;
@@ -150,7 +150,7 @@ public class MazeDisplay extends CommonBoard {
 			    	int col = Ch.currentCellY;
 			    	board[row][col].ch=null;
 			    	Ch.setVisible(false);
-			    	Ch = new Character(board[row+1][col],SWT.FILL);
+			    	Ch = new MazeCharacter(board[row+1][col],SWT.FILL);
 			    	Ch.currentCellX=row+1;
 			    	Ch.currentCellY=col;
 					Ch.frameIndex=0;

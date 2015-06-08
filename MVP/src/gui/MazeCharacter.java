@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
  * this is a widget representing the character in the maze
  * it extends canvas
  */
-public class Character extends Canvas {
+public class MazeCharacter extends Canvas {
 	   /**
 	 *  Image Loader is used in order to take a gif and turn it into single pictures
 	 */
@@ -37,7 +37,7 @@ public class Character extends Canvas {
     * 
     * 
     */
-	public Character(Composite parent, int style) {
+	public MazeCharacter(Composite parent, int style) {
 		super(parent, style);
 	
 		
