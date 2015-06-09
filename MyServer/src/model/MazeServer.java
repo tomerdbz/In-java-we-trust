@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.sql.Blob;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -15,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.util.SerializationHelper;
 
+import presenter.ServerProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
@@ -28,24 +28,24 @@ public class MazeServer extends MyTCPIPServer {
 	 * notice the Concurrent because of the workings with Threads.
 	 * 
 	 */
-	private ConcurrentHashMap<Maze,Solution> cache=new ConcurrentHashMap<Maze,Solution>();
+	ConcurrentHashMap<Maze,Solution> cache=new ConcurrentHashMap<Maze,Solution>();
 	/**	Temporary variable for Hint calculation. after calculating a hint - the hint will be saved here as a State for the Presenter to pick him up.
 	 * 
 	 */
-	private ConcurrentHashMap<String,State> hints=new ConcurrentHashMap<String,State>();
+	ConcurrentHashMap<String,State> hints=new ConcurrentHashMap<String,State>();
 	/**	databaseNames will contain names of mazes which were brought from the database. when we'll write back at the end we won't write them again..
 	 * 
 	 */
-	private ConcurrentLinkedQueue<String> databaseNames=new ConcurrentLinkedQueue<String>();
+	ConcurrentLinkedQueue<String> databaseNames=new ConcurrentLinkedQueue<String>();
 	/**	Properties defined. see Properties class for more info.
 	 * 
 	 */
-	private Properties properties;
+	ServerProperties serverProperties;
 	
 	/** Any generated maze will be inserted to this field, a HashMap mapping between Maze Names and the mazes themselves.
 	 * 
 	 */
-	private ConcurrentHashMap<String,Maze> generatedMazes=new ConcurrentHashMap<String,Maze>();
+	ConcurrentHashMap<String,Maze> generatedMazes=new ConcurrentHashMap<String,Maze>();
 	
 	
 	public MazeServer(int port, MazeClientHandler clientHandler) {

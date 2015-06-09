@@ -7,19 +7,16 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public class MyTCPIPServer {
 	private int port;
 	ClientHandler clientHandler;
 	private volatile boolean stopped;
-	/** Guava Library class - this service allows registered Callables and Runs to define What should be performed once a thread has succeeded. (or failed)
-	 * 
-	 */
-	private ListeningExecutorService executor;
+
 	public MyTCPIPServer(int port,ClientHandler clientHandler) {
 		this.port=port;
 		stopped=false;
