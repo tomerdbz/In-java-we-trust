@@ -21,6 +21,20 @@ public class ClientModel extends Observable implements Model {
 	private Socket myServer;
 	private InputStream inFromServer;
 	private OutputStream outToServer;
+	private Maze maze;
+	private Solution solution;
+	private State hint;
+	public ClientModel() {
+		try {
+			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
+			inFromServer=myServer.getInputStream();
+			outToServer=myServer.getOutputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	public ClientModel(Properties properties) {
 		this.properties=properties;
 		try {
@@ -34,7 +48,6 @@ public class ClientModel extends Observable implements Model {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	private InputStream objectToInputStream(Object[] objs)
 	{
@@ -62,43 +75,68 @@ public class ClientModel extends Observable implements Model {
 	public void generateMaze(String name, int rows, int cols, int rowSource,
 			int colSource, int rowGoal, int colGoal, String notifyArgument) {
 		Object[] objs=new Object[2];
-		objs[0]=notifyArgument;
+		objs[0]="generate maze";
 		objs[1]=name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
-		queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		maze=serializableMaze.getOriginalMaze();
+		notifyObservers(notifyArgument+" "+name);
 	}
 
 	@Override
 	public Maze getMaze(String mazeName) {
-		// TODO Auto-generated method stub
-		return null;
+		if(maze==null)
+		{
+			setChanged();
+			notifyObservers("error");
+		}
+		Maze retMaze=maze;
+		maze=null;
+		return retMaze;
 	}
 
 	@Override
 	public void solveMaze(String mazeName, String notifyArgument) {
 		Object[] objs=new Object[2];
-		objs[0]=notifyArgument; 
-		objs[1]=mazeName;;
-		queryServer(objectToInputStream(objs), inFromServer, outToServer);
-		
+		objs[0]="solve maze"; 
+		objs[1]=mazeName;
+		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		solution=serializableSolution.getOriginalSolution();
+		setChanged();
+		notifyObservers(notifyArgument+" "+mazeName);
 	}
 
 	@Override
 	public Solution getSolution(String mazeName) {
-		// TODO Auto-generated method stub
-		return null;
+		if(solution==null)
+		{
+			setChanged();
+			notifyObservers("error");
+		}
+		Solution retSolution=solution;
+		solution=null;
+		return retSolution;
 	}
 
 	@Override
 	public State getHint(String mazeName) {
-		// TODO Auto-generated method stub
-		return null;
+		if(hint==null)
+		{
+			setChanged();
+			notifyObservers("error");
+		}
+		State retHint=hint;
+		hint=null;
+		return retHint;
 	}
 
 	@Override
 	public void calculateHint(String mazeName, int row, int col,
 			String notifyArgument) {
-		// TODO Auto-generated method stub
-		
+		Object[] objs=new Object[2];
+		objs[0]="calculate hint";
+		objs[1]=mazeName+" "+row+","+col;
+		SerializableState serializableHint=(SerializableState)queryServer(objectToInputStream(objs),inFromServer,outToServer);
+		hint=serializableHint.getOriginalState();
 	}
 
 	@Override
@@ -129,6 +167,8 @@ public class ClientModel extends Observable implements Model {
 			//getting data - agreed protocol is that the data is compressed by ZIP
 			GZIPInputStream inputCompressedFromServer=new GZIPInputStream(inputFromServer);
 			value=new ObjectInputStream(inputCompressedFromServer).readObject();
+			if(value.toString().equals("error"))
+				return null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -138,9 +178,12 @@ public class ClientModel extends Observable implements Model {
 		return value;
 	}
 	@Override
-	public void setProperties(Properties prop) {
-		// TODO Auto-generated method stub
-		
+	public void setProperties(Properties properties) {
+		this.properties=properties;
+		Object[] objs=new Object[2];
+		objs[0]="properties";
+		objs[1]=properties;
+		queryServer(objectToInputStream(objs), inFromServer, outToServer);
 	}
 
 }

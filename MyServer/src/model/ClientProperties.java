@@ -1,4 +1,4 @@
-package presenter;
+package model;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import algorithms.search.Movement;
  * @author Tomer
  *
  */
-public class Properties implements Serializable {
+public class ClientProperties implements Serializable {
 	/**
 	 * 
 	 */
@@ -78,7 +78,7 @@ public class Properties implements Serializable {
 	/**	Default Ct'r - default Properties I have defined.
 	 * 
 	 */
-	public Properties()
+	public ClientProperties()
 	{
 		this.ui=UI.CLI;
 		//this.threadNumber=16;
@@ -103,7 +103,7 @@ public class Properties implements Serializable {
 	 * @param movement cost
 	 * @param diagonal movement cost
 	 */
-	public Properties(UI ui, MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost)
+	public ClientProperties(UI ui, MazeSolver mazeSolver,int threadNumber,MazeGenerator mazeGenerator, Movement movement,double mCost,double mdCost)
 	{
 		this.ui=ui;
 		//this.threadNumber=threadNumber;
