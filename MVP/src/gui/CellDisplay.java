@@ -21,27 +21,8 @@ import org.eclipse.swt.widgets.Composite;
  *	this class extends canvas and is a representation of a cell inside of the maze
  *
  */
-public class CellDisplay extends Canvas{
-	/**
-	 * image of the cell (the way the cell looks walls up down right or left 
-	 */
-	Image cellImage; 
-	String imageName;
-	/**
-	 *  hint represnets a special image that shows the user
-	 */
-	Image Hint=null; 
-	/**
-	 * a represenation of character if not null the character is in the cell
-	 */
-	MazeCharacter ch = null; //DELETE!!!!!!! hasCharacter instead!!!!! 
-	/**
-	 * does the tile represent the goal or not
-	 */
-	Image goal =null; 
-	/**
-	 * true if drag has occureed
-	 */
+public class CellDisplay extends CommonTile{
+	
 	boolean wasDragged=false; 
 	/**
 	 * 
@@ -51,7 +32,6 @@ public class CellDisplay extends Canvas{
 	/**
 	 * an instance of the enum above
 	 */
-	Direction dir; 
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 		addPaintListener(new PaintListener() {
@@ -133,6 +113,7 @@ public class CellDisplay extends Canvas{
 						dir=Direction.UpLeft;
 						
 					}
+					System.out.println(ch.currentCellX+" "+ch.currentCellY +" " +dir);
 					ch=null;
 					
 				}
@@ -162,14 +143,60 @@ public class CellDisplay extends Canvas{
 		//change image
 		redraw();
 	}
+	/*
+	@Override
 	public Image getCellImage(){
 		return cellImage;
 	}
+	
+	//public void setImageName(String imageName) {
+		//this.imageName = imageName;
+	//}
+	@Override
+	public void setHint(Image img) {
+		this.Hint=img;
+		
+	}
+	@Override
+	public void setGoal(Image img) {
+		this.goal=img;
+		
+	}
+	@Override
+	public void setCellImage(Image img) {
+		this.cellImage=img;
+		
+	}
+
+	@Override
 	public String getImageName() {
-		return imageName;
+		return this.imageName;
 	}
-	public void setImageName(String imageName) {
-		this.imageName = imageName;
+	@Override
+	public Image getHint() {
+		
+		return this.Hint;
 	}
+	@Override
+	public Image getGoal() {
+	
+		return goal;
+	}
+	@Override
+	public void setCharacter(CommonCharacter character) {
+		this.ch=character;
+		
+	}
+	@Override
+	public CommonCharacter getCharacter() {
+		return this.ch;
+	}
+	@Override
+	public void setImageName(String name) {
+		this.imageName=name;
+		
+	}
+	*/
+	
 
 }

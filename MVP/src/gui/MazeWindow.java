@@ -1,6 +1,6 @@
 package gui;
 
-import gui.CellDisplay.Direction;
+
 import jaco.mp3.player.MP3Player;
 
 import java.beans.XMLDecoder;
@@ -312,9 +312,9 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("calculate hint");
 				setChanged(); //mvp solve maze
 				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.Ch.currentCellX+","+ mazeDisplay.Ch.currentCellY);
-				for(int i=0; i<mazeDisplay.mazeRows;i++)
-					for(int j=0;j<mazeDisplay.mazeCols;j++){
-						mazeDisplay.mazeData[i][j].redraw();
+				for(int i=0; i<mazeDisplay.boardRows;i++)
+					for(int j=0;j<mazeDisplay.boardCols;j++){
+						mazeDisplay.board[i][j].drawTile();;
 					}
 				mazeDisplay.redraw();
 				mazeDisplay.forceFocus();
@@ -351,9 +351,9 @@ public class MazeWindow extends BasicWindow implements View {
 					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg")); //sets Background images
 				LastUserCommand= commands.get("generate maze");
 				setChanged();
-				String mazeData= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
-				System.out.println(mazeData);
-				notifyObservers(" "+ mazeData); //passses data to generate maze in MVP System
+				String board= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
+				System.out.println(board);
+				notifyObservers(" "+ board); //passses data to generate maze in MVP System
 				}
 				else if(mazearrayData!=null){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
@@ -410,18 +410,17 @@ public class MazeWindow extends BasicWindow implements View {
 				public void run() {
 					if(!mazeDisplay.isDisposed()){
 					mazeDisplay.getDisplay().syncExec(new Runnable() {
-						
 						@Override
 						public void run() {
 							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed()){
 							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length; //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
-							 mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].goal= new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]);
-							 mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
-							// System.out.println(rows+" " + cols+" "+ mazeDisplay.mazeData.length+" "+ mazeDisplay.mazeData[0].length);
-							// if( rows== mazeDisplay.mazeData.length && cols == mazeDisplay.mazeData[0].length )
-							 //mazeDisplay.mazeData[rows-1][cols-1].redraw(); //redraw the goal cell - bug
-							mazeDisplay.mazeData[mazeDisplay.mazeData.length-1][mazeDisplay.mazeData[0].length-1].redraw(); //redraw the goal cell
+							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
+							 mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].drawTile(); //redraw cell in which character now stays
+							// System.out.println(rows+" " + cols+" "+ mazeDisplay.board.length+" "+ mazeDisplay.board[0].length);
+							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
+							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
+							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].drawTile(); //redraw the goal cell
 							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
@@ -499,10 +498,10 @@ public class MazeWindow extends BasicWindow implements View {
 		display.syncExec(new Runnable() {
 			   public void run() {
 				   mazeDisplay.displayMaze(m);
-				   mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[0][0],SWT.FILL);
+				   mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
 				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-				   mazeDisplay.mazeData[0][0].ch=mazeDisplay.Ch; //set character to the begining of the maze
-				   mazeDisplay.mazeData[0][0].redraw();
+				   (mazeDisplay.board[0][0]).setCharacter(mazeDisplay.Ch); //set character to the begining of the maze
+				   mazeDisplay.board[0][0].drawTile();
 				   mazeDisplay.layout(); //draw all the things needed
 				   mazeDisplay.forceFocus();
 			    
@@ -515,24 +514,24 @@ public class MazeWindow extends BasicWindow implements View {
 	 * disposes all data of the maze
 	 */
 	public void closeCorrect(){
-		if(mazeDisplay.mazeData!=null){
-		for(int i=0;i<mazeDisplay.mazeData.length;i++)
+		if(mazeDisplay.board!=null){
+		for(int i=0;i<mazeDisplay.board.length;i++)
 		{
-			for(int j=0;j<mazeDisplay.mazeData[0].length;j++)
+			for(int j=0;j<mazeDisplay.board[0].length;j++)
 			{	
-				 if(mazeDisplay.mazeData[i][j].cellImage!=null)
-					 mazeDisplay.mazeData[i][j].cellImage.dispose();
-				 if(mazeDisplay.mazeData[i][j].goal!=null)
-					 mazeDisplay.mazeData[i][j].goal.dispose();
-				 if(mazeDisplay.mazeData[i][j].Hint!=null)
-					 mazeDisplay.mazeData[i][j].Hint.dispose();
-				 if(mazeDisplay.mazeData[i][j].ch!=null)
-					 mazeDisplay.mazeData[i][j].ch.dispose();
+				 if( mazeDisplay.board[i][j].getCellImage()!=null)
+					( mazeDisplay.board[i][j]).getCellImage().dispose();
+				 if(( mazeDisplay.board[i][j]).getGoal()!=null)
+					 ( mazeDisplay.board[i][j]).getGoal().dispose();
+				 if(( mazeDisplay.board[i][j]).getHint()!=null)
+					 ( mazeDisplay.board[i][j]).getHint().dispose();
+				 if(( mazeDisplay.board[i][j]).getCharacter()!=null)
+					 ( mazeDisplay.board[i][j]).getCharacter().dispose();
 				
 				 if(mazeDisplay.Ch!=null)
 					 mazeDisplay.Ch.dispose();
 					 
-				 mazeDisplay.mazeData[i][j].dispose();
+				 ( mazeDisplay.board[i][j]).dispose();
 			}
 		}
 		}
@@ -553,7 +552,7 @@ public class MazeWindow extends BasicWindow implements View {
 			String []indexes = path[i].split(",");
 			int xt=Integer.parseInt(indexes[0]);
 			int yt=Integer.parseInt(indexes[1]);	
-				mazeDisplay.mazeData[xt][yt].Hint=img; //put hints all over the solutions path
+				(mazeDisplay.board[xt][yt]).setHint(img); //put hints all over the solutions path
 			}
 	
 		
@@ -563,8 +562,8 @@ public class MazeWindow extends BasicWindow implements View {
 				
 				@Override
 				public void run() {
-					mazeDisplay.mazeData[dx][dy].Hint=img;
-					mazeDisplay.mazeData[dx][dy].redraw(); //redraw the hint
+					mazeDisplay.board[dx][dy].Hint=img;
+					mazeDisplay.board[dx][dy].redraw(); //redraw the hint
 				}
 			});*/
 			
@@ -572,9 +571,9 @@ public class MazeWindow extends BasicWindow implements View {
 			
 			@Override
 			public void run() {
-				for(int i=0; i<mazeDisplay.mazeRows;i++)
-					for(int j=0;j<mazeDisplay.mazeCols;j++){
-						mazeDisplay.mazeData[i][j].redraw();
+				for(int i=0; i<mazeDisplay.boardRows;i++)
+					for(int j=0;j<mazeDisplay.boardCols;j++){
+						mazeDisplay.board[i][j].drawTile();
 					}
 				mazeDisplay.redraw(); //redraw maze
 				mazeDisplay.forceFocus();	
@@ -588,20 +587,21 @@ public class MazeWindow extends BasicWindow implements View {
 	 * Checks if character has been dragged by mouse and handles it
 	 */
 	public void HasBeenDragged(){
-		if(mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].ch==null){ //if it has been dragged
-			Direction dir = mazeDisplay.mazeData[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].dir; //get direction of drag
+		if((mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY]).getCharacter()==null){//if it has been dragged
 			int x = mazeDisplay.Ch.currentCellX; //currenct row
 			int y = mazeDisplay.Ch.currentCellY; //current col 
+			Direction dir = (mazeDisplay.board[x][y]).dir; //get direction of drag
+			System.out.println(mazeDisplay.board[x][y].dir);
 			//all ifs are alike so there will be one example 
 			if(dir == Direction.UpRight){ //direction upright
-				if(x-1 >=0 && y+1<= mazeDisplay.mazeData[0].length-1) //not out of bounds
+				if(x-1 >=0 && y+1<= mazeDisplay.board[0].length-1) //not out of bounds
 				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y))) //check if we have path to that location
-				{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x-1][y+1],SWT.FILL);
+				{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x-1][y+1],SWT.FILL);
 		    	mazeDisplay.Ch.currentCellX=x-1;// if yes we put the character in that new location
 		    	mazeDisplay.Ch.currentCellY=y+1;
 				mazeDisplay.Ch.frameIndex=0;
-				mazeDisplay.mazeData[x-1][y+1].ch=mazeDisplay.Ch;
-				if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){ //if we have reached goal
+				(mazeDisplay.board[x-1][y+1]).setCharacter(mazeDisplay.Ch);
+				if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){ //if we have reached goal
 					 mazeDisplay.won=true; //signal we won
 					 mazeDisplay.redraw(); 
 					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png")); //background for winning
@@ -618,12 +618,12 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.UpLeft){
 					if(x-1 >=0 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathUp(x, y-1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathLeft(x-1, y)))
-					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x-1][y-1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x-1][y-1],SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x-1;
 			    	mazeDisplay.Ch.currentCellY=y-1;
 					mazeDisplay.Ch.frameIndex=0;
-					mazeDisplay.mazeData[x-1][y-1].ch=mazeDisplay.Ch;
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+					(mazeDisplay.board[x-1][y-1]).setCharacter(mazeDisplay.Ch);
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -641,14 +641,14 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			else
 			if(dir == Direction.DownLeft){
-				if(x+1 <=mazeDisplay.mazeData.length-1 && y-1>=0)
+				if(x+1 <=mazeDisplay.board.length-1 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathDown(x, y-1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathLeft(x+1, y)))
-					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x+1][y-1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x+1][y-1],SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x+1;
 			    	mazeDisplay.Ch.currentCellY=y-1;
 					mazeDisplay.Ch.frameIndex=0;
-					mazeDisplay.mazeData[x+1][y-1].ch=mazeDisplay.Ch;
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+					(mazeDisplay.board[x+1][y-1]).setCharacter(mazeDisplay.Ch);
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -668,14 +668,14 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			else
 			if(dir == Direction.DownRight){
-				if(x+1 <=mazeDisplay.mazeData.length-1 && y+1<=mazeDisplay.mazeData[0].length-1)
+				if(x+1 <=mazeDisplay.board.length-1 && y+1<=mazeDisplay.board[0].length-1)
 					if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathDown(x, y+1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathRight(x+1, y)))
-					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.mazeData[x+1][y+1],SWT.FILL);
+					{mazeDisplay.Ch = new MazeCharacter((mazeDisplay.board[x+1][y+1]),SWT.FILL);
 			    	mazeDisplay.Ch.currentCellX=x+1;
 			    	mazeDisplay.Ch.currentCellY=y+1;
 					mazeDisplay.Ch.frameIndex=0;
-					mazeDisplay.mazeData[x+1][y+1].ch=mazeDisplay.Ch;
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.mazeData.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.mazeData[0].length-1 && mazeDisplay.mazeData!=null){
+					(mazeDisplay.board[x+1][y+1]).setCharacter(mazeDisplay.Ch);
+					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -692,7 +692,7 @@ public class MazeWindow extends BasicWindow implements View {
 					}
 			}
 				
-				mazeDisplay.mazeData[x][y].ch=mazeDisplay.Ch;
+				(mazeDisplay.board[x][y]).setCharacter(mazeDisplay.Ch);
 			
 			
 			
@@ -739,12 +739,13 @@ public class MazeWindow extends BasicWindow implements View {
 		final String[] coordinates=h.getState().split(",");
 		if(isNumeric(coordinates[0]) && isNumeric(coordinates[1]))
 		{
-			mazeDisplay.mazeData[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].Hint=img; //put hints all over the solutions path
+			
+			(mazeDisplay.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])]).setHint(img); //put hints all over the solutions path
 			display.asyncExec(new Runnable() {
 				
 				@Override
 				public void run() {
-					mazeDisplay.mazeData[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].redraw(); //redraw the hint
+					mazeDisplay.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].drawTile();; //redraw the hint
 				}
 			});
 		}

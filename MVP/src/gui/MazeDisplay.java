@@ -33,25 +33,11 @@ public class MazeDisplay extends CommonBoard {
 	 */
 	boolean won=false;
 	
-	/**
-	 * representation of the character in the maze
-	 */
-	MazeCharacter Ch=null;
-	/**
-	 * Helps load gif to single images
-	 */
-	ImageLoader gifs=new ImageLoader();
-	/**
-	 * an array of images which represent the gif of the goal
-	 */
-	ImageData[] images = gifs.load(".\\resources\\images\\ChaosEmerald.gif");
-	/**
-	 * frame of the gif
-	 */
-	int frameIndex=0;
+
 	
 	public MazeDisplay(Composite parent, int style) {
 		super(parent, style | SWT.DOUBLE_BUFFERED);
+		images=gifs.load(".\\resources\\images\\ChaosEmerald.gif");
 		MP3Player player = new MP3Player();
 	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
 	    player.play();
@@ -78,7 +64,7 @@ public class MazeDisplay extends CommonBoard {
 				else if(board!=null)
 					for(int i=0;i<board.length;i++)
 						for(int j=0;j<board[0].length;j++)
-							board[i][j].redraw();
+							board[i][j].drawTile();
 			}
 		});
 	
@@ -86,39 +72,39 @@ public class MazeDisplay extends CommonBoard {
 			@Override
 			public void keyPressed(KeyEvent e) { //each of those codes represenets a key on the keyboard in our case up down right left arrows
 				 if (e.keyCode == 16777217 && Ch.currentCellX!=0 ){
-					 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(1)=='0';
-					 boolean cond2 =board[Ch.currentCellX-1][Ch.currentCellY].getImageName().charAt(3)=='0'; //check if a path is possible
+					 boolean cond1 = ( board[Ch.currentCellX][Ch.currentCellY]).getImageName().charAt(1)=='0';
+					 boolean cond2 =( board[Ch.currentCellX-1][Ch.currentCellY]).getImageName().charAt(3)=='0'; //check if a path is possible
 					 	if(cond1 && cond2){ //if so redraws the character in the new location
 						int row=Ch.currentCellX;
 				    	int col = Ch.currentCellY;
-				    	board[row][col].ch=null;
+				    	board[row][col].setCharacter(null);
 				    	Ch.setVisible(false);
-				    	Ch = new MazeCharacter(board[row-1][col],SWT.FILL);
+				    	Ch = new MazeCharacter( board[row-1][col],SWT.FILL);
 				    	Ch.currentCellX=row-1;
 				    	Ch.currentCellY=col;
 						Ch.frameIndex=0;
-						board[row-1][col].ch=Ch;
-						board[Ch.currentCellX+1][Ch.currentCellY].redraw();
-						board[Ch.currentCellX][Ch.currentCellY].redraw();
+						board[row-1][col].setCharacter(Ch);
+						board[Ch.currentCellX+1][Ch.currentCellY].drawTile();
+						board[Ch.currentCellX][Ch.currentCellY].drawTile();;
 					 //up
 					 	}
 			    } 
 				 else 
 					 if (e.keyCode == 16777220 && Ch.currentCellY!=board[0].length-1) {
-						 boolean cond1 = board[Ch.currentCellX][Ch.currentCellY].getImageName().charAt(2)=='0';
-						 boolean cond2 =board[Ch.currentCellX][Ch.currentCellY+1].getImageName().charAt(0)=='0';
+						 boolean cond1 = ( board[Ch.currentCellX][Ch.currentCellY]).getImageName().charAt(2)=='0';
+						 boolean cond2 =( board[Ch.currentCellX][Ch.currentCellY+1]).getImageName().charAt(0)=='0';
 					if(cond1&&cond2){
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	board[row][col].ch=null;
+			    	( board[row][col]).setCharacter(null);
 			    	Ch.setVisible(false);
-			    	Ch = new MazeCharacter(board[row][col+1],SWT.FILL);
+			    	Ch = new MazeCharacter( board[row][col+1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col+1;
 					Ch.frameIndex=0;
-					board[row][col+1].ch=Ch;
-					board[Ch.currentCellX][Ch.currentCellY-1].redraw();
-					board[Ch.currentCellX][Ch.currentCellY].redraw();
+					board[row][col+1].setCharacter(Ch);
+					board[Ch.currentCellX][Ch.currentCellY-1].drawTile();
+					board[Ch.currentCellX][Ch.currentCellY].drawTile();
 			    	//right
 						 }
 			    } 
@@ -129,13 +115,13 @@ public class MazeDisplay extends CommonBoard {
 					if(cond1&&cond2){	 
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	board[row][col].ch=null;
+			    	board[row][col].setCharacter(null);
 			    	Ch.setVisible(false);
 			    	Ch = new MazeCharacter(board[row][col-1],SWT.FILL);
 			    	Ch.currentCellX=row;
 			    	Ch.currentCellY=col-1;
 					Ch.frameIndex=0;
-					board[row][col-1].ch=Ch;
+					board[row][col-1].setCharacter(Ch);
 					board[Ch.currentCellX][Ch.currentCellY+1].redraw();
 					board[Ch.currentCellX][Ch.currentCellY].redraw();
 			    	//left
@@ -148,13 +134,13 @@ public class MazeDisplay extends CommonBoard {
 						 if(cond1&&cond2){
 			    	int row=Ch.currentCellX;
 			    	int col = Ch.currentCellY;
-			    	board[row][col].ch=null;
+			    	board[row][col].setCharacter(null);
 			    	Ch.setVisible(false);
 			    	Ch = new MazeCharacter(board[row+1][col],SWT.FILL);
 			    	Ch.currentCellX=row+1;
 			    	Ch.currentCellY=col;
 					Ch.frameIndex=0;
-					board[row+1][col].ch=Ch;
+					board[row+1][col].setCharacter(Ch);
 					board[Ch.currentCellX-1][Ch.currentCellY].redraw();
 					board[Ch.currentCellX][Ch.currentCellY].redraw();
 			    	//down
@@ -223,7 +209,7 @@ public class MazeDisplay extends CommonBoard {
 					   {
 						   board[i][j]=new CellDisplay(a,SWT.NONE);
 						   board[i][j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-						   board[i][j].setImage(cellImage(m,i,j)); //creates a cell and sets the correct image
+						   board[i][j].setCellImage(cellImage(m,i,j)); //creates a cell and sets the correct image
 					   }
 				   getShell().layout();
 			   }
@@ -238,7 +224,7 @@ public class MazeDisplay extends CommonBoard {
 		for(int i=0;i<board.length;i++)
 			for(int j=0;j<board[0].length;j++)
 			{
-				board[i][j].cellImage.dispose();
+				board[i][j].getCellImage().dispose();
 				board[i][j].dispose();
 			}
 	}
