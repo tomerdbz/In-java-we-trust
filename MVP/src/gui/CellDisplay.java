@@ -34,45 +34,7 @@ public class CellDisplay extends CommonTile{
 	 */
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style | SWT.DOUBLE_BUFFERED);
-		addPaintListener(new PaintListener() {
-			
-			@Override
-			public void paintControl(PaintEvent e) {
-			   
-					int width=getSize().x; //get width of window
-					int height=getSize().y; //get height of window
-			        //Rectangle rect = getParent().getBounds();
-					if(ch!=null && Hint!=null){ //character is on the tile and a hint is given
-						Hint=null;
-						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File(".\\resources\\sounds\\ring.mp3")); //if a hint has been reached play a sound
-					    player.play();
-
-					}
-					
-					if(cellImage!=null){ //display image of the tile
-			        ImageData data = cellImage.getImageData();
-			        e.gc.drawImage(cellImage,0,0,data.width,data.height,0,0,width,height);
-					}
-			       if(Hint!=null){ //display hint if it has been given
-			    	   ImageData data2=Hint.getImageData();
-			    	   e.gc.drawImage(Hint,0,0,data2.width,data2.height,0,0,width,height);
-			       } 
-			       if(ch!=null){ //if a character is on the tile display it 
-			    	   Image img= new Image(getDisplay(),ch.images[ch.frameIndex]);
-						ImageData data3= img.getImageData();
-						e.gc.drawImage(img,0,0,data3.width,data3.height,0,0,getSize().x,getSize().y);
-			       }
-			       if(goal!=null){ // draw the goal if it is on the tile
-			    	   
-						ImageData data4= goal.getImageData();
-						
-						e.gc.drawImage(goal,0,0,data4.width,data4.height,0,0,width,height);
-			       }
-			   
-				
-			}
-		});// mouse listener
+		// mouse listener
 		this.addMouseListener(new MouseListener(){
 
 			int[] before=new int[2]; //place of cursor before click
@@ -143,60 +105,45 @@ public class CellDisplay extends CommonTile{
 		//change image
 		redraw();
 	}
-	/*
 	@Override
-	public Image getCellImage(){
-		return cellImage;
-	}
-	
-	//public void setImageName(String imageName) {
-		//this.imageName = imageName;
-	//}
-	@Override
-	public void setHint(Image img) {
-		this.Hint=img;
-		
-	}
-	@Override
-	public void setGoal(Image img) {
-		this.goal=img;
-		
-	}
-	@Override
-	public void setCellImage(Image img) {
-		this.cellImage=img;
-		
-	}
+	public void drawTile(PaintEvent e) {
+		int width=getSize().x; //get width of window
+		int height=getSize().y; //get height of window
+        //Rectangle rect = getParent().getBounds();
+		if(ch!=null && Hint!=null){ //character is on the tile and a hint is given
+			Hint=null;
+			MP3Player player = new MP3Player();
+		    player.addToPlayList(new File(".\\resources\\sounds\\ring.mp3")); //if a hint has been reached play a sound
+		    player.play();
 
-	@Override
-	public String getImageName() {
-		return this.imageName;
-	}
-	@Override
-	public Image getHint() {
+		}
 		
-		return this.Hint;
-	}
-	@Override
-	public Image getGoal() {
+		if(cellImage!=null){ //display image of the tile
+        ImageData data = cellImage.getImageData();
+        e.gc.drawImage(cellImage,0,0,data.width,data.height,0,0,width,height);
+		}
+       if(Hint!=null){ //display hint if it has been given
+    	   ImageData data2=Hint.getImageData();
+    	   e.gc.drawImage(Hint,0,0,data2.width,data2.height,0,0,width,height);
+       } 
+       if(ch!=null){ //if a character is on the tile display it 
+    	   Image img= new Image(getDisplay(),ch.images[ch.frameIndex]);
+			ImageData data3= img.getImageData();
+			e.gc.drawImage(img,0,0,data3.width,data3.height,0,0,getSize().x,getSize().y);
+       }
+       if(goal!=null){ // draw the goal if it is on the tile
+    	   
+			ImageData data4= goal.getImageData();
+			
+			e.gc.drawImage(goal,0,0,data4.width,data4.height,0,0,width,height);
+       }
+   
 	
-		return goal;
-	}
-	@Override
-	public void setCharacter(CommonCharacter character) {
-		this.ch=character;
-		
-	}
-	@Override
-	public CommonCharacter getCharacter() {
-		return this.ch;
-	}
-	@Override
-	public void setImageName(String name) {
-		this.imageName=name;
-		
-	}
-	*/
-	
-
 }
+		
+	}
+	
+	
+	
+
+

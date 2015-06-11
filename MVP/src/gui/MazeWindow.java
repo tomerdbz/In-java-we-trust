@@ -321,7 +321,7 @@ public class MazeWindow extends BasicWindow implements View {
 				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.Ch.currentCellX+","+ mazeDisplay.Ch.currentCellY);
 				for(int i=0; i<mazeDisplay.boardRows;i++)
 					for(int j=0;j<mazeDisplay.boardCols;j++){
-						mazeDisplay.board[i][j].drawTile();;
+						mazeDisplay.board[i][j].redraw();
 					}
 				mazeDisplay.redraw();
 				mazeDisplay.forceFocus();
@@ -423,11 +423,11 @@ public class MazeWindow extends BasicWindow implements View {
 							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length; //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
-							 mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].drawTile(); //redraw cell in which character now stays
+							 mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
 							// System.out.println(rows+" " + cols+" "+ mazeDisplay.board.length+" "+ mazeDisplay.board[0].length);
 							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
 							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
-							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].drawTile(); //redraw the goal cell
+							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].redraw(); //redraw the goal cell
 							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
@@ -508,7 +508,7 @@ public class MazeWindow extends BasicWindow implements View {
 				   mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
 				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
 				   (mazeDisplay.board[0][0]).setCharacter(mazeDisplay.Ch); //set character to the begining of the maze
-				   mazeDisplay.board[0][0].drawTile();
+				   mazeDisplay.board[0][0].redraw();
 				   mazeDisplay.layout(); //draw all the things needed
 				   mazeDisplay.forceFocus();
 			    
@@ -580,7 +580,7 @@ public class MazeWindow extends BasicWindow implements View {
 			public void run() {
 				for(int i=0; i<mazeDisplay.boardRows;i++)
 					for(int j=0;j<mazeDisplay.boardCols;j++){
-						mazeDisplay.board[i][j].drawTile();
+						mazeDisplay.board[i][j].redraw();
 					}
 				mazeDisplay.redraw(); //redraw maze
 				mazeDisplay.forceFocus();	
@@ -752,7 +752,7 @@ public class MazeWindow extends BasicWindow implements View {
 				
 				@Override
 				public void run() {
-					mazeDisplay.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].drawTile();; //redraw the hint
+					mazeDisplay.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].redraw(); //redraw the hint
 				}
 			});
 		}

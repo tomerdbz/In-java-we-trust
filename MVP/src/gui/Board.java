@@ -1,6 +1,8 @@
 package gui;
 
+import org.eclipse.swt.events.PaintEvent;
+
 public interface Board {
-	void drawBoard();
+	public void drawBoard(PaintEvent arg0);
 	void applyInputDirection(Direction direction/*,Character?*/);
 }

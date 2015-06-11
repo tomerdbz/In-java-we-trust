@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <java version="1.8.0_40" class="java.beans.XMLDecoder">
- <object class="presenter.Properties">
+ <object class="presenter.ClientProperties">
   <void property="diagonalMovementCost">
    <double>12.0</double>
   </void>
   <void property="mazeSolver">
    <object class="java.lang.Enum" method="valueOf">
-    <class>presenter.Properties$MazeSolver</class>
+    <class>presenter.ClientProperties$MazeSolver</class>
     <string>AIR_DISTANCE_ASTAR</string>
    </object>
   </void>
   <void property="movementCost">
    <double>12.0</double>
   </void>
-  <void property="threadNumber">
-   <int>12</int>
+  <void property="serverIP">
+   <string>localhost</string>
+  </void>
+  <void property="serverPort">
+   <int>1234</int>
   </void>
   <void property="ui">
    <object class="java.lang.Enum" method="valueOf">
-    <class>presenter.Properties$UI</class>
+    <class>presenter.ClientProperties$UI</class>
     <string>GUI</string>
    </object>
   </void>
