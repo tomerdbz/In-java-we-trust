@@ -18,9 +18,6 @@ import presenter.ServerProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
-import database.management.DBMaze;
-import database.management.SerializableMaze;
-import database.management.SerializableSolution;
 
 public class MazeServer extends MyTCPIPServer {
 
@@ -37,10 +34,6 @@ public class MazeServer extends MyTCPIPServer {
 	 * 
 	 */
 	ConcurrentLinkedQueue<String> databaseNames=new ConcurrentLinkedQueue<String>();
-	/**	Properties defined. see Properties class for more info.
-	 * 
-	 */
-	ServerProperties serverProperties;
 	
 	/** Any generated maze will be inserted to this field, a HashMap mapping between Maze Names and the mazes themselves.
 	 * 
@@ -48,9 +41,9 @@ public class MazeServer extends MyTCPIPServer {
 	ConcurrentHashMap<String,Maze> generatedMazes=new ConcurrentHashMap<String,Maze>();
 	
 	
-	public MazeServer(int port, MazeClientHandler clientHandler) {
+	public MazeServer(ServerProperties serverProperties, MazeClientHandler clientHandler) {
 		//loadFromDatabase();
-		super(port, clientHandler);
+		super(serverProperties, clientHandler);
 	}
 	@Override
 	public void stoppedServer() {

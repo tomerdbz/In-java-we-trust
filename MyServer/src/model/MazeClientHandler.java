@@ -16,9 +16,7 @@ import algorithms.search.AStar;
 import algorithms.search.BFS;
 import algorithms.search.Solution;
 import algorithms.search.State;
-import database.management.SerializableMaze;
-import database.management.SerializableSolution;
-import database.management.SerializableState;
+
 
 public class MazeClientHandler implements ClientHandler {
 
