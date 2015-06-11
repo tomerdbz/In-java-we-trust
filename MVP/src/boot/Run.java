@@ -1,7 +1,6 @@
 package boot;
 
 import gui.MazeWindow;
-
 import java.beans.XMLDecoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
