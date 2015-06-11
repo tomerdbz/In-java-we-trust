@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import presenter.Properties;
+import presenter.ClientProperties;
 
 /** This class is reponsible to write Properties in a GUI UI.
  * @author Tomer
@@ -19,14 +19,14 @@ public class WritePropertiesGUI {
 	/**	Writes the properties after prompting a window to submit them.
 	 * 
 	 */
-	public void writeProperties(Display display, Shell shell)
+	public int writeProperties(Shell shell)
 	{
 		XMLEncoder e;
 		//Display display = new Display();
 	    //Shell shell = new Shell(display);
 
-	    ClassInputDialog dlg = new ClassInputDialog(shell,Properties.class);
-	    Properties input = (Properties) dlg.open();
+	    ClassInputDialog dlg = new ClassInputDialog(shell,ClientProperties.class);
+	    ClientProperties input = (ClientProperties) dlg.open();
 	    if (input != null) {
 	      // User clicked OK; set the text into the label
 	    	try {
@@ -34,6 +34,7 @@ public class WritePropertiesGUI {
 				e.writeObject(input);
 				e.flush();
 				e.close();
+				return 0;
 	    	} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -55,5 +56,6 @@ public class WritePropertiesGUI {
 			e1.printStackTrace();
 		}
 	     */
+	    return -1;
 	}
 }

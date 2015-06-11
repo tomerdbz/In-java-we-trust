@@ -1,6 +1,6 @@
 package model;
 
-import presenter.Properties;
+import presenter.ClientProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
@@ -16,6 +16,6 @@ public interface Model {
 	Solution getSolution(String mazeName);
 	State getHint(String mazeName);
 	void calculateHint(String mazeName, int row, int col,String notifyArgument);
-	void setProperties(Properties prop);
+	void setProperties(ClientProperties prop);
 	void stop();
 }

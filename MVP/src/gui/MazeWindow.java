@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
 import presenter.Presenter.Command;
-import presenter.Properties;
+import presenter.ClientProperties;
 import view.View;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
@@ -63,7 +63,7 @@ public class MazeWindow extends BasicWindow implements View {
 	 * properties of the maze
 	 * Thread pools Random maze generator or dfs and so...
 	 */
-	Properties properties;
+	ClientProperties properties;
 	/**
 	 * name of the maze
 	 */
@@ -206,34 +206,35 @@ public class MazeWindow extends BasicWindow implements View {
 						@Override
 						public void run() {//this function works on the same basis as open Properties the only difference is the source of the Properties data here we recieve it directly from the user
 							WritePropertiesGUI guiProp=new WritePropertiesGUI();
-							guiProp.writeProperties(display,shell);	
-							properties=Run.readProperties();
-							switch(properties.getUi())
+							if(guiProp.writeProperties(shell)!=-1)
 							{
-								case CLI:
-									timer.cancel();
-									closeCorrect();
-									display.dispose();
-									LastUserCommand= commands.get("exit");
-									setChanged();
-									notifyObservers();
-									RunCLI demo=new RunCLI();
-									demo.startProgram(getProperties());
-									break;
-								case GUI:
-									timer.cancel();
-									closeCorrect();
-									display.dispose();
-									LastUserCommand = commands.get("exit");
-									setChanged();
-									notifyObservers();
-									RunGUI demoG = new RunGUI();
-									demoG.start(getProperties());
-									break;
-								default:
-									return;	
+								properties=Run.readProperties();
+								switch(properties.getUi())
+								{
+									case CLI:
+										timer.cancel();
+										closeCorrect();
+										display.dispose();
+										LastUserCommand= commands.get("exit");
+										setChanged();
+										notifyObservers();
+										RunCLI demo=new RunCLI();
+										demo.startProgram(getProperties());
+										break;
+									case GUI:
+										timer.cancel();
+										closeCorrect();
+										display.dispose();
+										LastUserCommand = commands.get("exit");
+										setChanged();
+										notifyObservers();
+										RunGUI demoG = new RunGUI();
+										demoG.start(getProperties());
+										break;
+									default:
+										return;	
+								}
 							}
-							
 						}
 					});
 				
@@ -441,7 +442,7 @@ public class MazeWindow extends BasicWindow implements View {
 			XMLDecoder d;
 			in = new FileInputStream(filename);
 			d=new XMLDecoder(in);
-			properties=(Properties)d.readObject();
+			properties=(ClientProperties)d.readObject();
 			d.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -729,7 +730,7 @@ public class MazeWindow extends BasicWindow implements View {
 	 * @return properties
 	 */
 	@Override
-	public Properties getProperties() {
+	public ClientProperties getProperties() {
 		return properties;
 	}
 

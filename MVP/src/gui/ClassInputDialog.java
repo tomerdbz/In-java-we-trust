@@ -94,7 +94,7 @@ public class ClassInputDialog extends Dialog {
 	        display.sleep();
 	      }
 	    }
-	    display.dispose();
+	    //display.dispose();
 	    return input;
 	  }
 

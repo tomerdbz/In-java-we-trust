@@ -11,13 +11,13 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
 
-import presenter.Properties;
+import presenter.ClientProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
 public class ClientModel extends Observable implements Model {
-	private Properties properties;
+	private ClientProperties properties;
 	private Socket myServer;
 	private InputStream inFromServer;
 	private OutputStream outToServer;
@@ -35,7 +35,7 @@ public class ClientModel extends Observable implements Model {
 		}
 		
 	}
-	public ClientModel(Properties properties) {
+	public ClientModel(ClientProperties properties) {
 		this.properties=properties;
 		try {
 			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
@@ -178,7 +178,7 @@ public class ClientModel extends Observable implements Model {
 		return value;
 	}
 	@Override
-	public void setProperties(Properties properties) {
+	public void setProperties(ClientProperties properties) {
 		this.properties=properties;
 		Object[] objs=new Object[2];
 		objs[0]="properties";

@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import presenter.Presenter;
-import presenter.Properties;
+import presenter.ClientProperties;
 import view.MyView;
 
 /** ID'S: 208415513, 318507209 - Tomer Cabouly, Alon Orlovsky 
@@ -30,9 +30,9 @@ public class Run {
 				WritePropertiesGUI guiProp=new WritePropertiesGUI();
 				Display display=new Display();
 				Shell shell=new Shell(display);
-				guiProp.writeProperties(display,shell);
+				guiProp.writeProperties(shell);
 				MyModel m;
-				Properties prop;
+				ClientProperties prop;
 				if((prop=readProperties())!=null)
 				{
 					m=new MyModel(prop);
@@ -62,18 +62,18 @@ public class Run {
 			
 
 		}
-			public static Properties readProperties()
+			public static ClientProperties readProperties()
 			{
 				XMLDecoder d;
-				Properties p=null;
+				ClientProperties p=null;
 				try {
 					FileInputStream in=new FileInputStream("properties.xml");
 					d=new XMLDecoder(in);
-					p=(Properties)d.readObject();
+					p=(ClientProperties)d.readObject();
 					System.out.println(p);
 					d.close();
 				} catch (IOException e) {
-					return new Properties();
+					return new ClientProperties();
 				}
 				return p;
 			}

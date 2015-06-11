@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 
 import model.MyModel;
 import presenter.Presenter;
-import presenter.Properties;
+import presenter.ClientProperties;
 import view.MyView;
 
 /** This class is used when the client decides to change in the middle of the program to CLI interface.
@@ -15,7 +15,7 @@ import view.MyView;
  */
 public class RunCLI {
 
-	public void startProgram(Properties properties) {
+	public void startProgram(ClientProperties properties) {
 		MyView v=new MyView(new BufferedReader(new InputStreamReader(System.in)),new PrintWriter(System.out));
 		MyModel m;
 		m=new MyModel(properties);

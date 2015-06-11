@@ -19,7 +19,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.util.SerializationHelper;
 
 //import presenter.MyModelProperties;
-import presenter.Properties;
+import presenter.ClientProperties;
 import algorithms.demo.MazeAirDistance;
 import algorithms.demo.MazeManhattanDistance;
 import algorithms.demo.MazeSearch;
@@ -60,7 +60,7 @@ public class MyModel extends Observable implements Model{
 	/**	Properties defined. see Properties class for more info.
 	 * 
 	 */
-	private Properties properties;
+	private ClientProperties properties;
 	/** Guava Library class - this service allows registered Callables and Runs to define What should be performed once a thread has succeeded. (or failed)
 	 * 
 	 */
@@ -81,11 +81,11 @@ public class MyModel extends Observable implements Model{
 	{
 		//loadFromDatabase();
 	}
-	public MyModel(Properties prop)
+	public MyModel(ClientProperties prop)
 	{
 			//loadFromDatabase();
 			this.properties=prop;
-			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(prop.getThreadNumber()));
+			executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(16));
 		
 	}
 	private void loadFromDatabase()
@@ -432,12 +432,12 @@ public class MyModel extends Observable implements Model{
 		}
 		return names;
 	}
-	public Properties getProperties() {
+	public ClientProperties getProperties() {
 		return properties;
 	}
-	public void setProperties(Properties properties) {
+	public void setProperties(ClientProperties properties) {
 		this.properties = properties;
-		executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(properties.getThreadNumber()));
+		executor=MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(16));
 	}
 
 

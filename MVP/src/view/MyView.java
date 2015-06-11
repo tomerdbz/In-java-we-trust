@@ -5,7 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import presenter.Properties;
+import presenter.ClientProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
@@ -130,7 +130,7 @@ public class MyView extends Observable implements View,Observer {
 		
 	}
 	@Override
-	public Properties getProperties() {
+	public ClientProperties getProperties() {
 		// TODO Auto-generated method stub
 		return null;
 	}

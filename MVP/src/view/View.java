@@ -3,7 +3,7 @@ package view;
 import java.util.concurrent.ConcurrentHashMap;
 
 import presenter.Presenter.Command;
-import presenter.Properties;
+import presenter.ClientProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
@@ -16,7 +16,7 @@ public interface View {
 	void start();
 	void displayHint(State h);
 	void receiveData(String data);
-	Properties getProperties();
+	ClientProperties getProperties();
 	void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands);
 	Command getUserCommand();
 	void Display(String s);
