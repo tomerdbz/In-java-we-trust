@@ -21,12 +21,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 
 import presenter.Presenter.Command;
 import presenter.ClientProperties;
@@ -91,6 +93,10 @@ public class MazeWindow extends BasicWindow implements View {
 	 * true if the data we sent already exists in the database
 	 */
 	boolean dataRecieved=false; 
+	
+	public MazeWindow(Display display,Shell shell,String title, int width, int height) {
+		super(display,shell,title,width,height);
+	}
 	public MazeWindow(String title, int width, int height) {
 		super(title, width, height);
 		

@@ -47,7 +47,7 @@ public class Run {
 							v.start();
 							break;
 						case GUI:
-							MazeWindow vMaze=new MazeWindow("Maze Generations", 1300, 700);
+							MazeWindow vMaze=new MazeWindow(display,shell,"Maze Generations", 1300, 700);
 							Presenter pMaze=new Presenter(m,vMaze);
 							vMaze.addObserver(pMaze);
 							m.addObserver(pMaze);
