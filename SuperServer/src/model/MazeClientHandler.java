@@ -4,7 +4,10 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import algorithms.demo.MazeAirDistance;
 import algorithms.demo.MazeManhattanDistance;
@@ -18,55 +21,95 @@ import algorithms.search.Solution;
 import algorithms.search.State;
 
 
-public class MazeClientHandler implements ClientHandler {
+public class MazeClientHandler extends Observable implements ClientHandler  {
 
 	MazeServer server;
 	ClientProperties clientProperties;
+	volatile ConcurrentLinkedQueue<String> messages=new ConcurrentLinkedQueue<String>();
 	public MazeClientHandler(MazeServer server) {
 		this.server=server;
 	}
-	
+	public MazeClientHandler() {
+	}
 	
 	public void setClientProperties(ClientProperties clientProperties) {
+		setChanged();
+		notifyObservers("Setting Properties");
 		this.clientProperties = clientProperties;
 	}
 	
 	/** Please note: data should be sent to client compressed by GZIP!
 	 */
 	@Override
-	public void handleClient(InputStream inFromClient, OutputStream outToClient)
+	public void handleClient(Socket client)
 	{
+		String clientIP=client.getInetAddress().getHostAddress();
+		int clientPort=client.getPort();
+		String message=new String(clientIP +","+ clientPort+" has connected");
+		messages.add(message);
+		setChanged();
+		notifyObservers();//check messages
+		messages.remove(message);
 		try {
-		ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
-		ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
-		String command;
-		while((command=(String)inputFromClient.readObject()).contains("exit"))
-		{
-			Object arg=inputFromClient.readObject();
-			if(command.contains("properties"))
-				setClientProperties((ClientProperties)arg);
-			else if(command.contains("generate maze"))
+			InputStream inFromClient= client.getInputStream();;
+			OutputStream outToClient=client.getOutputStream();
+			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
+			ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
+			String command;
+			while((command=(String)inputFromClient.readObject()).contains("exit"))
 			{
-				String[] params=parseGenerateMazeArgument(arg);
-				outputToClient.writeObject(generateMaze(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
+				Object arg=inputFromClient.readObject();
+				if(command.contains("properties"))
+					setClientProperties((ClientProperties)arg);
+				else if(command.contains("generate maze"))
+				{
+					String[] params=parseGenerateMazeArgument(arg);
+					message=clientIP+ ","+clientPort+",generating maze";
+					messages.add(message);
+					setChanged();
+					notifyObservers();
+					outputToClient.writeObject(generateMaze(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
+					messages.remove(message);
+					outputToClient.flush();
+
+				}
+				else if(command.contains("solve maze"))
+				{
+					String[] params=parseSolveMazeArgument(arg);
+					message=clientIP+ ","+clientPort+",solving maze";
+					messages.add(message);
+					setChanged();
+					notifyObservers();
+					outputToClient.writeObject(solveMaze(params[0],"solving maze"));
+					messages.remove(message);
+					outputToClient.flush();
+
+				}
+				else if(command.contains("calculate hint"))
+				{
+					String[] params=parseCalculateHintArgument(arg);
+					message=clientIP+ ","+clientPort+",calculating hint";
+					messages.add(message);
+					setChanged();
+					notifyObservers();
+					outputToClient.writeObject(calculateHint(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
+					messages.remove(message);
+					outputToClient.flush();
+				}
+				
 			}
-			else if(command.contains("solve maze"))
-			{
-				String[] params=parseSolveMazeArgument(arg);
-				outputToClient.writeObject(solveMaze(params[0],"solving maze"));
-			}
-			else if(command.contains("calculate hint"))
-			{
-				String[] params=parseCalculateHintArgument(arg);
-				outputToClient.writeObject(calculateHint(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
-			}
-		}	
-		} catch (Exception e) {
+			inFromClient.close();
+			outToClient.close();
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+
 	}
 	
+	public ConcurrentLinkedQueue<String> getMessages() {
+		return messages;
+	}
 	private String[] parseCalculateHintArgument(Object arg) {
 		String[]values=((String)arg).split(" ");
 		String[]result=new String[3];
@@ -210,5 +253,15 @@ public class MazeClientHandler implements ClientHandler {
 		x=Integer.parseInt(indexes[0]); //t stands for temp
 		y=Integer.parseInt(indexes[1]);
 		return new State(""+x+","+y);
+	}
+
+
+	public MazeServer getServer() {
+		return server;
+	}
+
+
+	public void setServer(MazeServer server) {
+		this.server = server;
 	}
 }

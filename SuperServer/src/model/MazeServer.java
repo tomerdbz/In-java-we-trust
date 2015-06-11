@@ -14,12 +14,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.util.SerializationHelper;
 
-import presenter.ServerProperties;
 import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
-public class MazeServer extends MyTCPIPServer {
+public class MazeServer extends MyTCPIPServer implements Runnable {
 
 	/**	every solved maze will be inserted to the cache - a HashMap linking between a maze and its solution. 
 	 * notice the Concurrent because of the workings with Threads.
@@ -98,8 +97,7 @@ public class MazeServer extends MyTCPIPServer {
 						outputStream.write( mazeBytes2 );
 						mazeBytes = outputStream.toByteArray( );
 					} catch (IOException e) {
-						setChanged();
-						notifyObservers("error");
+
 					}
 					
 				}
@@ -119,16 +117,14 @@ public class MazeServer extends MyTCPIPServer {
 						outputStream.write( solutionBytes2 );
 						solutionBytes = outputStream.toByteArray( );
 					} catch (IOException e) {
-						setChanged();
-						notifyObservers("exit");
+
 					}
 					
 				}
 				SerializableSolution sol=(SerializableSolution)SerializationHelper.deserialize(solutionBytes);
 				cache.put(maze, sol.getOriginalSolution());
 			} catch (Exception e1) {
-				setChanged();
-				notifyObservers("error");
+
 			} 
 		}
 	}
@@ -148,6 +144,10 @@ public class MazeServer extends MyTCPIPServer {
 				names.add(str);
 		}
 		return names;
+	}
+	@Override
+	public void run() {
+		startServer();
 	}
 	
 	

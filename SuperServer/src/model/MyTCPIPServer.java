@@ -2,8 +2,6 @@ package model;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -43,11 +41,11 @@ public class MyTCPIPServer {
 						@Override
 						public void run() {
 							try {
-								InputStream inputFromClient=someClient.getInputStream();
-								OutputStream outputToClient=someClient.getOutputStream();
-								clientHandler.handleClient(inputFromClient,outputToClient);
-								inputFromClient.close();
-								outputToClient.close();
+								//InputStream inputFromClient=someClient.getInputStream();
+								//OutputStream outputToClient=someClient.getOutputStream();
+								clientHandler.handleClient(someClient);
+								//inputFromClient.close();
+								//outputToClient.close();
 								someClient.close();
 							} catch (IOException e) {
 								e.printStackTrace();
