@@ -20,6 +20,7 @@ public class GUIHandler implements ClientHandler,Observer {
 	{
 		
 		try {
+			
 			InputStream inFromClient=client.getInputStream();
 			OutputStream outToClient=client.getOutputStream();
 			BufferedReader inputFromClient=new BufferedReader(new InputStreamReader(inFromClient));
@@ -39,6 +40,7 @@ public class GUIHandler implements ClientHandler,Observer {
 				server.stoppedServer();
 				server=null;
 			}
+			outputToGUI=null;
 			inFromClient.close();
 			outToClient.close();
 		} catch (Exception e) {
