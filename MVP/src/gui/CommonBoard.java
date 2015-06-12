@@ -210,7 +210,6 @@ public abstract class CommonBoard extends Composite implements Board {
 					}
 					
 					if(after[0]< before[0] && after[1]<before[1]){
-						applyDiagonalInputDirection(Direction.UpLeft);
 						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
 						if(Shipua<1.5 && Shipua> 0.5)
 						applyDiagonalInputDirection(Direction.UpLeft);
