@@ -65,13 +65,18 @@ public class Presenter implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 		if(o == v){
-		
-			v.getCommand().doCommand("");
+			String data = (String)(arg);
+			v.getCommand().doCommand(data);
 			
 			
 		}
 		if(o == m ){
-			
+			String data = (String)(arg);
+			if(data.split(" ")[0].equals("msg")){
+			v.Display(data);
+			}
+			else
+			v.saveData(data);
 		}
 		
 		
