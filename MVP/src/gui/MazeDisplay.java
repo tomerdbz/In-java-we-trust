@@ -273,6 +273,8 @@ public class MazeDisplay extends CommonBoard {
 	    	//down
 				 }
 				 break;
+		default:
+			break;
 	    }
 		 if(character.currentCellX== board.length-1 && character.currentCellY == board[0].length-1 && board!=null){
 			 //if we have reacharactered the destination
