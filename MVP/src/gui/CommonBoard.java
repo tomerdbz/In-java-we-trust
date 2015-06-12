@@ -43,7 +43,7 @@ public abstract class CommonBoard extends Composite implements Board {
 	 * frame of the gif
 	 */
 	int frameIndex=0;
-	boolean wasDragged=false; 
+	boolean checkDragged=false; 
 	
 	public CommonBoard(Composite parent, int style) {
 		super(parent, style);
@@ -113,7 +113,7 @@ public abstract class CommonBoard extends Composite implements Board {
 			// mouse listener
 			//addMouseListenerToComposite();
 			
-					this.addDragDetectListener(new DragDetectListener(){
+				/*	this.addDragDetectListener(new DragDetectListener(){
 
 						@Override
 						public void dragDetected(DragDetectEvent arg0) {
@@ -122,7 +122,7 @@ public abstract class CommonBoard extends Composite implements Board {
 							}
 						}
 						
-					});
+					});*/
 	}
 
 
@@ -130,7 +130,7 @@ public abstract class CommonBoard extends Composite implements Board {
 
 	@Override
 	public abstract void  applyInputDirection(Direction direction);
-	
+	public abstract void applyDiagonalInputDirection(Direction direction);
 	
 	public void addMouseListenerToComposite() {
 		MouseListener ma=new MouseListener(){
@@ -142,42 +142,91 @@ public abstract class CommonBoard extends Composite implements Board {
 			
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				System.out.println("bamba");
-				wasDragged=false;
-				if(character!=null){
-					String str =getDisplay().getCursorLocation().toString(); //calculates mouse location by pixels
+				checkDragged=false;
+				if(board!=null){
+				int sizeOftileX = CommonBoard.this.getSize().x/(board[0].length);
+				int sizeOftileY = CommonBoard.this.getSize().y/(board.length);
+					String str =CommonBoard.this.toControl(getDisplay().getCursorLocation()).toString(); //calculates mouse location by pixels
 					String []loc = str.substring(7).split(",");
 					before[0]=Integer.parseInt(loc[0].substring(0));
 					before[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1));
+					int Ycell=((before[0]/sizeOftileX));
+					int xcell=((before[1]/sizeOftileY));
+					System.out.println(before[0] + " " +before[1]);
+					if((character.currentCellX==xcell)&&character.currentCellY==Ycell)
+						checkDragged=true;
 				}
 			}
 
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				System.out.println("bobo");
-				if(wasDragged){
-					String str =getDisplay().getCursorLocation().toString();
+					if(checkDragged){
+					String str =CommonBoard.this.toControl(getDisplay().getCursorLocation()).toString();
 					String []loc = str.substring(7).split(",");
 					after[0]=Integer.parseInt(loc[0].substring(0));
 					after[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1)); //calculates mouse location by pixels
+					System.out.println(after[0] + " " +after[1]);
 					if(after[0]> before[0] && after[1]>before[1]){
+						double Shipua = (double)((double)(after[1]-before[1])/(double)(after[0]-before[0]));
+						if(Shipua<1.5 && Shipua>  0.5 )
+						applyDiagonalInputDirection(Direction.DownRight);
+						else
+							if(Shipua>1.5 && character.currentCellX+1<=board.length-1)
+							{
+								System.out.println("downright");
+							applyInputDirection(Direction.DOWN);
+							}
+							else
+								if( character.currentCellY+1<= board[0].length-1){
+									System.out.println("right");
+								applyInputDirection(Direction.RIGHT);
+								}
 						//dir=Direction.DownRight;					//charactereck in whicharacter direction did the mouse move
 					}
 					if(after[0]> before[0] && after[1]<before[1]){
+						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
+						if(Shipua>-1.5 && Shipua<-0.5)
+						applyDiagonalInputDirection(Direction.UpRight);
+						else
+							if(Shipua<-0.5 && character.currentCellX-1>=0)
+							applyInputDirection(Direction.UP);
+							else
+								if( character.currentCellY+1<= board[0].length-1)
+								applyInputDirection(Direction.RIGHT);
 						//dir=Direction.UpRight;
 					}
 					if(after[0]< before[0] && after[1]>before[1]){
+						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
+						if(Shipua>-1.5 && Shipua<-0.5)
+							applyDiagonalInputDirection(Direction.DownLeft);
+							else
+								if(Shipua<-1.5  && character.currentCellX+1<=board.length-1)
+								applyInputDirection(Direction.DOWN);
+								else
+									if(character.currentCellY-1>=0)
+									applyInputDirection(Direction.LEFT);
 						//dir=Direction.DownLeft;
 						
 					}
+					
 					if(after[0]< before[0] && after[1]<before[1]){
+						applyDiagonalInputDirection(Direction.UpLeft);
+						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
+						if(Shipua<1.5 && Shipua> 0.5)
+						applyDiagonalInputDirection(Direction.UpLeft);
+						else
+							if(Shipua<0.5 && character.currentCellY-1>=0)
+							applyInputDirection(Direction.LEFT);
+							else
+								if(character.currentCellX-1>=0)
+								applyInputDirection(Direction.UP);
 						//dir=Direction.UpLeft;
 						
 					}
-					System.out.println(character.currentCellX+" "+character.currentCellY +" "); //+dir);
-					character=null;
+					}
 					
-				}
+					
+				
 						
 			}
 		};

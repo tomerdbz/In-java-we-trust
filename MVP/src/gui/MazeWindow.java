@@ -428,7 +428,6 @@ public class MazeWindow extends BasicWindow implements View {
 							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
 							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
 							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].redraw(); //redraw the goal cell
-							 HasBeenDragged(); //checks if we didnt drag
 							}
 							
 						}
@@ -590,132 +589,9 @@ public class MazeWindow extends BasicWindow implements View {
 		
 			
 		}
-	/**
-	 * characterecks if character has been dragged by mouse and handles it
-	 */
-	public void HasBeenDragged(){
-		if((mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY]).getCharacter()==null){//if it has been dragged
-			int x = mazeDisplay.character.currentCellX; //currenct row
-			int y = mazeDisplay.character.currentCellY; //current col 
-			Direction dir = (mazeDisplay.board[x][y]).dir; //get direction of drag
-			System.out.println(mazeDisplay.board[x][y].dir);
-			//all ifs are alike so there will be one example 
-			if(dir == Direction.UpRight){ //direction upright
-				if(x-1 >=0 && y+1<= mazeDisplay.board[0].length-1) //not out of bounds
-				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y))) //check if we have path to that location
-				{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x-1][y+1],SWT.FILL);
-		    	mazeDisplay.character.currentCellX=x-1;// if yes we put the character in that new location
-		    	mazeDisplay.character.currentCellY=y+1;
-				mazeDisplay.character.frameIndex=0;
-				(mazeDisplay.board[x-1][y+1]).setCharacter(mazeDisplay.character);
-				if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){ //if we have reached goal
-					 mazeDisplay.won=true; //signal we won
-					 mazeDisplay.redraw(); 
-					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png")); //background for winning
-						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3")); //play sound
-					    player.play();
-						
-				 }
-				return;
-				}
-			}
-			else
-				
-			if(dir == Direction.UpLeft){
-					if(x-1 >=0 && y-1>=0)
-					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathUp(x, y-1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathLeft(x-1, y)))
-					{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x-1][y-1],SWT.FILL);
-			    	mazeDisplay.character.currentCellX=x-1;
-			    	mazeDisplay.character.currentCellY=y-1;
-					mazeDisplay.character.frameIndex=0;
-					(mazeDisplay.board[x-1][y-1]).setCharacter(mazeDisplay.character);
-					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
-						 mazeDisplay.won=true;
-						 mazeDisplay.redraw();
-						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
-						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					     //   messageBox.setText("Winner");
-					       // messageBox.setMessage("You're the winner! This song is for you <3");
-							//messageBox.open();
-							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
-						    player.play();
-							
-					 }
-					return;
-					}
-			}
-			else
-			if(dir == Direction.DownLeft){
-				if(x+1 <=mazeDisplay.board.length-1 && y-1>=0)
-					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathDown(x, y-1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathLeft(x+1, y)))
-					{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x+1][y-1],SWT.FILL);
-			    	mazeDisplay.character.currentCellX=x+1;
-			    	mazeDisplay.character.currentCellY=y-1;
-					mazeDisplay.character.frameIndex=0;
-					(mazeDisplay.board[x+1][y-1]).setCharacter(mazeDisplay.character);
-					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
-						 mazeDisplay.won=true;
-						 mazeDisplay.redraw();
-						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
-						 
-						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					       // messageBox.setText("Winner");
-					       // messageBox.setMessage("You're the winner! This song is for you <3");
-							//messageBox.open();
-							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
-						    player.play();
-							
-					 }
-					return;
-					}
-				
-			}
-			else
-			if(dir == Direction.DownRight){
-				if(x+1 <=mazeDisplay.board.length-1 && y+1<=mazeDisplay.board[0].length-1)
-					if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathDown(x, y+1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathRight(x+1, y)))
-					{mazeDisplay.character = new MazeCharacter((mazeDisplay.board[x+1][y+1]),SWT.FILL);
-			    	mazeDisplay.character.currentCellX=x+1;
-			    	mazeDisplay.character.currentCellY=y+1;
-					mazeDisplay.character.frameIndex=0;
-					(mazeDisplay.board[x+1][y+1]).setCharacter(mazeDisplay.character);
-					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
-						 mazeDisplay.won=true;
-						 mazeDisplay.redraw();
-						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
-						// MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-					       // messageBox.setText("Winner");
-					       // messageBox.setMessage("You're the winner! This song is for you <3");
-							//messageBox.open();
-							MP3Player player = new MP3Player();
-						    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
-						    player.play();
-							
-					 }
-					return;
-					}
-			}
-				
-				(mazeDisplay.board[x][y]).setCharacter(mazeDisplay.character);
+	
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-		}
-	}
+	
 	/**
 	 * 
 	 * @param data checks if data exists in database true if not false if yes

@@ -195,9 +195,12 @@ public class MazeDisplay extends CommonBoard {
 	}
 	@Override
 	public void applyInputDirection(Direction direction) {
-		if (direction == Direction.UP ){
-			 boolean cond1 = ( board[character.currentCellX][character.currentCellY]).getImageName().charAt(1)=='0';
-			 boolean cond2 =( board[character.currentCellX-1][character.currentCellY]).getImageName().charAt(3)=='0'; //charactereck if a path is possible
+		boolean cond1;
+		boolean cond2;
+		switch (direction){
+		case UP:
+			 cond1 = ( board[character.currentCellX][character.currentCellY]).getImageName().charAt(1)=='0';
+			 cond2 =( board[character.currentCellX-1][character.currentCellY]).getImageName().charAt(3)=='0'; //charactereck if a path is possible
 			 	if(cond1 && cond2){ //if so redraws the characteraracter in the new location
 				int row=character.currentCellX;
 		    	int col = character.currentCellY;
@@ -210,13 +213,14 @@ public class MazeDisplay extends CommonBoard {
 				board[row-1][col].setCharacter(character);
 				board[character.currentCellX+1][character.currentCellY].redraw();
 				board[character.currentCellX][character.currentCellY].redraw();;
+				;
 			 //up
 			 	}
-	    } 
-		 else 
-			 if (direction == Direction.RIGHT) {
-				 boolean cond1 = ( board[character.currentCellX][character.currentCellY]).getImageName().charAt(2)=='0';
-				 boolean cond2 =( board[character.currentCellX][character.currentCellY+1]).getImageName().charAt(0)=='0';
+			 	break;
+	    
+		case RIGHT:
+				 cond1 = ( board[character.currentCellX][character.currentCellY]).getImageName().charAt(2)=='0';
+				 cond2 =( board[character.currentCellX][character.currentCellY+1]).getImageName().charAt(0)=='0';
 			if(cond1&&cond2){
 	    	int row=character.currentCellX;
 	    	int col = character.currentCellY;
@@ -231,11 +235,11 @@ public class MazeDisplay extends CommonBoard {
 			board[character.currentCellX][character.currentCellY].redraw();
 	    	//right
 				 }
-	    } 
-			else 
-			if (direction == Direction.LEFT) {
-				 boolean cond1 = board[character.currentCellX][character.currentCellY].getImageName().charAt(0)=='0';
-				 boolean cond2 =board[character.currentCellX][character.currentCellY-1].getImageName().charAt(2)=='0';
+			break;
+	    
+		case LEFT:
+			cond1 = board[character.currentCellX][character.currentCellY].getImageName().charAt(0)=='0';
+			cond2 =board[character.currentCellX][character.currentCellY-1].getImageName().charAt(2)=='0';
 			if(cond1&&cond2){	 
 	    	int row=character.currentCellX;
 	    	int col = character.currentCellY;
@@ -250,11 +254,10 @@ public class MazeDisplay extends CommonBoard {
 			board[character.currentCellX][character.currentCellY].redraw();
 	    	//left
 			}
-	    } 
-			else
-			if (direction == Direction.DOWN) {
-				 boolean cond1 = board[character.currentCellX][character.currentCellY].getImageName().charAt(3)=='0';
-				 boolean cond2 =board[character.currentCellX+1][character.currentCellY].getImageName().charAt(1)=='0';	
+			break;
+		case DOWN: 
+				  cond1 = board[character.currentCellX][character.currentCellY].getImageName().charAt(3)=='0';
+				 cond2 =board[character.currentCellX+1][character.currentCellY].getImageName().charAt(1)=='0';	
 				 if(cond1&&cond2){
 	    	int row=character.currentCellX;
 	    	int col = character.currentCellY;
@@ -269,8 +272,10 @@ public class MazeDisplay extends CommonBoard {
 			board[character.currentCellX][character.currentCellY].redraw();
 	    	//down
 				 }
-	    } //if we have reacharactered the destination
+				 break;
+	    }
 		 if(character.currentCellX== board.length-1 && character.currentCellY == board[0].length-1 && board!=null){
+			 //if we have reacharactered the destination
 			 won=true; 
 			 redraw(); //play a sound :)
 			 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
@@ -282,6 +287,107 @@ public class MazeDisplay extends CommonBoard {
 		 }
 		
 	}
+	@Override
+	public void applyDiagonalInputDirection(Direction direction) {
+		int x = character.currentCellX; //currenct row
+		int y = character.currentCellY; //current col 
+		//all ifs are alike so there will be one example 
+		switch(direction){
+		case UpRight: //direction upright
+			if(x-1 >=0 && y+1<=  board[0].length-1) //not out of bounds
+			if(( HasPathRight(x, y)&&  HasPathUp(x, y+1))||( HasPathUp(x,y)&& HasPathRight(x-1, y))) //check if we have path to that location
+			{ character = new MazeCharacter( board[x-1][y+1],SWT.FILL);
+	    	 character.currentCellX=x-1;// if yes we put the character in that new location
+	    	 character.currentCellY=y+1;
+			 character.frameIndex=0;
+			( board[x-1][y+1]).setCharacter( character);
+			if( character.currentCellX==  board.length-1 &&  character.currentCellY ==  board[0].length-1 &&  board!=null){ //if we have reached goal
+				  won=true; //signal we won
+				  redraw(); 
+				 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png")); //background for winning
+					MP3Player player = new MP3Player();
+				    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3")); //play sound
+				    player.play();
+					
+			 }
+			board[x][y].setCharacter(null);
+			board[x][y].redraw();
+			
+			}
+			break;
+		
+			
+		case UpLeft:
+				if(x-1 >=0 && y-1>=0)
+				if(( HasPathLeft(x, y)&&  HasPathUp(x, y-1))||( HasPathUp(x,y)&& HasPathLeft(x-1, y)))
+				{ character = new MazeCharacter( board[x-1][y-1],SWT.FILL);
+		    	 character.currentCellX=x-1;
+		    	 character.currentCellY=y-1;
+				 character.frameIndex=0;
+				( board[x-1][y-1]).setCharacter( character);
+				if( character.currentCellX==  board.length-1 &&  character.currentCellY ==  board[0].length-1 &&  board!=null){
+					  won=true;
+					  redraw();
+					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
+						MP3Player player = new MP3Player();
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+					    player.play();
+						
+				 }
+				board[x][y].setCharacter(null);
+				board[x][y].redraw();
+				
+				}
+				break;
+		case DownLeft:
+			if(x+1 <= board.length-1 && y-1>=0)
+				if(( HasPathLeft(x, y)&&  HasPathDown(x, y-1))||( HasPathDown(x,y)&& HasPathLeft(x+1, y)))
+				{ character = new MazeCharacter( board[x+1][y-1],SWT.FILL);
+		    	 character.currentCellX=x+1;
+		    	 character.currentCellY=y-1;
+				 character.frameIndex=0;
+				( board[x+1][y-1]).setCharacter( character);
+				if( character.currentCellX==  board.length-1 &&  character.currentCellY ==  board[0].length-1 &&  board!=null){
+					  won=true;
+					  redraw();
+					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
+						MP3Player player = new MP3Player();
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+					    player.play();
+						
+				 }
+				board[x][y].setCharacter(null);
+				board[x][y].redraw();
+				
+				}
+			break;
+		
+		case DownRight:
+			if(x+1 <= board.length-1 && y+1<= board[0].length-1)
+				if(( HasPathRight(x, y)&&  HasPathDown(x, y+1))||( HasPathDown(x,y)&& HasPathRight(x+1, y)))
+				{ character = new MazeCharacter(( board[x+1][y+1]),SWT.FILL);
+		    	 character.currentCellX=x+1;
+		    	 character.currentCellY=y+1;
+				 character.frameIndex=0;
+				( board[x+1][y+1]).setCharacter( character);
+				if( character.currentCellX==  board.length-1 &&  character.currentCellY ==  board[0].length-1 &&  board!=null){
+					  won=true;
+					  redraw();
+					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
+						MP3Player player = new MP3Player();
+					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+					    player.play();
+						
+				 }
+				board[x][y].setCharacter(null);
+				board[x][y].redraw();
+				}
+			break;
+		
+		}
+		
+	}
+	
 	
 	
 
