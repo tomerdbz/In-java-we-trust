@@ -33,12 +33,11 @@ public abstract class CommonTile extends Canvas implements Tile{
 	Direction dir;
 	public CommonTile(Composite parent, int style) {
 		super(parent, style);
-addPaintListener(new PaintListener() {
+		addPaintListener(new PaintListener() {
 			
 			@Override
-			public void paintControl(PaintEvent e) {
-			   
-			drawTile(e);
+			public void paintControl(PaintEvent e) {   
+				drawTile(e);
 		}
 	});
 	}

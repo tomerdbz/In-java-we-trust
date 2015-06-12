@@ -318,7 +318,7 @@ public class MazeWindow extends BasicWindow implements View {
 				if(MazeWindow.this.mazeName!=null && !mazeDisplay.won){
 				LastUserCommand= commands.get("calculate hint");
 				setChanged(); //mvp solve maze
-				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.Ch.currentCellX+","+ mazeDisplay.Ch.currentCellY);
+				notifyObservers(" "+MazeWindow.this.mazeName + " "+ mazeDisplay.character.currentCellX+","+ mazeDisplay.character.currentCellY);
 				for(int i=0; i<mazeDisplay.boardRows;i++)
 					for(int j=0;j<mazeDisplay.boardCols;j++){
 						mazeDisplay.board[i][j].redraw();
@@ -419,11 +419,11 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.getDisplay().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							if(mazeDisplay.Ch!=null && !mazeDisplay.isDisposed()){
-							 mazeDisplay.Ch.frameIndex= (mazeDisplay.Ch.frameIndex + 1) % mazeDisplay.Ch.images.length; //next frame in gifs
+							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed()){
+							 mazeDisplay.character.frameIndex= (mazeDisplay.character.frameIndex + 1) % mazeDisplay.character.images.length; //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
-							 mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY].redraw(); //redraw cell in which character now stays
+							 mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY].redraw(); //redraw cell in which character now stays
 							// System.out.println(rows+" " + cols+" "+ mazeDisplay.board.length+" "+ mazeDisplay.board[0].length);
 							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
 							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
@@ -505,9 +505,9 @@ public class MazeWindow extends BasicWindow implements View {
 		display.syncExec(new Runnable() {
 			   public void run() {
 				   mazeDisplay.displayMaze(m);
-				   mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
-				   mazeDisplay.Ch.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-				   (mazeDisplay.board[0][0]).setCharacter(mazeDisplay.Ch); //set character to the begining of the maze
+				   mazeDisplay.character = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
+				   mazeDisplay.character.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
+				   (mazeDisplay.board[0][0]).setCharacter(mazeDisplay.character); //set character to the begining of the maze
 				   mazeDisplay.board[0][0].redraw();
 				   mazeDisplay.layout(); //draw all the things needed
 				   mazeDisplay.forceFocus();
@@ -535,8 +535,8 @@ public class MazeWindow extends BasicWindow implements View {
 				 if(( mazeDisplay.board[i][j]).getCharacter()!=null)
 					 ( mazeDisplay.board[i][j]).getCharacter().dispose();
 				
-				 if(mazeDisplay.Ch!=null)
-					 mazeDisplay.Ch.dispose();
+				 if(mazeDisplay.character!=null)
+					 mazeDisplay.character.dispose();
 					 
 				 ( mazeDisplay.board[i][j]).dispose();
 			}
@@ -591,24 +591,24 @@ public class MazeWindow extends BasicWindow implements View {
 			
 		}
 	/**
-	 * Checks if character has been dragged by mouse and handles it
+	 * characterecks if character has been dragged by mouse and handles it
 	 */
 	public void HasBeenDragged(){
-		if((mazeDisplay.board[mazeDisplay.Ch.currentCellX][mazeDisplay.Ch.currentCellY]).getCharacter()==null){//if it has been dragged
-			int x = mazeDisplay.Ch.currentCellX; //currenct row
-			int y = mazeDisplay.Ch.currentCellY; //current col 
+		if((mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY]).getCharacter()==null){//if it has been dragged
+			int x = mazeDisplay.character.currentCellX; //currenct row
+			int y = mazeDisplay.character.currentCellY; //current col 
 			Direction dir = (mazeDisplay.board[x][y]).dir; //get direction of drag
 			System.out.println(mazeDisplay.board[x][y].dir);
 			//all ifs are alike so there will be one example 
 			if(dir == Direction.UpRight){ //direction upright
 				if(x-1 >=0 && y+1<= mazeDisplay.board[0].length-1) //not out of bounds
 				if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathUp(x, y+1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathRight(x-1, y))) //check if we have path to that location
-				{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x-1][y+1],SWT.FILL);
-		    	mazeDisplay.Ch.currentCellX=x-1;// if yes we put the character in that new location
-		    	mazeDisplay.Ch.currentCellY=y+1;
-				mazeDisplay.Ch.frameIndex=0;
-				(mazeDisplay.board[x-1][y+1]).setCharacter(mazeDisplay.Ch);
-				if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){ //if we have reached goal
+				{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x-1][y+1],SWT.FILL);
+		    	mazeDisplay.character.currentCellX=x-1;// if yes we put the character in that new location
+		    	mazeDisplay.character.currentCellY=y+1;
+				mazeDisplay.character.frameIndex=0;
+				(mazeDisplay.board[x-1][y+1]).setCharacter(mazeDisplay.character);
+				if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){ //if we have reached goal
 					 mazeDisplay.won=true; //signal we won
 					 mazeDisplay.redraw(); 
 					 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png")); //background for winning
@@ -625,12 +625,12 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.UpLeft){
 					if(x-1 >=0 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathUp(x, y-1))||(mazeDisplay.HasPathUp(x,y)&&mazeDisplay.HasPathLeft(x-1, y)))
-					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x-1][y-1],SWT.FILL);
-			    	mazeDisplay.Ch.currentCellX=x-1;
-			    	mazeDisplay.Ch.currentCellY=y-1;
-					mazeDisplay.Ch.frameIndex=0;
-					(mazeDisplay.board[x-1][y-1]).setCharacter(mazeDisplay.Ch);
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
+					{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x-1][y-1],SWT.FILL);
+			    	mazeDisplay.character.currentCellX=x-1;
+			    	mazeDisplay.character.currentCellY=y-1;
+					mazeDisplay.character.frameIndex=0;
+					(mazeDisplay.board[x-1][y-1]).setCharacter(mazeDisplay.character);
+					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -650,12 +650,12 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.DownLeft){
 				if(x+1 <=mazeDisplay.board.length-1 && y-1>=0)
 					if((mazeDisplay.HasPathLeft(x, y)&& mazeDisplay.HasPathDown(x, y-1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathLeft(x+1, y)))
-					{mazeDisplay.Ch = new MazeCharacter(mazeDisplay.board[x+1][y-1],SWT.FILL);
-			    	mazeDisplay.Ch.currentCellX=x+1;
-			    	mazeDisplay.Ch.currentCellY=y-1;
-					mazeDisplay.Ch.frameIndex=0;
-					(mazeDisplay.board[x+1][y-1]).setCharacter(mazeDisplay.Ch);
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
+					{mazeDisplay.character = new MazeCharacter(mazeDisplay.board[x+1][y-1],SWT.FILL);
+			    	mazeDisplay.character.currentCellX=x+1;
+			    	mazeDisplay.character.currentCellY=y-1;
+					mazeDisplay.character.frameIndex=0;
+					(mazeDisplay.board[x+1][y-1]).setCharacter(mazeDisplay.character);
+					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -677,12 +677,12 @@ public class MazeWindow extends BasicWindow implements View {
 			if(dir == Direction.DownRight){
 				if(x+1 <=mazeDisplay.board.length-1 && y+1<=mazeDisplay.board[0].length-1)
 					if((mazeDisplay.HasPathRight(x, y)&& mazeDisplay.HasPathDown(x, y+1))||(mazeDisplay.HasPathDown(x,y)&&mazeDisplay.HasPathRight(x+1, y)))
-					{mazeDisplay.Ch = new MazeCharacter((mazeDisplay.board[x+1][y+1]),SWT.FILL);
-			    	mazeDisplay.Ch.currentCellX=x+1;
-			    	mazeDisplay.Ch.currentCellY=y+1;
-					mazeDisplay.Ch.frameIndex=0;
-					(mazeDisplay.board[x+1][y+1]).setCharacter(mazeDisplay.Ch);
-					if(mazeDisplay.Ch.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.Ch.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
+					{mazeDisplay.character = new MazeCharacter((mazeDisplay.board[x+1][y+1]),SWT.FILL);
+			    	mazeDisplay.character.currentCellX=x+1;
+			    	mazeDisplay.character.currentCellY=y+1;
+					mazeDisplay.character.frameIndex=0;
+					(mazeDisplay.board[x+1][y+1]).setCharacter(mazeDisplay.character);
+					if(mazeDisplay.character.currentCellX== mazeDisplay.board.length-1 && mazeDisplay.character.currentCellY == mazeDisplay.board[0].length-1 && mazeDisplay.board!=null){
 						 mazeDisplay.won=true;
 						 mazeDisplay.redraw();
 						 shell.setBackgroundImage(new Image(display,".\\resources\\images\\sonicwon.png"));
@@ -699,7 +699,7 @@ public class MazeWindow extends BasicWindow implements View {
 					}
 			}
 				
-				(mazeDisplay.board[x][y]).setCharacter(mazeDisplay.Ch);
+				(mazeDisplay.board[x][y]).setCharacter(mazeDisplay.character);
 			
 			
 			

@@ -35,63 +35,7 @@ public class CellDisplay extends CommonTile{
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 		// mouse listener
-		this.addMouseListener(new MouseListener(){
-
-			int[] before=new int[2]; //place of cursor before click
-			int[] after=new int[2]; // place of cursor after releasing click
-			@Override
-			public void mouseDoubleClick(MouseEvent arg0) {	}
-			
-			@Override
-			public void mouseDown(MouseEvent arg0) { 
-				wasDragged=false;
-				if(ch!=null){
-					String str =getDisplay().getCursorLocation().toString(); //calculates mouse location by pixels
-					String []loc = str.substring(7).split(",");
-					before[0]=Integer.parseInt(loc[0].substring(0));
-					before[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1));
-				}
-			}
-
-			@Override
-			public void mouseUp(MouseEvent arg0) {
-
-				if(wasDragged){
-					String str =getDisplay().getCursorLocation().toString();
-					String []loc = str.substring(7).split(",");
-					after[0]=Integer.parseInt(loc[0].substring(0));
-					after[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1)); //calculates mouse location by pixels
-					if(after[0]> before[0] && after[1]>before[1]){
-						dir=Direction.DownRight;					//check in which direction did the mouse move
-					}
-					if(after[0]> before[0] && after[1]<before[1]){
-						dir=Direction.UpRight;
-					}
-					if(after[0]< before[0] && after[1]>before[1]){
-						dir=Direction.DownLeft;
-						
-					}
-					if(after[0]< before[0] && after[1]<before[1]){
-						dir=Direction.UpLeft;
-						
-					}
-					System.out.println(ch.currentCellX+" "+ch.currentCellY +" " +dir);
-					ch=null;
-					
-				}
-						
-			}
-		});
-		this.addDragDetectListener(new DragDetectListener(){
-
-			@Override
-			public void dragDetected(DragDetectEvent arg0) {
-				if(ch!=null){
-				wasDragged=true; //detect if a drag has occureed
-				}
-			}
-			
-		});
+		
 		
 		
 	

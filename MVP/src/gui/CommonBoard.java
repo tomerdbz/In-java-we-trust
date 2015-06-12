@@ -1,9 +1,5 @@
 package gui;
 
-import jaco.mp3.player.MP3Player;
-
-import java.io.File;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
@@ -14,14 +10,13 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Composite;
 
 public abstract class CommonBoard extends Composite implements Board {
 	/**
-	 * a 2 dimension array which represents the tiles in the board
+	 * a 2 dimension array whicharacter represents the tiles in the board
 	 */
 	CommonTile[][] board;
 	/**
@@ -33,15 +28,15 @@ public abstract class CommonBoard extends Composite implements Board {
 	 */
 	int boardCols;
 	/**
-	 * representation of the character in the maze
+	 * representation of the characteraracter in the maze
 	 */
-	CommonCharacter Ch=null;
+	CommonCharacter character=null;
 	/**
 	 * Helps load gif to single images
 	 */
 	ImageLoader gifs=new ImageLoader();
 	/**
-	 * an array of images which represent the gif of the goal
+	 * an array of images whicharacter represent the gif of the goal
 	 */
 	ImageData[] images;
 	/**
@@ -61,26 +56,26 @@ public abstract class CommonBoard extends Composite implements Board {
 		});
 			this.addKeyListener(new KeyListener(){	
 				@Override
-				public void keyPressed(KeyEvent e) { //each of those codes represenets a key on the keyboard in our case up down right left arrows
-					if (e.keyCode == 16777217 && Ch.currentCellX!=0 ){
+				public void keyPressed(KeyEvent e) { //eacharacter of those codes represenets a key on the keyboard in our case up down right left arrows
+					if (e.keyCode == 16777217 && character.currentCellX!=0 ){
 						applyInputDirection((Direction.UP));
 						 //up
 						 	
 				    } 
 					 else 
-						 if (e.keyCode == 16777220 && Ch.currentCellY!=board[0].length-1) {
+						 if (e.keyCode == 16777220 && character.currentCellY!=board[0].length-1) {
 							 applyInputDirection((Direction.RIGHT));
 				    	//right
 							 
 				    } 
 						else 
-						if (e.keyCode == 16777219 && Ch.currentCellY!=0) {
+						if (e.keyCode == 16777219 && character.currentCellY!=0) {
 							applyInputDirection(Direction.LEFT);
 				    	//left
 						
 				    } 
 						else
-						if (e.keyCode == 16777218 &&Ch.currentCellX!= board.length-1) {
+						if (e.keyCode == 16777218 &&character.currentCellX!= board.length-1) {
 							applyInputDirection(Direction.DOWN);
 				    	//down
 							 
@@ -116,67 +111,18 @@ public abstract class CommonBoard extends Composite implements Board {
 				}
 		});
 			// mouse listener
-			this.addMouseListener(new MouseListener(){
-
-				int[] before=new int[2]; //place of cursor before click
-				int[] after=new int[2]; // place of cursor after releasing click
-				@Override
-				public void mouseDoubleClick(MouseEvent arg0) {	}
-				
-				@Override
-				public void mouseDown(MouseEvent arg0) { 
-					System.out.println("kaka");
-				
-					/*wasDragged=false;
-					if(ch!=null){
-						String str =getDisplay().getCursorLocation().toString(); //calculates mouse location by pixels
-						String []loc = str.substring(7).split(",");
-						before[0]=Integer.parseInt(loc[0].substring(0));
-						before[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1));
-					}*/
-				}
-
-				@Override
-				public void mouseUp(MouseEvent arg0) {
-
-					/*if(wasDragged){
-						String str =getDisplay().getCursorLocation().toString();
-						String []loc = str.substring(7).split(",");
-						after[0]=Integer.parseInt(loc[0].substring(0));
-						after[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1)); //calculates mouse location by pixels
-						if(after[0]> before[0] && after[1]>before[1]){
-							dir=Direction.DownRight;					//check in which direction did the mouse move
-						}
-						if(after[0]> before[0] && after[1]<before[1]){
-							dir=Direction.UpRight;
-						}
-						if(after[0]< before[0] && after[1]>before[1]){
-							dir=Direction.DownLeft;
-							
-						}
-						if(after[0]< before[0] && after[1]<before[1]){
-							dir=Direction.UpLeft;
-							
-						}
-						System.out.println(ch.currentCellX+" "+ch.currentCellY +" " +dir);
-						ch=null;
-						
-					}*/
-							
-				}
-			});
-			this.addDragDetectListener(new DragDetectListener(){
-
-				@Override
-				public void dragDetected(DragDetectEvent arg0) {
-				//	if(ch!=null){
-					//wasDragged=true; //detect if a drag has occureed
-					//}
-				//}
-				}	
-			});
+			//addMouseListenerToComposite();
 			
+					this.addDragDetectListener(new DragDetectListener(){
 
+						@Override
+						public void dragDetected(DragDetectEvent arg0) {
+							if(character!=null){
+							wasDragged=true; //detect if a drag has occureed
+							}
+						}
+						
+					});
 	}
 
 
@@ -184,5 +130,62 @@ public abstract class CommonBoard extends Composite implements Board {
 
 	@Override
 	public abstract void  applyInputDirection(Direction direction);
+	
+	
+	public void addMouseListenerToComposite() {
+		MouseListener ma=new MouseListener(){
+
+			int[] before=new int[2]; //place of cursor before click
+			int[] after=new int[2]; // place of cursor after releasing click
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {	}
+			
+			@Override
+			public void mouseDown(MouseEvent arg0) {
+				System.out.println("bamba");
+				wasDragged=false;
+				if(character!=null){
+					String str =getDisplay().getCursorLocation().toString(); //calculates mouse location by pixels
+					String []loc = str.substring(7).split(",");
+					before[0]=Integer.parseInt(loc[0].substring(0));
+					before[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1));
+				}
+			}
+
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				System.out.println("bobo");
+				if(wasDragged){
+					String str =getDisplay().getCursorLocation().toString();
+					String []loc = str.substring(7).split(",");
+					after[0]=Integer.parseInt(loc[0].substring(0));
+					after[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1)); //calculates mouse location by pixels
+					if(after[0]> before[0] && after[1]>before[1]){
+						//dir=Direction.DownRight;					//charactereck in whicharacter direction did the mouse move
+					}
+					if(after[0]> before[0] && after[1]<before[1]){
+						//dir=Direction.UpRight;
+					}
+					if(after[0]< before[0] && after[1]>before[1]){
+						//dir=Direction.DownLeft;
+						
+					}
+					if(after[0]< before[0] && after[1]<before[1]){
+						//dir=Direction.UpLeft;
+						
+					}
+					System.out.println(character.currentCellX+" "+character.currentCellY +" "); //+dir);
+					character=null;
+					
+				}
+						
+			}
+		};
+		
+	    addMouseListener(ma);
+	    for (int i=0;i<board.length;i++)
+	     	for(int j=0;j<board[0].length;j++)
+	      		board[i][j].addMouseListener(ma);
+	}
 
 }
