@@ -16,6 +16,11 @@ public class ServerProperties implements Serializable {
 		port=5400;
 		numOfClients=32;
 	}
+	public ServerProperties(int port,int numOfClients) {
+		this.port=port;
+		this.numOfClients=numOfClients;
+	}
+	
 	public int getPort() {
 		return port;
 	}

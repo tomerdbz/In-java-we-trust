@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.Executors;
 
+import presenter.ServerProperties;
+
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 

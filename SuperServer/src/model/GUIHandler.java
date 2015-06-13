@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
 
+import presenter.ServerProperties;
+
 public class GUIHandler extends Observable implements ClientHandler,Observer {
 	MazeClientHandler handler;
 	PrintWriter outputToGUI;

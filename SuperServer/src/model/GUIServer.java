@@ -1,5 +1,7 @@
 package model;
 
+import presenter.ServerProperties;
+
 public class GUIServer extends MyTCPIPServer {
 
 	public GUIServer(ServerProperties serverProperties,
