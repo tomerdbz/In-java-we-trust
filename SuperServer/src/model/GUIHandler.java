@@ -20,9 +20,7 @@ public class GUIHandler extends Observable implements ClientHandler,Observer {
 	@Override
 	public void handleClient(Socket client)
 	{
-		
-		try {
-			
+		try {		
 			InputStream inFromClient=client.getInputStream();
 			OutputStream outToClient=client.getOutputStream();
 			BufferedReader inputFromClient=new BufferedReader(new InputStreamReader(inFromClient));
@@ -43,7 +41,8 @@ public class GUIHandler extends Observable implements ClientHandler,Observer {
 			{
 				if(input.equals("exit"))
 				{
-					server.stoppedServer();
+					//remember to not do this - karin dodis - private joke - delete what's down
+					//server.stoppedServer();
 					return;
 				}
 				else if(input.contains("disconnect"))
