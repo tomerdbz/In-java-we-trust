@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import presenter.ServerCommand;
@@ -34,12 +35,21 @@ import presenter.ServerProperties;
 public class ServerWindow extends BasicWindow implements View {
 	String [] clients;
 	Text status;
-	ServerProperties serverProperties;
+	//ServerProperties serverProperties;
 	ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>();
 	ServerCommand lastCommand =null;
 	String DataFromModel=null;
 	public ServerWindow(String title, int width, int height) {
 		super(title, width, height);
+		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
+		shell.setBackgroundMode(SWT.INHERIT_FORCE);
+		MP3Player player = new MP3Player();
+	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
+	}
+	public ServerWindow(String title, int width, int height,org.eclipse.swt.widgets.Display display,Shell shell) {
+		super(display,shell,title, width, height);
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		MP3Player player = new MP3Player();
@@ -272,7 +282,7 @@ public class ServerWindow extends BasicWindow implements View {
 							WriteServerPropertiesGUI guiProp=new WriteServerPropertiesGUI();
 							if(guiProp.writeProperties(display,shell)!=-1)
 							{
-								serverProperties=readProperties();
+								//serverProperties=readProperties();
 							}
 							//setChanged();
 							//notifyObservers("properties");
@@ -341,7 +351,7 @@ public class ServerWindow extends BasicWindow implements View {
 			XMLDecoder d;
 			in = new FileInputStream(filename);
 			d=new XMLDecoder(in);
-			serverProperties=(ServerProperties)d.readObject();
+			//serverProperties=(ServerProperties)d.readObject();
 			d.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

@@ -12,17 +12,21 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
 
+import presenter.ServerProperties;
+
 public class MyModel extends Observable implements Model {
 	private InputStream inFromServer;
 	private OutputStream outToServer;
-	public MyModel(){
-		//try {
-			//Socket myServer=new Socket("localhost",5400);
-			//inFromServer=myServer.getInputStream();
-			//outToServer=myServer.getOutputStream();
-	//	} catch (IOException e) {
-	//		e.printStackTrace();
-	//	}
+	ServerProperties serverProperties;
+	public MyModel(ServerProperties serverProperties){
+		try {
+			Socket myServer=new Socket("localhost",5400);
+			inFromServer=myServer.getInputStream();
+			outToServer=myServer.getOutputStream();
+			this.serverProperties=serverProperties;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	@Override
@@ -47,6 +51,36 @@ public class MyModel extends Observable implements Model {
 		
 	}
 
+	
+
+	
+
+	@Override
+	public void DisconnectServer() {
+		PrintWriter write =new PrintWriter(outToServer);
+		write.println("stop server");
+		write.flush();
+		setChanged();
+		notifyObservers("msg server has stopped");
+	}
+	@Override
+	public void StartServer() {
+		PrintWriter write;
+		write = new  PrintWriter(outToServer);
+		write.println("start server");
+		write.flush();
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(outToServer);
+			os.writeObject(serverProperties);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		setChanged();
+		notifyObservers("msg server started");
+	
+		
+	}
 	@Override
 	public void DisconnectClient(String client) {
 		try {
@@ -59,27 +93,7 @@ public class MyModel extends Observable implements Model {
 		}
 		setChanged();
 		notifyObservers("msg client disconnected "+client);
-	}
-
-	@Override
-	public void StartServer() {
-		PrintWriter write;
-			write = new  PrintWriter(outToServer);
-			write.println("start server");
-			write.flush();
 		
-		setChanged();
-		notifyObservers("msg server started");
-		
-	}
-
-	@Override
-	public void DisconnectServer() {
-		PrintWriter write =new PrintWriter(outToServer);
-		write.println("stop server");
-		write.flush();
-		setChanged();
-		notifyObservers("msg server has stopped");
 	}
 	
 }
