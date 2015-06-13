@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,20 +28,24 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
+import presenter.ServerCommand;
 import presenter.ServerProperties;
 
-public class ServerWindow extends BasicWindow {
+public class ServerWindow extends BasicWindow implements View {
 	String [] clients;
 	Text status;
 	ServerProperties serverProperties;
+	ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>();
+	ServerCommand lastCommand =null;
+	String DataFromModel=null;
 	public ServerWindow(String title, int width, int height) {
 		super(title, width, height);
-		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
+		//shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		MP3Player player = new MP3Player();
-	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	    player.play();
-	    player.setRepeat(true);
+		//MP3Player player = new MP3Player();
+	    //player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
+	  //  player.play();
+	    //player.setRepeat(true);
 	}
 
 	@Override
@@ -102,16 +107,19 @@ public class ServerWindow extends BasicWindow {
 	        {
 	        	for (int loopIndex = 0; loopIndex < selectedClients.length; loopIndex++)
 	        	{
+	        		commandMap.get("connection status");
+		        	setChanged();
+		        	notifyObservers(selectedClients[loopIndex]);
 	        		if(loopIndex!=selectedClients.length-1)
-	        			outString += selectedClients[loopIndex].split(" ")[2] + ", ";
+	        			outString += selectedClients[loopIndex].split(" ")[2] + DataFromModel +", ";
 	        		else
-	        			outString+=selectedClients[loopIndex].split(" ")[2];
+	        			outString+=selectedClients[loopIndex].split(" ")[2] + DataFromModel;
 	        	}
 	        }
 	        else if(selectedClients.length==1)
 	        	outString=selectedClients[0].split(" ")[2];
 	        if(selectedClients.length!=0)
-	        	status.setText("Selected Clients: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
+	        	status.setText("Selected Clients1: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
 	        else
 	        	status.setText("");
 	        /* setChanged();
@@ -123,8 +131,11 @@ public class ServerWindow extends BasicWindow {
 	      public void widgetDefaultSelected(SelectionEvent event) {
 	        int[] selectedClients = list.getSelectionIndices();
 	        String outString = "";
-	        for (int loopIndex = 0; loopIndex < selectedClients.length; loopIndex++)
-	          outString += selectedClients[loopIndex] + " ";
+	        for (int loopIndex = 0; loopIndex < selectedClients.length; loopIndex++){
+	        	outString += selectedClients[loopIndex] + " ";
+	        	
+	        	
+	        }
 	        System.out.println("Selected Clients: " + outString);
 	      }
 	    });
@@ -137,7 +148,17 @@ public class ServerWindow extends BasicWindow {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				String[] unparsedClients = list.getSelection();//clients values in the list - how they are written in the list
+				String[] unparsedClients = list.getSelection();
+				for(int i=0;i<unparsedClients.length;i++){
+					commandMap.get("disconnect client");
+					setChanged();
+					notifyObservers(unparsedClients[i].split(" ")[2]);
+					
+					
+				}
+				
+				
+				//clients values in the list - how they are written in the list
 				/* You choose how the Presenter shall transfer the clients to the list and how they will be written
 				 * Parse it accordingly. if it's written like: "Client: IP PORT ..." You can parse it easily. 
 				 */
@@ -312,4 +333,32 @@ public class ServerWindow extends BasicWindow {
 		}
 		return p;
 	}
+
+	@Override
+	public ServerCommand getCommand() {
+		return this.lastCommand;
+	}
+
+	@Override
+	public void setCommands(ConcurrentHashMap<String, ServerCommand> commandMap) {
+		this.commandMap=commandMap;
+		
+	}
+
+	@Override
+	public void Display(String msg) {
+		MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+        messageBox.setText("Information");
+        messageBox.setMessage(msg);
+		messageBox.open();
+		
+	}
+
+	@Override
+	public void saveData(String data) {
+		this.DataFromModel=data;
+		
+	}
+
+	
 }
