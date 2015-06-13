@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import algorithms.demo.MazeAirDistance;
@@ -21,15 +23,18 @@ import algorithms.search.Solution;
 import algorithms.search.State;
 
 
-public class MazeClientHandler extends Observable implements ClientHandler  {
+public class MazeClientHandler extends Observable implements ClientHandler,Observer  {
 
 	MazeServer server;
 	ClientProperties clientProperties;
+	volatile ConcurrentHashMap<String,Boolean> activeConnections=new ConcurrentHashMap<String,Boolean>();
 	volatile ConcurrentLinkedQueue<String> messages=new ConcurrentLinkedQueue<String>();
+	GUIHandler handler;
 	public MazeClientHandler(MazeServer server) {
 		this.server=server;
 	}
-	public MazeClientHandler() {
+	public MazeClientHandler(GUIHandler handler) {
+		this.handler=handler;
 	}
 	
 	public void setClientProperties(ClientProperties clientProperties) {
@@ -45,6 +50,7 @@ public class MazeClientHandler extends Observable implements ClientHandler  {
 	{
 		String clientIP=client.getInetAddress().getHostAddress();
 		int clientPort=client.getPort();
+		activeConnections.put(clientIP+","+clientPort, true);
 		String message=new String(clientIP +","+ clientPort+" has connected");
 		messages.add(message);
 		setChanged();
@@ -56,7 +62,7 @@ public class MazeClientHandler extends Observable implements ClientHandler  {
 			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
 			ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
 			String command;
-			while((command=(String)inputFromClient.readObject()).contains("exit"))
+			while(activeConnections.get(clientIP+","+clientPort) &&(command=(String)inputFromClient.readObject()).contains("exit"))
 			{
 				Object arg=inputFromClient.readObject();
 				if(command.contains("properties"))
@@ -101,7 +107,6 @@ public class MazeClientHandler extends Observable implements ClientHandler  {
 			inFromClient.close();
 			outToClient.close();
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -263,5 +268,14 @@ public class MazeClientHandler extends Observable implements ClientHandler  {
 
 	public void setServer(MazeServer server) {
 		this.server = server;
+	}
+	@Override
+	public void update(Observable o, Object arg) {
+		if(o==handler)
+			if(arg.toString().contains("disconnect"))
+			{
+				String[] ipAndPort=arg.toString().split(",");
+				activeConnections.replace(ipAndPort[0]+","+ipAndPort[1], false);
+			}
 	}
 }

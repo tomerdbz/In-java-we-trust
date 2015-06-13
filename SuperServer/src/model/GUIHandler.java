@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
 
-public class GUIHandler implements ClientHandler,Observer {
+public class GUIHandler extends Observable implements ClientHandler,Observer {
 	MazeClientHandler handler;
 	PrintWriter outputToGUI;
 	MazeServer server;
@@ -29,17 +29,29 @@ public class GUIHandler implements ClientHandler,Observer {
 				if((inputFromClient.readLine()).equals("start server"))
 				{
 					ObjectInputStream propertiesLoader=new ObjectInputStream(inFromClient);
-					handler=new MazeClientHandler();
+					handler=new MazeClientHandler(this);
 					handler.addObserver(this);
+					this.addObserver(handler);
 					server=new MazeServer((ServerProperties)propertiesLoader.readObject(), handler);
 					handler.setServer(server);
 					new Thread(server).start();
 				}
-			if((inputFromClient.readLine()).equals("stop server"))
+			String input;
+			while(!((input=inputFromClient.readLine()).equals("stop server")))
 			{
-				server.stoppedServer();
-				server=null;
+				if(input.equals("exit"))
+				{
+					server.stoppedServer();
+					return;
+				}
+				else if(input.contains("disconnect"))
+				{
+					setChanged();
+					notifyObservers(input);
+				}
 			}
+			server.stoppedServer();
+			server=null;
 			outputToGUI=null;
 			inFromClient.close();
 			outToClient.close();
