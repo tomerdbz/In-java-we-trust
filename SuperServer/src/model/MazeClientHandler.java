@@ -66,7 +66,11 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			{
 				Object arg=inputFromClient.readObject();
 				if(command.contains("properties"))
+				{
 					setClientProperties((ClientProperties)arg);
+					outputToClient.writeObject("success in setting properties");
+					outputToClient.flush();
+				}
 				else if(command.contains("generate maze"))
 				{
 					String[] params=parseGenerateMazeArgument(arg);
