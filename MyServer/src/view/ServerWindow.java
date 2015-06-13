@@ -40,12 +40,12 @@ public class ServerWindow extends BasicWindow implements View {
 	String DataFromModel=null;
 	public ServerWindow(String title, int width, int height) {
 		super(title, width, height);
-		//shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
+		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		//MP3Player player = new MP3Player();
-	    //player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	  //  player.play();
-	    //player.setRepeat(true);
+		MP3Player player = new MP3Player();
+	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
 	}
 
 	@Override
@@ -71,11 +71,42 @@ public class ServerWindow extends BasicWindow implements View {
 		Button startServerButton=new Button(shell,SWT.PUSH);
 		startServerButton.setText("Start Server");
 		startServerButton.setLayoutData(new GridData(SWT.LEFT,SWT.CENTER,false,false,1,1));
+		startServerButton.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				lastCommand = commandMap.get("start server");
+				setChanged();
+				notifyObservers();
+				
+			}
+			
+		});
 		
 		
 		Button stopServerButton=new Button(shell,SWT.PUSH);
 		stopServerButton.setText("Stop Server");
 		stopServerButton.setLayoutData(new GridData(SWT.RIGHT,SWT.CENTER,false,false,1,1));
+		stopServerButton.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				lastCommand = commandMap.get("stop server");
+				setChanged();
+				notifyObservers("stop server");
+				
+			}
+			
+		});
 		
 		final Label listLabel=new Label(shell,SWT.CENTER);
 		listLabel.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
@@ -91,9 +122,9 @@ public class ServerWindow extends BasicWindow implements View {
 	    //list.setBounds(40, 20, 220, 100);
 		list.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 		list.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true,2,1));
-	    for (int loopIndex = 0; loopIndex < 20; loopIndex++) { //example to how I would put the data
-	      list.add("Client IP: 127.0.0." + loopIndex +" Port: x");
-	    }
+	 //   for (int loopIndex = 0; loopIndex < 20; loopIndex++) { //example to how I would put the data
+	     // list.add("Client IP: 127.0.0." + loopIndex +" Port: x");
+	   // }
 
 	    final Text status = new Text(shell, SWT.CENTER | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 	    //status.setBounds(300, 130, 160, 25);
@@ -150,7 +181,7 @@ public class ServerWindow extends BasicWindow implements View {
 			public void widgetSelected(SelectionEvent arg0) {
 				String[] unparsedClients = list.getSelection();
 				for(int i=0;i<unparsedClients.length;i++){
-					commandMap.get("disconnect client");
+					lastCommand = commandMap.get("disconnect client");
 					setChanged();
 					notifyObservers(unparsedClients[i].split(" ")[2]);
 					

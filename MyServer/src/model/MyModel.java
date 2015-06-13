@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -15,13 +16,13 @@ public class MyModel extends Observable implements Model {
 	private InputStream inFromServer;
 	private OutputStream outToServer;
 	public MyModel(){
-		try {
-			Socket myServer=new Socket("localhost",5400);
-			inFromServer=myServer.getInputStream();
-			outToServer=myServer.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//try {
+			//Socket myServer=new Socket("localhost",5400);
+			//inFromServer=myServer.getInputStream();
+			//outToServer=myServer.getOutputStream();
+	//	} catch (IOException e) {
+	//		e.printStackTrace();
+	//	}
 		
 	}
 	@Override
@@ -48,18 +49,25 @@ public class MyModel extends Observable implements Model {
 
 	@Override
 	public void DisconnectClient(String client) {
-		PrintWriter write =new PrintWriter(outToServer);
-		write.println("disconnect "+client);
-		write.flush();
+		try {
+			ObjectOutputStream write =new ObjectOutputStream(outToServer);
+			write.writeObject("disconnect "+client);
+			write.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		setChanged();
 		notifyObservers("msg client disconnected "+client);
 	}
 
 	@Override
 	public void StartServer() {
-		PrintWriter write =new PrintWriter(outToServer);
-		write.println("start server");
-		write.flush();
+		PrintWriter write;
+			write = new  PrintWriter(outToServer);
+			write.println("start server");
+			write.flush();
+		
 		setChanged();
 		notifyObservers("msg server started");
 		
@@ -68,7 +76,7 @@ public class MyModel extends Observable implements Model {
 	@Override
 	public void DisconnectServer() {
 		PrintWriter write =new PrintWriter(outToServer);
-		write.println("start server");
+		write.println("stop server");
 		write.flush();
 		setChanged();
 		notifyObservers("msg server has stopped");
