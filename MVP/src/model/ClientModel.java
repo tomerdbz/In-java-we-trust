@@ -1,12 +1,8 @@
 package model;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
@@ -19,16 +15,17 @@ import algorithms.search.State;
 public class ClientModel extends Observable implements Model {
 	private ClientProperties properties;
 	private Socket myServer;
-	private InputStream inFromServer;
-	private OutputStream outToServer;
+	private ObjectInputStream inputFromServer;
+	private ObjectOutputStream outputToServer;
 	private Maze maze;
 	private Solution solution;
 	private State hint;
 	public ClientModel() {
 		try {
 			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inFromServer=myServer.getInputStream();
-			outToServer=myServer.getOutputStream();
+			inputFromServer=new ObjectInputStream(myServer.getInputStream());
+			outputToServer=new ObjectOutputStream(myServer.getOutputStream());
+		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,37 +36,15 @@ public class ClientModel extends Observable implements Model {
 		this.properties=properties;
 		try {
 			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inFromServer=myServer.getInputStream();
-			outToServer=myServer.getOutputStream();
+			inputFromServer=new ObjectInputStream(myServer.getInputStream());
+			outputToServer=new ObjectOutputStream(myServer.getOutputStream());
 			Object[] objs=new Object[2];
 			objs[0]="properties";
 			objs[1]=properties;
-			queryServer(objectToInputStream(objs), inFromServer, outToServer);
+			queryServer(objs);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	private InputStream objectToInputStream(Object[] objs)
-	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    ObjectOutputStream oos;
-		try {
-			oos = new ObjectOutputStream(baos);
-			for(int i=0;i<objs.length;i++)
-				oos.writeObject(objs[i]);
-
-		    oos.flush();
-		    oos.close();
-
-		    InputStream is = new ByteArrayInputStream(baos.toByteArray());
-		    return is;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
-
 	}
 	@Override
 	public void generateMaze(String name, int rows, int cols, int rowSource,
@@ -77,7 +52,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="generate maze";
 		objs[1]=name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
-		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objs);
 		maze=serializableMaze.getOriginalMaze();
 		notifyObservers(notifyArgument+" "+name);
 	}
@@ -99,7 +74,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="solve maze"; 
 		objs[1]=mazeName;
-		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objs);
 		solution=serializableSolution.getOriginalSolution();
 		setChanged();
 		notifyObservers(notifyArgument+" "+mazeName);
@@ -135,15 +110,15 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="calculate hint";
 		objs[1]=mazeName+" "+row+","+col;
-		SerializableState serializableHint=(SerializableState)queryServer(objectToInputStream(objs),inFromServer,outToServer);
+		SerializableState serializableHint=(SerializableState)queryServer(objs);
 		hint=serializableHint.getOriginalState();
 	}
 
 	@Override
 	public void stop() {
 		try {
-			inFromServer.close();
-			outToServer.close();
+			myServer.getInputStream().close();
+			myServer.getOutputStream().close();
 			myServer.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -153,17 +128,13 @@ public class ClientModel extends Observable implements Model {
 	}
 	
 	
-	private Object queryServer(InputStream modelInput,InputStream inFromServer, OutputStream outToServer)
+	private Object queryServer(Object[] input)
 	{
 		Object value=null;
-		ObjectInputStream input;
-		ObjectOutputStream outputToServer;
 		try {
-			input=new ObjectInputStream((modelInput));
-			outputToServer = new ObjectOutputStream((outToServer));
-			ObjectInputStream inputFromServer=new ObjectInputStream((inFromServer));
-			outputToServer.writeObject(input.readObject());
-			outputToServer.writeObject(input.readObject());
+			for(int i=0;i<input.length;i++)
+				outputToServer.writeObject(input[i]);
+			outputToServer.flush();
 			//getting data - agreed protocol is that the data is compressed by ZIP
 			GZIPInputStream inputCompressedFromServer=new GZIPInputStream(inputFromServer);
 			value=new ObjectInputStream(inputCompressedFromServer).readObject();
@@ -183,7 +154,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="properties";
 		objs[1]=properties;
-		queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		queryServer(objs);
 	}
 
 }
