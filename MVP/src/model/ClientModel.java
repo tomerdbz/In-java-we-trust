@@ -23,7 +23,7 @@ public class ClientModel extends Observable implements Model {
 	public ClientModel() {
 		try {
 			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inputFromServer=new ObjectInputStream(myServer.getInputStream());
+			inputFromServer=new ObjectInputStream(new GZIPInputStream(new ObjectInputStream(myServer.getInputStream())));
 			outputToServer=new ObjectOutputStream(myServer.getOutputStream());
 		
 		} catch (IOException e) {
@@ -136,8 +136,7 @@ public class ClientModel extends Observable implements Model {
 				outputToServer.writeObject(input[i]);
 			outputToServer.flush();
 			//getting data - agreed protocol is that the data is compressed by ZIP
-			GZIPInputStream inputCompressedFromServer=new GZIPInputStream(inputFromServer);
-			value=new ObjectInputStream(inputCompressedFromServer).readObject();
+			value=inputFromServer.readObject();
 			if(value.toString().equals("error"))
 				return null;
 		} catch (IOException e) {
