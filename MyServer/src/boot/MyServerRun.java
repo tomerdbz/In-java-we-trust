@@ -9,7 +9,7 @@ import model.MyModel;
 import view.ServerWindow;
 import view.WriteServerPropertiesGUI;
 
-public class Run {
+public class MyServerRun {
 
 	public static void main(String[] args) {
 		WriteServerPropertiesGUI sp = new WriteServerPropertiesGUI();

@@ -2,7 +2,7 @@
 <java version="1.8.0_40" class="java.beans.XMLDecoder">
  <object class="presenter.ClientProperties">
   <void property="diagonalMovementCost">
-   <double>12.0</double>
+   <double>213.0</double>
   </void>
   <void property="mazeSolver">
    <object class="java.lang.Enum" method="valueOf">
@@ -10,11 +10,14 @@
     <string>BFS</string>
    </object>
   </void>
+  <void property="movementCost">
+   <double>20.0</double>
+  </void>
   <void property="serverIP">
-   <string>localhost</string>
+   <string>127.0.0.1</string>
   </void>
   <void property="serverPort">
-   <int>54</int>
+   <int>3600</int>
   </void>
   <void property="ui">
    <object class="java.lang.Enum" method="valueOf">

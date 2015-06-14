@@ -25,15 +25,6 @@ public class ClientModel extends Observable implements Model {
 	private Solution solution;
 	private State hint;
 	public ClientModel() {
-		try {
-			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inFromServer=myServer.getInputStream();
-			outToServer=myServer.getOutputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 	public ClientModel(ClientProperties properties) {
 		this.properties=properties;
@@ -44,7 +35,11 @@ public class ClientModel extends Observable implements Model {
 			Object[] objs=new Object[2];
 			objs[0]="properties";
 			objs[1]=properties;
-			queryServer(objectToInputStream(objs), inFromServer, outToServer);
+			ObjectOutputStream out=new ObjectOutputStream(outToServer);
+			out.writeObject("properties");
+			out.writeObject(properties);
+			out.flush();
+			//queryServer(objectToInputStream(objs), inFromServer, outToServer);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -162,8 +157,11 @@ public class ClientModel extends Observable implements Model {
 			input=new ObjectInputStream((modelInput));
 			outputToServer = new ObjectOutputStream((outToServer));
 			ObjectInputStream inputFromServer=new ObjectInputStream((inFromServer));
+			System.out.println(input.readObject());
 			outputToServer.writeObject(input.readObject());
+			outputToServer.flush();
 			outputToServer.writeObject(input.readObject());
+			outputToServer.flush();
 			//getting data - agreed protocol is that the data is compressed by ZIP
 			GZIPInputStream inputCompressedFromServer=new GZIPInputStream(inputFromServer);
 			value=new ObjectInputStream(inputCompressedFromServer).readObject();
@@ -177,8 +175,41 @@ public class ClientModel extends Observable implements Model {
 		
 		return value;
 	}
+	
+	
+	
 	@Override
 	public void setProperties(ClientProperties properties) {
+		if(this.properties==null)
+		{
+			try {
+				myServer=new Socket(properties.getServerIP(),properties.getServerPort());
+				inFromServer=myServer.getInputStream();
+				outToServer=myServer.getOutputStream();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		if(!(properties.getServerIP().equals(this.properties.getServerIP())) || !(properties.getServerPort()==this.properties.getServerPort()))
+		{
+			try {
+				inFromServer.close();
+				outToServer.close();
+				myServer.close();
+				
+				myServer=new Socket(properties.getServerIP(),properties.getServerPort());
+				inFromServer=myServer.getInputStream();
+				outToServer=myServer.getOutputStream();
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 		this.properties=properties;
 		Object[] objs=new Object[2];
 		objs[0]="properties";

@@ -62,6 +62,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
 			ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
 			String command;
+			System.out.println("client connected!");
 			while(activeConnections.get(clientIP+","+clientPort) &&(command=(String)inputFromClient.readObject()).contains("exit"))
 			{
 				Object arg=inputFromClient.readObject();
