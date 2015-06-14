@@ -18,12 +18,16 @@ public class MyModel extends Observable implements Model {
 	private InputStream inFromServer;
 	private OutputStream outToServer;
 	ServerProperties serverProperties;
+	//Thread ClientManager;
+	//BufferedReader BR;
 	public MyModel(ServerProperties serverProperties){
 		try {
 			Socket myServer=new Socket("localhost",5400);
 			inFromServer=myServer.getInputStream();
 			outToServer=myServer.getOutputStream();
 			this.serverProperties=serverProperties;
+		//	BR= new BufferedReader(new InputStreamReader(inFromServer));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -72,10 +76,29 @@ public class MyModel extends Observable implements Model {
 		try {
 			ObjectOutputStream os = new ObjectOutputStream(outToServer);
 			os.writeObject(serverProperties);
+			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		/*ClientManager = new Thread ( new Runnable(){
+
+			@Override
+			public void run() {
+				
+				
+				
+				try {
+					String line = BR.readLine();
+					wait(1000);
+				} catch (InterruptedException | IOException e) {
+					
+					e.printStackTrace();
+				}
+				
+				
+			}
+			
+		});*/
 		setChanged();
 		notifyObservers("msg server started");
 	
@@ -85,7 +108,7 @@ public class MyModel extends Observable implements Model {
 	public void DisconnectClient(String client) {
 		try {
 			ObjectOutputStream write =new ObjectOutputStream(outToServer);
-			write.writeObject("disconnect "+client);
+			write.writeObject("disconnect "+client); //ip,port,disconnect
 			write.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
