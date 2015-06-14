@@ -21,6 +21,8 @@ public class ClientModel extends Observable implements Model {
 	private Socket myServer;
 	private InputStream inFromServer;
 	private OutputStream outToServer;
+	private ObjectOutputStream outputToServer;
+	private ObjectInputStream inputDecompressedFromServer;
 	private Maze maze;
 	private Solution solution;
 	private State hint;
@@ -35,11 +37,9 @@ public class ClientModel extends Observable implements Model {
 			Object[] objs=new Object[2];
 			objs[0]="properties";
 			objs[1]=properties;
-			ObjectOutputStream out=new ObjectOutputStream(outToServer);
-			out.writeObject("properties");
-			out.writeObject(properties);
-			out.flush();
-			//queryServer(objectToInputStream(objs), inFromServer, outToServer);
+			outputToServer=new ObjectOutputStream(outToServer);
+			inputDecompressedFromServer=new ObjectInputStream(new GZIPInputStream(inFromServer));
+			queryServer(objs, inFromServer, outToServer);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -72,7 +72,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="generate maze";
 		objs[1]=name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
-		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objs, inFromServer, outToServer);
 		maze=serializableMaze.getOriginalMaze();
 		notifyObservers(notifyArgument+" "+name);
 	}
@@ -94,7 +94,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="solve maze"; 
 		objs[1]=mazeName;
-		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objs, inFromServer, outToServer);
 		solution=serializableSolution.getOriginalSolution();
 		setChanged();
 		notifyObservers(notifyArgument+" "+mazeName);
@@ -130,7 +130,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="calculate hint";
 		objs[1]=mazeName+" "+row+","+col;
-		SerializableState serializableHint=(SerializableState)queryServer(objectToInputStream(objs),inFromServer,outToServer);
+		SerializableState serializableHint=(SerializableState)queryServer(objs,inFromServer,outToServer);
 		hint=serializableHint.getOriginalState();
 	}
 
@@ -148,23 +148,16 @@ public class ClientModel extends Observable implements Model {
 	}
 	
 	
-	private Object queryServer(InputStream modelInput,InputStream inFromServer, OutputStream outToServer)
+	private Object queryServer(Object[] input,InputStream inFromServer, OutputStream outToServer)
 	{
 		Object value=null;
-		ObjectInputStream input;
-		ObjectOutputStream outputToServer;
 		try {
-			input=new ObjectInputStream((modelInput));
 			outputToServer = new ObjectOutputStream((outToServer));
-			ObjectInputStream inputFromServer=new ObjectInputStream((inFromServer));
-			System.out.println(input.readObject());
-			outputToServer.writeObject(input.readObject());
-			outputToServer.flush();
-			outputToServer.writeObject(input.readObject());
+			for(int i=0;i<input.length;i++)
+				outputToServer.writeObject(input[i]);
 			outputToServer.flush();
 			//getting data - agreed protocol is that the data is compressed by ZIP
-			GZIPInputStream inputCompressedFromServer=new GZIPInputStream(inputFromServer);
-			value=new ObjectInputStream(inputCompressedFromServer).readObject();
+			value=inputDecompressedFromServer.readObject();
 			if(value.toString().equals("error"))
 				return null;
 		} catch (IOException e) {
@@ -214,7 +207,7 @@ public class ClientModel extends Observable implements Model {
 		Object[] objs=new Object[2];
 		objs[0]="properties";
 		objs[1]=properties;
-		queryServer(objectToInputStream(objs), inFromServer, outToServer);
+		queryServer(objs, inFromServer, outToServer);
 	}
 
 }

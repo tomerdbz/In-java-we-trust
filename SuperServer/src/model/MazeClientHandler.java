@@ -26,7 +26,7 @@ import algorithms.search.State;
 public class MazeClientHandler extends Observable implements ClientHandler,Observer  {
 
 	MazeServer server;
-	ClientProperties clientProperties;
+	volatile ConcurrentHashMap<String,ClientProperties>clientsProperties=new ConcurrentHashMap<String, ClientProperties>();
 	volatile ConcurrentHashMap<String,Boolean> activeConnections=new ConcurrentHashMap<String,Boolean>();
 	volatile ConcurrentLinkedQueue<String> messages=new ConcurrentLinkedQueue<String>();
 	GUIHandler handler;
@@ -35,12 +35,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	}
 	public MazeClientHandler(GUIHandler handler) {
 		this.handler=handler;
-	}
-	
-	public void setClientProperties(ClientProperties clientProperties) {
-		setChanged();
-		notifyObservers("Setting Properties");
-		this.clientProperties = clientProperties;
 	}
 	
 	/** Please note: data should be sent to client compressed by GZIP!
@@ -57,18 +51,20 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		notifyObservers();//check messages
 		messages.remove(message);
 		try {
-			InputStream inFromClient= client.getInputStream();;
+			InputStream inFromClient= client.getInputStream();
 			OutputStream outToClient=client.getOutputStream();
 			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
 			ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
 			String command;
-			System.out.println("client connected!");
-			while(activeConnections.get(clientIP+","+clientPort) &&(command=(String)inputFromClient.readObject()).contains("exit"))
+			System.out.println(clientIP +" " + clientPort+" "+"client connected!");
+			while(activeConnections.get(clientIP+","+clientPort) && !(command=(String)inputFromClient.readObject()).contains("exit"))
 			{
 				Object arg=inputFromClient.readObject();
 				if(command.contains("properties"))
 				{
-					setClientProperties((ClientProperties)arg);
+					clientsProperties.put(clientIP+","+clientPort,((ClientProperties)arg));
+					setChanged();
+					notifyObservers("Setting Properties");
 					outputToClient.writeObject("success in setting properties");
 					outputToClient.flush();
 				}
@@ -79,7 +75,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 					messages.add(message);
 					setChanged();
 					notifyObservers();
-					outputToClient.writeObject(generateMaze(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
+					outputToClient.writeObject(generateMaze(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
 					messages.remove(message);
 					outputToClient.flush();
 
@@ -91,7 +87,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 					messages.add(message);
 					setChanged();
 					notifyObservers();
-					outputToClient.writeObject(solveMaze(params[0],"solving maze"));
+					outputToClient.writeObject(solveMaze(clientIP,clientPort,params[0],"solving maze"));
 					messages.remove(message);
 					outputToClient.flush();
 
@@ -103,12 +99,13 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 					messages.add(message);
 					setChanged();
 					notifyObservers();
-					outputToClient.writeObject(calculateHint(params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
+					outputToClient.writeObject(calculateHint(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
 					messages.remove(message);
 					outputToClient.flush();
 				}
 				
 			}
+			clientsProperties.remove(clientIP+","+clientPort);
 			inFromClient.close();
 			outToClient.close();
 		} catch (Exception e1) {
@@ -160,9 +157,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * @param - colGoal - Goal col of generated maze
 	 * @return - a SerializableMaze to send to client
 	 */
-	public SerializableMaze generateMaze(String name,int rows, int cols, int rowSource, int colSource,
+	public SerializableMaze generateMaze(String clientIP,int clientPort,String name,int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal,String notifyArgument) {
-		if(this.clientProperties==null)
+		ClientProperties clientProperties;
+		if((clientProperties=this.clientsProperties.get(clientIP+","+clientPort))==null)
 		{
 			return null;
 		}
@@ -190,8 +188,9 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * @param - mazeName - maze name to solve.
 	 * @return - a SerializableSolution to send to the client.
 	 */
-	public SerializableSolution solveMaze(String mazeName,String notifyArgument) {
-		if(this.clientProperties==null)
+	public SerializableSolution solveMaze(String clientIP,int clientPort,String mazeName,String notifyArgument) {
+		ClientProperties clientProperties;
+		if((clientProperties=this.clientsProperties.get(clientIP+","+clientPort))==null)
 		{
 			return null;
 		}
@@ -224,7 +223,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		return new SerializableSolution(solution);
 		
 	}
-	public SerializableState calculateHint(String mazeName, int row, int col,String notifyArgument)
+	public SerializableState calculateHint(String clientIP,int clientPort,String mazeName, int row, int col,String notifyArgument)
 	{
 		Maze m;
 		if((m=server.generatedMazes.get(mazeName))==null)
@@ -232,7 +231,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			return null;
 		}
 		if(server.cache.get(m)==null)
-			solveMaze(mazeName,notifyArgument);	
+			solveMaze(clientIP,clientPort,mazeName,notifyArgument);	
 		return new SerializableState(solutionToHint(mazeName,server.cache.get(m),row,col,notifyArgument));
 	}
 	private State solutionToHint(String mazeName, Solution sol,int row,int col,String notifyArgument)
