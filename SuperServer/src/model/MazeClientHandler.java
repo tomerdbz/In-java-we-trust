@@ -10,6 +10,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.zip.GZIPOutputStream;
 
 import algorithms.demo.MazeAirDistance;
 import algorithms.demo.MazeManhattanDistance;
@@ -54,7 +55,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			InputStream inFromClient= client.getInputStream();
 			OutputStream outToClient=client.getOutputStream();
 			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
-			ObjectOutputStream outputToClient=new ObjectOutputStream(outToClient);
+			ObjectOutputStream outputToClient=new ObjectOutputStream(new GZIPOutputStream(new ObjectOutputStream(outToClient)));
 			String command;
 			System.out.println(clientIP +" " + clientPort+" "+"client connected!");
 			while(activeConnections.get(clientIP+","+clientPort) && !(command=(String)inputFromClient.readObject()).contains("exit"))
