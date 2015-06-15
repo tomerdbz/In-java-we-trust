@@ -1,6 +1,7 @@
 package boot;
 
 import gui.MazeWindow;
+
 import java.beans.XMLDecoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -8,13 +9,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import model.MyModel;
+import model.ClientModel;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import presenter.Presenter;
 import presenter.ClientProperties;
+import presenter.Presenter;
 import view.MyView;
 
 /** ID'S: 208415513, 318507209 - Tomer Cabouly, Alon Orlovsky 
@@ -30,11 +31,11 @@ public class Run {
 				Display display=new Display();
 				Shell shell=new Shell(display);
 				guiProp.writeProperties(shell);
-				MyModel m;
+				ClientModel m;
 				ClientProperties prop;
 				if((prop=readProperties())!=null)
 				{
-					m=new MyModel(prop);
+					m=new ClientModel(prop);
 					
 					switch(prop.getUi())
 					{
