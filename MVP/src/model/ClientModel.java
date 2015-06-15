@@ -13,15 +13,36 @@ import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
+/** This Model is connecting to a Server which is doing all of MyModel jobs.
+ * 	Instead of calculating and working hard, it's querying a server.
+ * @author Tomer
+ *
+ */
 public class ClientModel extends Observable implements Model {
+	/**	ClientProperties - see JavaDoc of this class
+	 * 
+	 */
 	private ClientProperties properties;
+	/**	upon generating a maze I'd like to save it for the presenter to come and take it. 
+	 * 
+	 */
 	private Maze maze;
+	
+	/**
+	 *	upon solving a maze I'd like to save it for the presenter to come and take it. 
+	 */
 	private Solution solution;
+	/**
+	 * 	upon calculating a hint I'd like to save it for the presenter to come and take it.
+	 */
 	private State hint;
 	
 	public ClientModel(ClientProperties properties) {
 		this.properties=properties;
 	}
+	/**	this method generates a maze - but it doesn't do that actually.
+	 * it finds out what maze generator should the server use and then tells it to generate a maze based on that and user input the presenter gave ClientModel. 
+	 */
 	@Override
 	public void generateMaze(String name, int rows, int cols, int rowSource,
 			int colSource, int rowGoal, int colGoal, String notifyArgument) {
@@ -55,6 +76,10 @@ public class ClientModel extends Observable implements Model {
 		return retMaze;
 	}
 
+	/** This method solves a maze - but it doesn't do that actually.
+	 * 	it checks how should the solution should be calculated - which algorithm, which movement is allowed and movements cost.
+	 * then it tells the Server all this info and lets him solve the maze.
+	 */
 	@Override
 	public void solveMaze(String mazeName, String notifyArgument) {
 		String property=null;
@@ -112,6 +137,9 @@ public class ClientModel extends Observable implements Model {
 		return retHint;
 	}
 
+	/** This method calculates a hint - but it doesn't do that actually.
+	 * 	it checks how the solution was calculated and passes this information to the Server to calculate it.
+	 */
 	@Override
 	public void calculateHint(String mazeName, int row, int col,
 			String notifyArgument) {
@@ -153,6 +181,16 @@ public class ClientModel extends Observable implements Model {
 	}
 	
 	
+	/** Ahh - the cherry pie!
+	 * This method does it all - the excitement, the thrill, the tears...
+	 * it queries the Server and handles the Client-Server session.
+	 * @param serverIP - IP for server socket
+	 * @param serverPort - port for server socket
+	 * @param command - like "generate maze", "solve maze",...
+	 * @param data - arguments like maze name, number of rows,...
+	 * @param property - a String describes how the query should be done.
+	 * @return Server's response to the query - maze, solution, hint,...
+	 */
 	private Object queryServer(String serverIP,int serverPort,String command,String data,String property)
 	{
 		Object result=null;
