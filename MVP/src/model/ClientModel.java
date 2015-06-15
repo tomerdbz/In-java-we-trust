@@ -207,12 +207,13 @@ public class ClientModel extends Observable implements Model {
 				ObjectInputStream inputDecompressed;
 				inputDecompressed = new ObjectInputStream(new GZIPInputStream(server.getInputStream()));
 				result=inputDecompressed.readObject();
+				if(result.toString().contains("disconnect"))
+					writerToServer.println("ok");
 				writerToServer.close();
 				inputDecompressed.close();
 				server.close();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
