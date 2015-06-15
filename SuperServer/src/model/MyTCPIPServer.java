@@ -12,12 +12,22 @@ import presenter.ServerProperties;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+/** This class creates a generic TCP/IP Server. 
+ * @author Tomer
+ *
+ */
 public class MyTCPIPServer {
-	/**	Properties defined. see Properties class for more info.
+	/**	Server Properties - how many clients should the server handle simultaneously and port to handle them.
 	 * 
 	 */
 	ServerProperties serverProperties;
+	/**	The client handler that will be injected to this field will change how clients will be handled.
+	 * 
+	 */
 	ClientHandler clientHandler;
+	/** a flag to know when the server was signaled to stop.
+	 * 
+	 */
 	private volatile boolean stopped;
 
 	public MyTCPIPServer(ServerProperties serverProperties,ClientHandler clientHandler) {
@@ -27,6 +37,10 @@ public class MyTCPIPServer {
 		
 		// TODO Auto-generated constructor stub
 	}
+	/**	This method will start the TCP/IP Server.
+	 * Please Inject your desired client handler first.
+	 * 
+	 */
 	public void startServer()
 	{
 		ServerSocket server;

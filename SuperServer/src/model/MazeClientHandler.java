@@ -3,6 +3,8 @@ package model;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -24,20 +26,41 @@ import algorithms.search.Solution;
 import algorithms.search.State;
 
 
+/**	This class implements ClientHandler as a TCP/IP client handler
+ * but - BONUS-  also implements Observer and extending Observable for REMOTE CONTROL COMMUNICATION!
+ * the remote control could tell the handler to stop handle a client (when disconnecting) but the remote control also want to know statuses of clients and what the handler - and the server are doing at the moment.
+ * 
+ * @author Tomer
+ *
+ */
 public class MazeClientHandler extends Observable implements ClientHandler,Observer  {
 
+	/**	A server reference. I'd like to save mazes and solutions. those lies in data structures in the server. 
+	 * 
+	 */
 	MazeServer server;
+	/**	A HashMap linking between Client IP and Port - as a String and its Socket.
+	 * that way if the remote control will notify to disconnect I could reach the socket through this HashMap.
+	 * 
+	 */
 	volatile ConcurrentHashMap<String,Socket> activeConnections=new ConcurrentHashMap<String,Socket>();
+	/**	A queue containing all the messages - all the things the handler is doing right now. Every time it changes it notifies the remote control.
+	 * 
+	 */
 	volatile ConcurrentLinkedQueue<String> messages=new ConcurrentLinkedQueue<String>();
-	GUIUDPServer handler;
+	/**	A reference of the UDP Server that send messages to the remote control is saved to notify him in the method update() I got by being an Observer.
+	 * 
+	 */
+	GUIUDPServer remote;
 	public MazeClientHandler(MazeServer server) {
 		this.server=server;
 	}
-	public MazeClientHandler(GUIUDPServer handler) {
-		this.handler=handler;
+	public MazeClientHandler(GUIUDPServer remote) {
+		this.remote=remote;
 	}
 	
-	/** Please note: data should be sent to client compressed by GZIP!
+	/** The handleClient Method! it notifies what it's doing to the client throughout it's operation.
+	 * 	it gets the command from the client, additional arguments and parameters. does as requested and sends.
 	 */
 	@Override
 	public void handleClient(Socket client)
@@ -45,7 +68,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		String clientIP=client.getInetAddress().getHostAddress();
 		int clientPort=client.getPort();
 		activeConnections.put(clientIP+","+clientPort, client);
-		String message=new String(clientIP +","+ clientPort+" has connected");
+		String message=new String(clientIP +","+ clientPort+",connected");
 		messages.add(message);
 		setChanged();
 		notifyObservers();//check messages
@@ -111,6 +134,11 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		String last=new String(clientIP +","+ clientPort+",disconnected");
+		messages.add(last);
+		setChanged();
+		notifyObservers();
+		messages.remove(last);
 
 	}
 	
@@ -121,6 +149,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	{		
 		return properties.split(" ");
 	}
+	/**	parses the argument that came as String to all the parameters.
+	 * @param arg - One String that contains all - maze name, row and col.
+	 * @return String array containing them parsed.
+	 */
 	private String[] parseCalculateHintArgument(Object arg) {
 		String[]values=((String)arg).split(" ");
 		String[]result=new String[3];
@@ -130,14 +162,20 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		return result;
 	}
 
-
+	/**	parses the argument that came as String to all the parameters.
+	 * @param arg - One String that contains all - maze name
+	 * @return String array containing them parsed.
+	 */
 	private String[] parseSolveMazeArgument(Object arg) {
 		String[] result=new String[1];
 		result[0]=(String)arg;
 		return result;
 	}
 
-
+	/**	parses the argument that came as String to all the parameters.
+	 * @param arg - One String that contains all - maze name, rows and cols,...
+	 * @return String array containing them parsed.
+	 */
 	private String[] parseGenerateMazeArgument(Object arg) {
 		String params=(String)arg;
 		String[] values=params.split(" ");
@@ -224,6 +262,17 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		return new SerializableSolution(solution);
 		
 	}
+	/**	calculates a hint based on an existing solution.
+	 * 	if a solution does not exist - it first solves the maze and only then calculating the hint.
+	 * @param solver - how the maze was solved - which algorithm
+	 * @param move - which movement was allowed - Diagonal or nonDiagonal?
+	 * @param moveCost - movement cost
+	 * @param moveDiagonalCost - diagonal movement cost
+	 * @param mazeName - name of maze
+	 * @param row - from which row to calculate the hint
+	 * @param col - from which col to calculate the hint
+	 * @return a SerializableState - which is the hint - that will be sent to the client.
+	 */
 	public SerializableState calculateHint(String solver,String move,double moveCost,double moveDiagonalCost,String mazeName, int row, int col)
 	{
 		Maze m;
@@ -235,6 +284,13 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			solveMaze(solver,move,moveCost,moveDiagonalCost,mazeName);	
 		return new SerializableState(solutionToHint(mazeName,server.cache.get(m),row,col));
 	}
+	/** The method that actually calculates the hint.
+	 * @param mazeName
+	 * @param sol - the maze solution
+	 * @param row
+	 * @param col
+	 * @return a State which is the hint.
+	 */
 	private State solutionToHint(String mazeName, Solution sol,int row,int col)
 	{
 		Maze m=server.generatedMazes.get(mazeName);
@@ -274,13 +330,35 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	public void setServer(MazeServer server) {
 		this.server = server;
 	}
+	/** upon a disconnection request client will be sent a nice message and the server will await for his ack. then it will disconnect it.
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		if(o==handler)
+		if(o==remote)
 			if(arg.toString().contains("disconnect"))
 			{
-				//send message
-				//close resources
+				String ip=arg.toString().split(",")[0];
+				String port=arg.toString().split(",")[1];
+				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()));
+				try{
+					BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
+					PrintWriter out=new PrintWriter(new OutputStreamWriter(clientToDisconnect.getOutputStream()));
+					out.println("You were disconnected. Please try again later");
+					out.flush();
+					readerFromClient.readLine(); //Client answers and acks.
+				}catch(Exception e)
+				{
+					
+				}
+				try{
+				clientToDisconnect.getOutputStream().close();
+				clientToDisconnect.getInputStream().close();
+				clientToDisconnect.close();
+				}catch(Exception e)
+				{
+					
+				}
+
 			}
 	}
 }
