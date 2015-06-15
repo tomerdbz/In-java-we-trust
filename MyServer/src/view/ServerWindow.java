@@ -29,16 +29,18 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import boot.RunGui;
 import presenter.ServerCommand;
 import presenter.ServerProperties;
 
 public class ServerWindow extends BasicWindow implements View {
 	String [] clients;
 	Text status;
-	//ServerProperties serverProperties;
+	ServerProperties serverProperties;
 	ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>();
 	ServerCommand lastCommand =null;
 	String DataFromModel=null;
+	List list;
 	public ServerWindow(String title, int width, int height) {
 		super(title, width, height);
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
@@ -65,6 +67,9 @@ public class ServerWindow extends BasicWindow implements View {
 
 			@Override
 			public void handleEvent(Event arg0) {
+				lastCommand  = commandMap.get("exit");
+				setChanged();
+				notifyObservers();
 				display.dispose();				
 			}
 			
@@ -128,7 +133,7 @@ public class ServerWindow extends BasicWindow implements View {
 		listLabel.setFont(font);
 		listLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 2, 1));
 		
-		final List list = new List(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		 list = new List(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 	    //list.setBounds(40, 20, 220, 100);
 		list.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 		list.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true,2,1));
@@ -160,7 +165,7 @@ public class ServerWindow extends BasicWindow implements View {
 	        else if(selectedClients.length==1)
 	        	outString=selectedClients[0].split(" ")[2];
 	        if(selectedClients.length!=0)
-	        	status.setText("Selected Clients1: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
+	        	status.setText("Selected Clients: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
 	        else
 	        	status.setText("");
 	        /* setChanged();
@@ -193,8 +198,8 @@ public class ServerWindow extends BasicWindow implements View {
 				for(int i=0;i<unparsedClients.length;i++){
 					lastCommand = commandMap.get("disconnect client");
 					setChanged();
-					notifyObservers(unparsedClients[i].split(" ")[2]);
-					
+					//notifyObservers(unparsedClients[i].split(" ")[2]);
+					notifyObservers(unparsedClients[i]);
 					
 				}
 				
@@ -255,8 +260,9 @@ public class ServerWindow extends BasicWindow implements View {
 				String filename=fd.open(); //choose the file
 				if(filename!=null){
 					setProperties(filename);
-					//setChanged();
-					//notifyObservers("properties");
+					shell.close();
+					new RunGui().loadWindow(serverProperties);
+					
 				}
 			}
 	    	
@@ -282,10 +288,10 @@ public class ServerWindow extends BasicWindow implements View {
 							WriteServerPropertiesGUI guiProp=new WriteServerPropertiesGUI();
 							if(guiProp.writeProperties(display,shell)!=-1)
 							{
-								//serverProperties=readProperties();
+								shell.close();
+								new RunGui().loadWindow(readProperties());
 							}
-							//setChanged();
-							//notifyObservers("properties");
+							
 						}
 					
 				});
@@ -351,7 +357,7 @@ public class ServerWindow extends BasicWindow implements View {
 			XMLDecoder d;
 			in = new FileInputStream(filename);
 			d=new XMLDecoder(in);
-			//serverProperties=(ServerProperties)d.readObject();
+			serverProperties=(ServerProperties)d.readObject();
 			d.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -400,6 +406,15 @@ public class ServerWindow extends BasicWindow implements View {
 		this.DataFromModel=data;
 		
 	}
-
+	@Override
+	public void addClient(String Client) {
+		list.add("Client IP: " + Client.split(" ")[0]+" Port: "+ Client.split(" ")[1]);
+		
+	}
+	@Override
+	public void removeClient(String Client) {
+		//list.remove("Client IP: " + Client.split(" ")[0]+ " Port: "+ Client.split(" ")[1]);
+		list.remove(Client);
+	}
 	
 }

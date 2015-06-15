@@ -7,4 +7,5 @@ public interface Model {
 	public void DisconnectClient(String client);
 	public void StartServer();
 	public void DisconnectServer();
+	public void exit();
 }

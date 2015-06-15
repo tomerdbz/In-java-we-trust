@@ -10,5 +10,6 @@ public interface View {
 	public void setCommands(ConcurrentHashMap<String, ServerCommand> commandMap);
 	public void Display(String msg);
 	public void saveData(String data);
-
+	public void addClient(String Client);
+	public void removeClient(String Client);
 }

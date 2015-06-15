@@ -47,6 +47,14 @@ public class Presenter implements Observer{
 		}
 		
 	}
+	public class ExitWindow implements ServerCommand{
+
+		@Override
+		public void doCommand(String params) {
+			m.exit();
+		}
+		
+	}
 	
 	Model m;
 	View v;
@@ -60,6 +68,7 @@ public class Presenter implements Observer{
 		commandMap.put("disconnect user", new DisconnectUser());
 		commandMap.put("start server",new StartServer());
 		commandMap.put("stop server", new StopServer());
+		commandMap.put("exit", new ExitWindow());
 			v.setCommands(commandMap);
 		}
 	@Override
@@ -73,9 +82,15 @@ public class Presenter implements Observer{
 		if(o == m ){
 			String data = (String)(arg);
 			if(data.split(" ")[0].equals("msg")){
-			v.Display(data);
+			v.Display(data.substring(4));
 			}
 			else
+				if(data.split(" ")[0].equals("add"))
+					v.addClient(data.substring(4));
+				else
+					if(data.split(" ")[0].equals("remove"))
+						v.removeClient(data.substring(7));
+				else
 			v.saveData(data);
 		}
 		
