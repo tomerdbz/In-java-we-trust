@@ -82,8 +82,6 @@ public class Presenter implements Observer {
 
 		@Override
 		public void doCommand(String arg, String params) {
-			
-			System.out.println(m.getSolution(arg));
 			v.displaySolution(m.getSolution(arg));
 		}
 
