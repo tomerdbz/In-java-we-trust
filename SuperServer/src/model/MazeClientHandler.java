@@ -1,9 +1,8 @@
 package model;
 
-import java.io.InputStream;
-import java.io.ObjectInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -20,6 +19,7 @@ import algorithms.mazeGenerators.Maze;
 import algorithms.mazeGenerators.RandomMazeGenerator;
 import algorithms.search.AStar;
 import algorithms.search.BFS;
+import algorithms.search.Movement;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
@@ -27,14 +27,13 @@ import algorithms.search.State;
 public class MazeClientHandler extends Observable implements ClientHandler,Observer  {
 
 	MazeServer server;
-	volatile ConcurrentHashMap<String,ClientProperties>clientsProperties=new ConcurrentHashMap<String, ClientProperties>();
-	volatile ConcurrentHashMap<String,Boolean> activeConnections=new ConcurrentHashMap<String,Boolean>();
+	volatile ConcurrentHashMap<String,Socket> activeConnections=new ConcurrentHashMap<String,Socket>();
 	volatile ConcurrentLinkedQueue<String> messages=new ConcurrentLinkedQueue<String>();
-	GUIHandler handler;
+	GUIUDPServer handler;
 	public MazeClientHandler(MazeServer server) {
 		this.server=server;
 	}
-	public MazeClientHandler(GUIHandler handler) {
+	public MazeClientHandler(GUIUDPServer handler) {
 		this.handler=handler;
 	}
 	
@@ -45,70 +44,70 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	{
 		String clientIP=client.getInetAddress().getHostAddress();
 		int clientPort=client.getPort();
-		activeConnections.put(clientIP+","+clientPort, true);
+		activeConnections.put(clientIP+","+clientPort, client);
 		String message=new String(clientIP +","+ clientPort+" has connected");
 		messages.add(message);
 		setChanged();
 		notifyObservers();//check messages
 		messages.remove(message);
 		try {
-			InputStream inFromClient= client.getInputStream();
-			OutputStream outToClient=client.getOutputStream();
-			ObjectInputStream inputFromClient=new ObjectInputStream(inFromClient);
-			ObjectOutputStream outputToClient=new ObjectOutputStream(new GZIPOutputStream(new ObjectOutputStream(outToClient)));
-			String command;
-			System.out.println(clientIP +" " + clientPort+" "+"client connected!");
-			while(activeConnections.get(clientIP+","+clientPort) && !(command=(String)inputFromClient.readObject()).contains("exit"))
+			BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(client.getInputStream()));
+			String command=readerFromClient.readLine();
+			ObjectOutputStream outputCompressedToClient=new ObjectOutputStream(new GZIPOutputStream(client.getOutputStream()));
+			outputCompressedToClient.flush();
+			if(command.contains("generate maze"))
 			{
-				Object arg=inputFromClient.readObject();
-				if(command.contains("properties"))
-				{
-					clientsProperties.put(clientIP+","+clientPort,((ClientProperties)arg));
-					setChanged();
-					notifyObservers("Setting Properties");
-					outputToClient.writeObject("success in setting properties");
-					outputToClient.flush();
-				}
-				else if(command.contains("generate maze"))
-				{
-					String[] params=parseGenerateMazeArgument(arg);
-					message=clientIP+ ","+clientPort+",generating maze";
-					messages.add(message);
-					setChanged();
-					notifyObservers();
-					outputToClient.writeObject(generateMaze(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
-					messages.remove(message);
-					outputToClient.flush();
+				String generator=readerFromClient.readLine();
+				String arg=readerFromClient.readLine();
+				String[] params=parseGenerateMazeArgument(arg);
+				message=clientIP+ ","+clientPort+",generating maze";
+				messages.add(message);
+				setChanged();
+				notifyObservers();
+				outputCompressedToClient.writeObject(generateMaze(generator,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6])));
+				outputCompressedToClient.flush();
+				//outputToClient.writeObject(generateMaze(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
+				messages.remove(message);
+				//outputToClient.flush();
 
-				}
-				else if(command.contains("solve maze"))
-				{
-					String[] params=parseSolveMazeArgument(arg);
-					message=clientIP+ ","+clientPort+",solving maze";
-					messages.add(message);
-					setChanged();
-					notifyObservers();
-					outputToClient.writeObject(solveMaze(clientIP,clientPort,params[0],"solving maze"));
-					messages.remove(message);
-					outputToClient.flush();
-
-				}
-				else if(command.contains("calculate hint"))
-				{
-					String[] params=parseCalculateHintArgument(arg);
-					message=clientIP+ ","+clientPort+",calculating hint";
-					messages.add(message);
-					setChanged();
-					notifyObservers();
-					outputToClient.writeObject(calculateHint(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
-					messages.remove(message);
-					outputToClient.flush();
-				}
-				
 			}
-			clientsProperties.remove(clientIP+","+clientPort);
-			inFromClient.close();
-			outToClient.close();
+			else if(command.contains("solve maze"))
+			{
+				String solverProperties=readerFromClient.readLine();
+				String arg=readerFromClient.readLine();
+				String[] params=parseSolveMazeArgument(arg);
+				String[] properties=parseProperties(solverProperties);
+				message=clientIP+ ","+clientPort+",solving maze";
+				messages.add(message);
+				setChanged();
+				notifyObservers();
+				outputCompressedToClient.writeObject(solveMaze(properties[0],properties[1],Double.parseDouble(properties[2]),Double.parseDouble(properties[3]),params[0]));
+				outputCompressedToClient.flush();
+				//outputToClient.writeObject(solveMaze(clientIP,clientPort,params[0],"solving maze"));
+				messages.remove(message);
+				//outputToClient.flush();
+
+			}
+			else if(command.contains("calculate hint"))
+			{
+				String solverProperties=readerFromClient.readLine();
+				String arg=readerFromClient.readLine();
+				String[] params=parseCalculateHintArgument(arg);
+				String[] properties=parseProperties(solverProperties);
+				message=clientIP+ ","+clientPort+",calculating hint";
+				messages.add(message);
+				setChanged();
+				notifyObservers();
+				outputCompressedToClient.writeObject(calculateHint(properties[0],properties[1],Double.parseDouble(properties[2]),Double.parseDouble(properties[3]),params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2])));
+				outputCompressedToClient.flush();
+				//outputToClient.writeObject(calculateHint(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
+				messages.remove(message);
+				//outputToClient.flush();
+			}
+			outputCompressedToClient.close();
+			readerFromClient.close();
+			client.close();
+			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -117,6 +116,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	
 	public ConcurrentLinkedQueue<String> getMessages() {
 		return messages;
+	}
+	private String[] parseProperties(String properties)
+	{		
+		return properties.split(" ");
 	}
 	private String[] parseCalculateHintArgument(Object arg) {
 		String[]values=((String)arg).split(" ");
@@ -158,26 +161,22 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * @param - colGoal - Goal col of generated maze
 	 * @return - a SerializableMaze to send to client
 	 */
-	public SerializableMaze generateMaze(String clientIP,int clientPort,String name,int rows, int cols, int rowSource, int colSource,
-			int rowGoal, int colGoal,String notifyArgument) {
-		ClientProperties clientProperties;
-		if((clientProperties=this.clientsProperties.get(clientIP+","+clientPort))==null)
-		{
-			return null;
-		}
+	public SerializableMaze generateMaze(String generator,String name,int rows, int cols, int rowSource, int colSource,
+			int rowGoal, int colGoal) {
+		
 		if(server.generatedMazes.containsKey(name))
 			return new SerializableMaze(server.generatedMazes.get(name));
 		Maze maze=null;
-		switch(clientProperties.getMazeGenerator()) 
+		switch(generator) 
 		{
-		case DFS:
-			maze=new DFSMazeGenerator().generateMaze(rows, cols, rowSource, colSource, rowGoal, colGoal);
-			break;
-		case RANDOM:
-			maze=new RandomMazeGenerator().generateMaze(rows, cols, rowSource, colSource, rowGoal, colGoal);;
-			break;
-		default:
-			break;
+			case "DFS":
+				maze=new DFSMazeGenerator().generateMaze(rows, cols, rowSource, colSource, rowGoal, colGoal);
+				break;
+			case "RANDOM":
+				maze=new RandomMazeGenerator().generateMaze(rows, cols, rowSource, colSource, rowGoal, colGoal);;
+				break;
+			default:
+				break;
 		}
 		server.generatedMazes.put(name, maze);
 		return new SerializableMaze(maze);
@@ -189,12 +188,8 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * @param - mazeName - maze name to solve.
 	 * @return - a SerializableSolution to send to the client.
 	 */
-	public SerializableSolution solveMaze(String clientIP,int clientPort,String mazeName,String notifyArgument) {
-		ClientProperties clientProperties;
-		if((clientProperties=this.clientsProperties.get(clientIP+","+clientPort))==null)
-		{
-			return null;
-		}
+	public SerializableSolution solveMaze(String solver,String move,double moveCost,double moveDiagonalCost,String mazeName) {
+		
 		Maze m=server.generatedMazes.get(mazeName);
 		if(m==null)
 		{
@@ -205,16 +200,21 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			return new SerializableSolution(server.cache.get(m));
 		}
 		Solution solution=null;
-		switch(clientProperties.getMazeSolver())
+		Movement movement;
+		if(move.equals("DIAGONAL"))
+			movement=Movement.DIAGONAL;
+		else
+			movement=Movement.NONDIAGONAL;
+		switch(solver)
 		{
-		case BFS:
-			solution=new BFS().search(new MazeSearch(m,clientProperties.getMovement(),clientProperties.getMovementCost(),clientProperties.getDiagonalMovementCost()));
+		case "BFS":
+			solution=new BFS().search(new MazeSearch(m,movement,moveCost,moveDiagonalCost));
 			break;
-		case AIR_DISTANCE_ASTAR:
-			solution=new AStar(new MazeAirDistance(m.getRowGoal(),m.getColGoal(),clientProperties.getMovementCost())).search(new MazeSearch(m,clientProperties.getMovement(),clientProperties.getMovementCost(),clientProperties.getDiagonalMovementCost()));
+		case "AIR_DISTANCE_ASTAR":
+			solution=new AStar(new MazeAirDistance(m.getRowGoal(),m.getColGoal(),moveCost)).search(new MazeSearch(m,movement,moveCost,moveDiagonalCost));
 			break;
-		case MANHATTAN_DISTANCE_ASTAR:
-			solution=new AStar(new MazeManhattanDistance(m.getRowGoal(),m.getColGoal(),clientProperties.getMovementCost())).search(new MazeSearch(m,clientProperties.getMovement(),clientProperties.getMovementCost(),clientProperties.getDiagonalMovementCost()));;
+		case "MANHATTAN_DISTANCE_ASTAR":
+			solution=new AStar(new MazeManhattanDistance(m.getRowGoal(),m.getColGoal(),moveCost)).search(new MazeSearch(m,movement,moveCost,moveDiagonalCost));;
 			break;
 			
 		default:
@@ -224,7 +224,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		return new SerializableSolution(solution);
 		
 	}
-	public SerializableState calculateHint(String clientIP,int clientPort,String mazeName, int row, int col,String notifyArgument)
+	public SerializableState calculateHint(String solver,String move,double moveCost,double moveDiagonalCost,String mazeName, int row, int col)
 	{
 		Maze m;
 		if((m=server.generatedMazes.get(mazeName))==null)
@@ -232,10 +232,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			return null;
 		}
 		if(server.cache.get(m)==null)
-			solveMaze(clientIP,clientPort,mazeName,notifyArgument);	
-		return new SerializableState(solutionToHint(mazeName,server.cache.get(m),row,col,notifyArgument));
+			solveMaze(solver,move,moveCost,moveDiagonalCost,mazeName);	
+		return new SerializableState(solutionToHint(mazeName,server.cache.get(m),row,col));
 	}
-	private State solutionToHint(String mazeName, Solution sol,int row,int col,String notifyArgument)
+	private State solutionToHint(String mazeName, Solution sol,int row,int col)
 	{
 		Maze m=server.generatedMazes.get(mazeName);
 		int min=m.getRows()+m.getCols();//mazeDisplay.Ch.currentCellX) + Math.abs(mazeDisplay.Ch.currentCellY));
@@ -279,8 +279,8 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		if(o==handler)
 			if(arg.toString().contains("disconnect"))
 			{
-				String[] ipAndPort=arg.toString().split(",");
-				activeConnections.replace(ipAndPort[0]+","+ipAndPort[1], false);
+				//send message
+				//close resources
 			}
 	}
 }

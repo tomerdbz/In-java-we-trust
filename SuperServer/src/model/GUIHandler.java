@@ -31,6 +31,7 @@ public class GUIHandler extends Observable implements ClientHandler,Observer {
 					ObjectInputStream propertiesLoader=new ObjectInputStream(inFromClient);
 					handler=new MazeClientHandler(this);
 					handler.addObserver(this);
+					new GUIUDPServer(handler,IP,PORT);
 					this.addObserver(handler);
 					server=new MazeServer((ServerProperties)propertiesLoader.readObject(), handler);
 					handler.setServer(server);
@@ -41,8 +42,8 @@ public class GUIHandler extends Observable implements ClientHandler,Observer {
 			{
 				if(input.equals("exit"))
 				{
-					//remember to not do this - karin dodis - private joke - delete what's down
-					//server.stoppedServer();
+					inFromClient.close();
+					outToClient.close();
 					return;
 				}
 				else if(input.contains("disconnect"))
