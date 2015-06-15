@@ -52,7 +52,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 					e.printStackTrace();
 				}
 				
-			}while(!input.equals("start server"));
+			}while(!input.startsWith("start server"));
 		}
 	}
 	private void initiateClientsServer()
@@ -87,7 +87,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 				input=new String(receivePacket.getData());
 				senderIP=receivePacket.getAddress();
 				senderPort=receivePacket.getPort();
-				if(input.equals("exit"))
+				if(input.startsWith("exit"))
 					return;
 				else if(input.contains("disconnect"))
 				{
@@ -104,7 +104,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 			 * DatagramPacket sendPacket=new DatagramPacket(sendData,sendData.length,senderIP,senderPort);
 			 * serverSocket.send(sendPacket);
 			 */
-		}while(!input.equals("stop server"));
+		}while(!input.startsWith("stop server"));
 		clientsServer.stoppedServer();
 		clientsServer=null;
 	}
