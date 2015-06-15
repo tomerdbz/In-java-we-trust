@@ -2,7 +2,8 @@ package model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.zip.GZIPInputStream;
@@ -14,46 +15,31 @@ import algorithms.search.State;
 
 public class ClientModel extends Observable implements Model {
 	private ClientProperties properties;
-	private Socket myServer;
-	private ObjectInputStream inputFromServer;
-	private ObjectOutputStream outputToServer;
 	private Maze maze;
 	private Solution solution;
 	private State hint;
-	public ClientModel() {
-		try {
-			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inputFromServer=new ObjectInputStream(new GZIPInputStream(new ObjectInputStream(myServer.getInputStream())));
-			outputToServer=new ObjectOutputStream(myServer.getOutputStream());
-		
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+	
 	public ClientModel(ClientProperties properties) {
 		this.properties=properties;
-		try {
-			myServer=new Socket(properties.getServerIP(),properties.getServerPort());
-			inputFromServer=new ObjectInputStream(myServer.getInputStream());
-			outputToServer=new ObjectOutputStream(myServer.getOutputStream());
-			Object[] objs=new Object[2];
-			objs[0]="properties";
-			objs[1]=properties;
-			queryServer(objs);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	@Override
 	public void generateMaze(String name, int rows, int cols, int rowSource,
 			int colSource, int rowGoal, int colGoal, String notifyArgument) {
-		Object[] objs=new Object[2];
-		objs[0]="generate maze";
-		objs[1]=name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal;
-		SerializableMaze serializableMaze=(SerializableMaze)queryServer(objs);
+		String property=null;
+		switch(properties.getMazeGenerator())
+		{
+			case DFS:
+				property="DFS";
+				break;
+			case RANDOM:
+				property="RANDOM";
+				break;
+			default:
+				return;
+		}
+		SerializableMaze serializableMaze=(SerializableMaze)queryServer(properties.getServerIP(),properties.getServerPort(),"generate maze",name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal,property);
 		maze=serializableMaze.getOriginalMaze();
+		setChanged();
 		notifyObservers(notifyArgument+" "+name);
 	}
 
@@ -71,11 +57,33 @@ public class ClientModel extends Observable implements Model {
 
 	@Override
 	public void solveMaze(String mazeName, String notifyArgument) {
-		Object[] objs=new Object[2];
-		objs[0]="solve maze"; 
-		objs[1]=mazeName;
-		SerializableSolution serializableSolution=(SerializableSolution)queryServer(objs);
+		String property=null;
+		switch(properties.getMazeSolver())
+		{
+			case BFS:
+				property="BFS";
+				break;
+			case MANHATTAN_DISTANCE_ASTAR:
+				property="MANHATTAN_DISTANCE_ASTAR";
+				break;
+			case AIR_DISTANCE_ASTAR:
+				property="AIR_DISTANCE_ASTAR";
+				break;
+			default:
+				return;
+		}
+		switch(properties.getMovement())
+		{
+		case DIAGONAL:
+			property+=" DIAGONAL";
+			break;
+		case NONDIAGONAL:
+			property+=" NONDIAGONAL";
+		}
+		property+=" "+properties.getMovementCost()+" "+properties.getDiagonalMovementCost();
+		SerializableSolution serializableSolution=(SerializableSolution)queryServer(properties.getServerIP(),properties.getServerPort(),"solve maze",mazeName,property);
 		solution=serializableSolution.getOriginalSolution();
+		System.out.println(solution);
 		setChanged();
 		notifyObservers(notifyArgument+" "+mazeName);
 	}
@@ -87,9 +95,9 @@ public class ClientModel extends Observable implements Model {
 			setChanged();
 			notifyObservers("error");
 		}
-		Solution retSolution=solution;
+		Solution retSol=solution;
 		solution=null;
-		return retSolution;
+		return retSol;
 	}
 
 	@Override
@@ -107,53 +115,78 @@ public class ClientModel extends Observable implements Model {
 	@Override
 	public void calculateHint(String mazeName, int row, int col,
 			String notifyArgument) {
-		Object[] objs=new Object[2];
-		objs[0]="calculate hint";
-		objs[1]=mazeName+" "+row+","+col;
-		SerializableState serializableHint=(SerializableState)queryServer(objs);
+		String property=null;
+		switch(properties.getMazeSolver())
+		{
+			case BFS:
+				property="BFS";
+				break;
+			case MANHATTAN_DISTANCE_ASTAR:
+				property="MANHATTAN_DISTANCE_ASTAR";
+				break;
+			case AIR_DISTANCE_ASTAR:
+				property="AIR_DISTANCE_ASTAR";
+				break;
+			default:
+				return;
+		}
+		switch(properties.getMovement())
+		{
+		case DIAGONAL:
+			property+=" DIAGONAL";
+			break;
+		case NONDIAGONAL:
+			property+=" NONDIAGONAL";
+		}
+		property+=" "+properties.getMovementCost()+" "+properties.getDiagonalMovementCost();
+		SerializableState serializableHint=(SerializableState)queryServer(properties.getServerIP(),properties.getServerPort(),"calculate hint",mazeName+" "+row+","+col,property);
 		hint=serializableHint.getOriginalState();
+		setChanged();
+		notifyObservers(notifyArgument+ " "+mazeName);
+		//what to notify check in MyModel//notifyObservers(notifyArgument);
 	}
 
 	@Override
 	public void stop() {
-		try {
-			myServer.getInputStream().close();
-			myServer.getOutputStream().close();
-			myServer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
 		
 	}
 	
 	
-	private Object queryServer(Object[] input)
+	private Object queryServer(String serverIP,int serverPort,String command,String data,String property)
 	{
-		Object value=null;
-		try {
-			for(int i=0;i<input.length;i++)
-				outputToServer.writeObject(input[i]);
-			outputToServer.flush();
-			//getting data - agreed protocol is that the data is compressed by ZIP
-			value=inputFromServer.readObject();
-			if(value.toString().equals("error"))
-				return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		Object result=null;
+			Socket server;			
+			try {
+				server = new Socket(serverIP,serverPort);
+				PrintWriter writerToServer=new PrintWriter(new OutputStreamWriter(server.getOutputStream()));
+				writerToServer.println(command);
+				writerToServer.flush();
+				writerToServer.println(property);
+				writerToServer.flush();
+				writerToServer.println(data);
+				writerToServer.flush();
+				ObjectInputStream inputDecompressed;
+				inputDecompressed = new ObjectInputStream(new GZIPInputStream(server.getInputStream()));
+				result=inputDecompressed.readObject();
+				writerToServer.close();
+				inputDecompressed.close();
+				server.close();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		
-		return value;
+		
+		return result;
+		
 	}
 	@Override
 	public void setProperties(ClientProperties properties) {
 		this.properties=properties;
-		Object[] objs=new Object[2];
-		objs[0]="properties";
-		objs[1]=properties;
-		queryServer(objs);
 	}
 
 }
