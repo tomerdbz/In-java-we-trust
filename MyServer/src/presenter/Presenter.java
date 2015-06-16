@@ -75,8 +75,10 @@ public class Presenter implements Observer{
 	public void update(Observable o, Object arg) {
 		if(o == v){
 			String data = (String)(arg);
+			if(data!=null)
 			v.getCommand().doCommand(data);
-			
+			else
+				v.getCommand().doCommand("");
 			
 		}
 		if(o == m ){

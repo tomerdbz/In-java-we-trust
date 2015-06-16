@@ -19,6 +19,7 @@ public class MyModel extends Observable implements Model {
 	InetAddress address;
 	ExecutorService executor=Executors.newSingleThreadExecutor();
 	ConcurrentHashMap<String,String> clientStatus = new ConcurrentHashMap<String, String>();
+	Thread t;
 	//BufferedReader BR;
 	public MyModel(ServerProperties serverProperties){
 		try {
@@ -136,11 +137,11 @@ public class MyModel extends Observable implements Model {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		executor.submit((new Runnable(){
+		t = new Thread((new Runnable(){
 
 			@Override
 			public void run() {
-				//while(true){
+				while(true){
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
@@ -149,23 +150,28 @@ public class MyModel extends Observable implements Model {
 					System.out.println(line);
 					String [] lines =line.split("\n");
 					for(int i =0 ;i<lines.length;i++){
-					if(lines[i].split(",").length==3 && lines[i].split(",")[2].equals("connected")){
+					if(lines[i].split(",").length==3 ){
+						System.out.println(lines[i].split(",")[2].equals("connected"));
+						if(lines[i].split(",")[2].equals("connected")){
 						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"connected");
 						setChanged();
+						
 						notifyObservers( "add " +lines[i]);
-					}
-					else
-						if(lines[i].split(",").length==3){
+						}
+						else
+						{
 							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
 						}
+					}
 					}
 				} catch (IOException e) {
 					
 					e.printStackTrace();
 				}
-			//}
+			}
 			}
 		}));
+		t.start();
 		setChanged();
 		notifyObservers("msg server started");
 	
@@ -181,7 +187,7 @@ public class MyModel extends Observable implements Model {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		String message=client.split(" ")[2]+","+ client.split(" ")[4];
+		String message=client.split(" ")[2]+","+ client.split(" ")[4]+",disconnect";
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
@@ -197,7 +203,7 @@ public class MyModel extends Observable implements Model {
 	}
 	@Override
 	public void exit() {
-		executor.shutdown();
+		t.interrupt();
 		String message="exit";
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
