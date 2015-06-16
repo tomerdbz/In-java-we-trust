@@ -80,6 +80,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			String command=readerFromClient.readLine();
 			ObjectOutputStream outputCompressedToClient=new ObjectOutputStream(new GZIPOutputStream(client.getOutputStream()));
 			outputCompressedToClient.flush();
+			activeConnectionsOutputStream.put(clientIP+","+clientPort, outputCompressedToClient);
 			if(command.contains("generate maze"))
 			{
 				String generator=readerFromClient.readLine();
@@ -138,6 +139,8 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		}
 		setChanged();
 		notifyObservers();
+		activeConnections.remove(clientIP+","+clientPort);
+		activeConnectionsOutputStream.remove(clientIP+","+clientPort);
 		String last=new String(clientIP +","+ clientPort+",disconnected");
 		messages.add(last);
 		setChanged();
@@ -348,7 +351,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
 				try{
 					//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
-					activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1)).writeObject("disconnect");
+					ObjectOutputStream objOut=activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
+					objOut.writeObject("disconnect");
+					objOut.flush();
+					
 					//readerFromClient.readLine(); //Client answers and acks.
 				}catch(Exception e)
 				{
