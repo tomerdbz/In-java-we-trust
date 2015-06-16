@@ -184,6 +184,8 @@ public class Presenter implements Observer {
 		}
 		else if (o==m)
 		{
+			if(arg1.toString().equals("disconnect"))
+				v.Display("Server could not handle the request");
 			String name;
 			if(arg1!=null && !arg1.toString().equals("error"))
 			{
