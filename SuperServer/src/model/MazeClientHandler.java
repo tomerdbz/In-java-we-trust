@@ -137,8 +137,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		setChanged();
-		notifyObservers();
+		
 		activeConnections.remove(clientIP+","+clientPort);
 		activeConnectionsOutputStream.remove(clientIP+","+clientPort);
 		String last=new String(clientIP +","+ clientPort+",disconnected");
@@ -351,7 +350,9 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
 				try{
 					//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
+					
 					ObjectOutputStream objOut=activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
+					objOut.flush();
 					objOut.writeObject("disconnect");
 					objOut.flush();
 					
