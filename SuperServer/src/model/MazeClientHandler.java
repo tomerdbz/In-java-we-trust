@@ -44,6 +44,8 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * 
 	 */
 	volatile ConcurrentHashMap<String,Socket> activeConnections=new ConcurrentHashMap<String,Socket>();
+	volatile ConcurrentHashMap<String,ObjectOutputStream> activeConnectionsOutputStream=new ConcurrentHashMap<String,ObjectOutputStream>();
+	
 	/**	A queue containing all the messages - all the things the handler is doing right now. Every time it changes it notifies the remote control.
 	 * 
 	 */
@@ -344,7 +346,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
 				try{
 					//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
-					clientToDisconnect.sendUrgentData(-1);
+					activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1)).writeObject("disconnect");
 					//readerFromClient.readLine(); //Client answers and acks.
 				}catch(Exception e)
 				{
