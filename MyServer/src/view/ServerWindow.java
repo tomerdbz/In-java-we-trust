@@ -427,7 +427,15 @@ public class ServerWindow extends BasicWindow implements View {
 	@Override
 	public void removeClient(String Client) {
 		//list.remove("Client IP: " + Client.split(" ")[0]+ " Port: "+ Client.split(" ")[1]);
-		list.remove(Client);
+		display.asyncExec(new Runnable(){
+
+			@Override
+			public void run() {
+				list.remove(Client);
+				
+			}
+			
+		});
 	}
 	
 }

@@ -19,7 +19,7 @@ public class MyModel extends Observable implements Model {
 	InetAddress address;
 	ExecutorService executor=Executors.newSingleThreadExecutor();
 	ConcurrentHashMap<String,String> clientStatus = new ConcurrentHashMap<String, String>();
-	Thread t;
+	Thread t=null;
 	//BufferedReader BR;
 	public MyModel(ServerProperties serverProperties){
 		try {
@@ -173,7 +173,7 @@ public class MyModel extends Observable implements Model {
 					}
 				} catch (IOException e) {
 					
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 			}
@@ -210,7 +210,9 @@ public class MyModel extends Observable implements Model {
 	}
 	@Override
 	public void exit() {
+		if(t!=null){
 		t.interrupt();
+		}
 		String message="exit";
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
