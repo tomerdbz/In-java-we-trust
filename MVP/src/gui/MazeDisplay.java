@@ -33,15 +33,14 @@ public class MazeDisplay extends CommonBoard {
 	 */
 	boolean won=false;
 	
+	MP3Player player;
 
 	
 	public MazeDisplay(Composite parent, int style) {
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 		images=gifs.load(".\\resources\\images\\ChaosEmerald.gif");
-		MP3Player player = new MP3Player();
-	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	    player.play();
-	    player.setRepeat(true);
+		player = new MP3Player();
+
 		
 	
 		
@@ -53,6 +52,12 @@ public class MazeDisplay extends CommonBoard {
 	 */
 	public void displayMaze(Maze m)
 	{
+		player.stop();
+		player=new MP3Player();
+		player.addToPlayList(new File(".\\resources\\sounds\\mazemenu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
+	    
 		MazeDisplay a =this; //for our convenience
 		getDisplay().syncExec(new Runnable() {
 			   public void run() {
@@ -173,13 +178,22 @@ public class MazeDisplay extends CommonBoard {
 	@Override
 	public void drawBoard(PaintEvent arg0) {
 		if(board==null && won==false){ //displays the photo in the begining of the program as an intro
-			int width=getParent().getSize().x;
+
+			player.addToPlayList(new File(".\\resources\\sounds\\startmenu.mp3"));
+		    player.play();
+		    player.setRepeat(true);
+			
+		    int width=getParent().getSize().x;
 			int height=getParent().getSize().y;
 			ImageData data = new ImageData(".\\resources\\images\\Wallpaper.png");
 			arg0.gc.drawImage(new Image(getDisplay(),".\\resources\\images\\Wallpaper.png"),0,0,data.width,data.height,0,0,width,height);
 		}
 		else if(won==true)
 		{
+			player.stop();
+			player=new MP3Player();
+		    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+		    player.play();
 			setVisible(false);
 			//won=false;
 			//won=false;
@@ -281,9 +295,7 @@ public class MazeDisplay extends CommonBoard {
 			 won=true; 
 			 redraw(); //play a sound :)
 			 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
-				MP3Player player = new MP3Player();
-			    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
-			    player.play();
+			 
 				
 				
 		 }
@@ -307,9 +319,9 @@ public class MazeDisplay extends CommonBoard {
 				  won=true; //signal we won
 				  redraw(); 
 				 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png")); //background for winning
-					MP3Player player = new MP3Player();
-				    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3")); //play sound
-				    player.play();
+				 player.stop();
+				 player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
+				 player.play();
 					
 			 }
 			board[x][y].setCharacter(null);
@@ -353,9 +365,7 @@ public class MazeDisplay extends CommonBoard {
 					  won=true;
 					  redraw();
 					 getShell().setBackgroundImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"));
-						MP3Player player = new MP3Player();
-					    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
-					    player.play();
+						
 						
 				 }
 				board[x][y].setCharacter(null);
