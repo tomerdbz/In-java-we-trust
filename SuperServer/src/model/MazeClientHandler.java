@@ -1,6 +1,7 @@
 package model;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -348,19 +349,21 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			if(arg.toString().contains("disconnect"))
 			{
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
-				try{
+				
 					//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
-					
-					ObjectOutputStream objOut=activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
-					objOut.flush();
+				System.out.println(activeConnectionsOutputStream.containsKey(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1)));	
+				ObjectOutputStream objOut=activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
+				System.out.println(objOut);
+				/*try {
 					objOut.writeObject("disconnect");
 					objOut.flush();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/
 					
 					//readerFromClient.readLine(); //Client answers and acks.
-				}catch(Exception e)
-				{
-					System.out.println(e.getMessage());
-				}
+			
 				try{
 				clientToDisconnect.close();
 				}catch(Exception e)

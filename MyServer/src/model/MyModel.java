@@ -155,16 +155,16 @@ public class MyModel extends Observable implements Model {
 						if(lines[i].split(",")[2].equals("connected")){
 						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"connected");
 						setChanged();
-						
+						System.out.println(lines[i]);
 						notifyObservers( "add " +lines[i]);
 						}
-						/*else
+						else
 						if(lines[i].split(",")[2].equals("disconnected"))
 						{
 							clientStatus.remove(lines[i]);
 							setChanged();
 							notifyObservers("remove "+"Client IP: " + lines[i].split(",")[0]+" Port: "+ lines[i].split(",")[1]);
-						}*/
+						}
 						else
 						{
 							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
