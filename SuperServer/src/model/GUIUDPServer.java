@@ -26,7 +26,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 		}
 
 		waitForStartSignal();
-		
+
 		initiateClientsServer();
 		
 		handleClientsServer();
@@ -58,12 +58,19 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 	private void initiateClientsServer()
 	{
 		byte[] receiveData=new byte[1024];
-		String input=null;
+		String buffer=null,input="";
 		DatagramPacket receivePacket=new DatagramPacket(receiveData,receiveData.length);
 		try {
 			serverSocket.receive(receivePacket);
-			input=new String(receivePacket.getData());//expect it to be: String= numOfClients+" "+PortToServeClients
-			ServerProperties clientsServerProperties=new ServerProperties(Integer.parseInt(input.split(" ")[1]),Integer.parseInt(input.split(" ")[0]));
+			buffer=new String(receivePacket.getData());//expect it to be: String= numOfClients+" "+PortToServeClients
+			
+			for(int i=0;i<buffer.length();i++)
+				if(Character.isDigit(buffer.charAt(i)) || buffer.charAt(i)==',')
+						input+=buffer.charAt(i);
+				else
+					break;
+			
+			ServerProperties clientsServerProperties=new ServerProperties(Integer.parseInt(input.split(",")[1]),Integer.parseInt(input.split(",")[0]));
 			handler=new MazeClientHandler(this);
 			handler.addObserver(this);
 			this.addObserver(handler);
@@ -115,7 +122,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 			String allMessages="";
 			for(String message: handler.messages)
 			{
-				allMessages+=message;
+				allMessages+="\n"+ message;
 			}
 			DatagramPacket sendPacket=new DatagramPacket(allMessages.getBytes(),allMessages.length(),senderIP,senderPort);
 			try {
