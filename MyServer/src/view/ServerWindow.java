@@ -408,7 +408,7 @@ public class ServerWindow extends BasicWindow implements View {
 	}
 	@Override
 	public void addClient(String Client) {
-		list.add("Client IP: " + Client.split(" ")[0]+" Port: "+ Client.split(" ")[1]);
+		list.add("Client IP: " + Client.split(",")[0]+" Port: "+ Client.split(",")[1]);
 		
 	}
 	@Override

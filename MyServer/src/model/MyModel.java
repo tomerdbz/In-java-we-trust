@@ -147,7 +147,7 @@ public class MyModel extends Observable implements Model {
 
 			@Override
 			public void run() {
-				while(true){
+				//while(true){
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
@@ -156,13 +156,13 @@ public class MyModel extends Observable implements Model {
 					System.out.println(line);
 					String [] lines =line.split("\n");
 					for(int i =0 ;i<lines.length;i++){
-					if(lines[i].split(",").length==3 && lines[i].split(",")[2].startsWith("has connected")){
-						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"has connected");
+					if(lines[i].split(",").length==3 && lines[i].split(",")[2].equals("connected")){
+						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"connected");
 						setChanged();
 						notifyObservers( "add " +lines[i]);
 					}
 					else
-						if(line.split(",").length==3){
+						if(lines[i].split(",").length==3){
 							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
 						}
 					}
@@ -170,9 +170,10 @@ public class MyModel extends Observable implements Model {
 					
 					e.printStackTrace();
 				}
-			}
+			//}
 			}
 		});
+		ClientManager.run();
 		setChanged();
 		notifyObservers("msg server started");
 	
