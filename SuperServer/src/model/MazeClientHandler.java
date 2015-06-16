@@ -136,6 +136,8 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		setChanged();
+		notifyObservers();
 		String last=new String(clientIP +","+ clientPort+",disconnected");
 		messages.add(last);
 		setChanged();
