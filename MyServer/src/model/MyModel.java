@@ -158,6 +158,13 @@ public class MyModel extends Observable implements Model {
 						
 						notifyObservers( "add " +lines[i]);
 						}
+						/*else
+						if(lines[i].split(",")[2].equals("disconnected"))
+						{
+							clientStatus.remove(lines[i]);
+							setChanged();
+							notifyObservers("remove "+"Client IP: " + lines[i].split(",")[0]+" Port: "+ lines[i].split(",")[1]);
+						}*/
 						else
 						{
 							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
