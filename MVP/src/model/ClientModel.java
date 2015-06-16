@@ -211,7 +211,6 @@ public class ClientModel extends Observable implements Model {
 				{
 					setChanged();
 					notifyObservers("disconnect");
-					writerToServer.println("ok");
 				}
 				writerToServer.close();
 				inputDecompressed.close();
