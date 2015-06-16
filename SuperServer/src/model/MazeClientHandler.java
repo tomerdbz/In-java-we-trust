@@ -341,7 +341,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		if(o==remote)
 			if(arg.toString().contains("disconnect"))
 			{
-				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()));
+				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
 				try{
 					BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
 					PrintWriter out=new PrintWriter(new OutputStreamWriter(clientToDisconnect.getOutputStream()));

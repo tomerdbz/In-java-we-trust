@@ -134,7 +134,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 					String buffer=input;
 					input="";
 					for(int i=0;i<buffer.length();i++)
-						if(Character.isDigit(buffer.charAt(i)) || buffer.charAt(i)==',')
+						if(Character.isDigit(buffer.charAt(i)) || buffer.charAt(i)==',' || buffer.charAt(i)=='.' || Character.isLetter(buffer.charAt(i)))
 								input+=buffer.charAt(i);
 						else
 							break;
