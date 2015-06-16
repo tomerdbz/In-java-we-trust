@@ -153,17 +153,21 @@ public class ServerWindow extends BasicWindow implements View {
 	        {
 	        	for (int loopIndex = 0; loopIndex < selectedClients.length; loopIndex++)
 	        	{
-	        		commandMap.get("connection status");
+	        		lastCommand =commandMap.get("connection status");
 		        	setChanged();
 		        	notifyObservers(selectedClients[loopIndex]);
 	        		if(loopIndex!=selectedClients.length-1)
-	        			outString += selectedClients[loopIndex].split(" ")[2] + DataFromModel +", ";
+	        			outString += selectedClients[loopIndex].split(" ")[2] +" " + DataFromModel +", ";
 	        		else
-	        			outString+=selectedClients[loopIndex].split(" ")[2] + DataFromModel;
+	        			outString+=selectedClients[loopIndex].split(" ")[2] +" " + DataFromModel;
 	        	}
 	        }
-	        else if(selectedClients.length==1)
-	        	outString=selectedClients[0].split(" ")[2];
+	        else if(selectedClients.length==1){
+	        	lastCommand =commandMap.get("connection status");
+	        	setChanged();
+	        	notifyObservers(selectedClients[0]);
+	        	outString=selectedClients[0].split(" ")[2]+" " +DataFromModel;
+	        }
 	        if(selectedClients.length!=0)
 	        	status.setText("Selected Clients: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
 	        else
@@ -196,7 +200,7 @@ public class ServerWindow extends BasicWindow implements View {
 			public void widgetSelected(SelectionEvent arg0) {
 				String[] unparsedClients = list.getSelection();
 				for(int i=0;i<unparsedClients.length;i++){
-					lastCommand = commandMap.get("disconnect client");
+					lastCommand = commandMap.get("disconnect user");
 					setChanged();
 					//notifyObservers(unparsedClients[i].split(" ")[2]);
 					notifyObservers(unparsedClients[i]);
@@ -408,7 +412,16 @@ public class ServerWindow extends BasicWindow implements View {
 	}
 	@Override
 	public void addClient(String Client) {
-		list.add("Client IP: " + Client.split(",")[0]+" Port: "+ Client.split(",")[1]);
+		display.asyncExec(new Runnable(){
+
+			@Override
+			public void run() {
+				list.add("Client IP: " + Client.split(",")[0]+" Port: "+ Client.split(",")[1]);
+				
+			}
+			
+		});
+		
 		
 	}
 	@Override
