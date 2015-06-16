@@ -1,20 +1,13 @@
 package model;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.GZIPInputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import presenter.ServerProperties;
 
@@ -24,7 +17,7 @@ public class MyModel extends Observable implements Model {
 	ServerProperties serverProperties;
 	DatagramSocket socket;
 	InetAddress address;
-	Thread ClientManager=null;
+	ExecutorService executor=Executors.newSingleThreadExecutor();
 	ConcurrentHashMap<String,String> clientStatus = new ConcurrentHashMap<String, String>();
 	//BufferedReader BR;
 	public MyModel(ServerProperties serverProperties){
@@ -143,7 +136,7 @@ public class MyModel extends Observable implements Model {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		ClientManager = new Thread(new Runnable(){
+		executor.submit((new Runnable(){
 
 			@Override
 			public void run() {
@@ -172,8 +165,7 @@ public class MyModel extends Observable implements Model {
 				}
 			//}
 			}
-		});
-		ClientManager.run();
+		}));
 		setChanged();
 		notifyObservers("msg server started");
 	
@@ -205,7 +197,7 @@ public class MyModel extends Observable implements Model {
 	}
 	@Override
 	public void exit() {
-		
+		executor.shutdown();
 		String message="exit";
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
