@@ -22,8 +22,7 @@ public class MyModel extends Observable implements Model {
 	//private InputStream inFromServer;
 	//private OutputStream outToServer;
 	ServerProperties serverProperties;
-	DatagramSocket socketSend;
-	DatagramSocket socketRec;
+	DatagramSocket socket;
 	InetAddress address;
 	Thread ClientManager=null;
 	ConcurrentHashMap<String,String> clientStatus = new ConcurrentHashMap<String, String>();
@@ -35,9 +34,10 @@ public class MyModel extends Observable implements Model {
 			outToServer=myServer.getOutputStream();
 			this.serverProperties=serverProperties;
 			BR= new BufferedReader(new InputStreamReader(inFromServer));*/
-			socketSend = new DatagramSocket(5401);
-			address=InetAddress.getByName("localhost");
-			socketRec = new DatagramSocket(7000);
+			this.serverProperties = serverProperties;
+			socket = new DatagramSocket(1234);
+			address=InetAddress.getByName("127.0.0.1");
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -84,7 +84,7 @@ public class MyModel extends Observable implements Model {
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socketSend.send(sendPacket);
+			socket.send(sendPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -129,10 +129,17 @@ public class MyModel extends Observable implements Model {
 		});*/
 		String message="start server";
 		byte[] data=message.getBytes();
-		DatagramPacket sendPacket = new DatagramPacket(data,
-		data.length, address, 5400);
+		DatagramPacket sendPacket = new DatagramPacket(data,data.length, address, 5400);
 		try {
-			socketSend.send(sendPacket);
+			socket.send(sendPacket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		message =this.serverProperties.getNumOfClients() + "," +(this.serverProperties.getPort());
+		data = message.getBytes();
+		sendPacket = new DatagramPacket(data,data.length, address, 5400);
+		try {
+			socket.send(sendPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -140,27 +147,31 @@ public class MyModel extends Observable implements Model {
 
 			@Override
 			public void run() {
-				
+				while(true){
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
-					socketRec.receive(receivedPacket);
+					socket.receive(receivedPacket);
 					String line=new String(receivedPacket.getData(), 0,receivedPacket.getLength());
-					if(line.split(",").length==3 && line.split(",")[2].equals("has connected")){
-						clientStatus.put(line.split(",")[0]+","+ line.split(",")[1],"has connected");
+					System.out.println(line);
+					String [] lines =line.split("\n");
+					for(int i =0 ;i<lines.length;i++){
+					if(lines[i].split(",").length==3 && lines[i].split(",")[2].startsWith("has connected")){
+						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"has connected");
 						setChanged();
-						notifyObservers( "add " +line);
+						notifyObservers( "add " +lines[i]);
 					}
 					else
 						if(line.split(",").length==3){
-							clientStatus.put(line.split(",")[0]+","+ line.split(",")[1],line.split(",")[2]);
+							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
 						}
+					}
 				} catch (IOException e) {
 					
 					e.printStackTrace();
 				}
 			}
-			
+			}
 		});
 		setChanged();
 		notifyObservers("msg server started");
@@ -182,7 +193,7 @@ public class MyModel extends Observable implements Model {
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socketSend.send(sendPacket);
+			socket.send(sendPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -199,12 +210,11 @@ public class MyModel extends Observable implements Model {
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socketSend.send(sendPacket);
+			socket.send(sendPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		socketSend.close();
-		socketRec.close();
+		socket.close();
 		setChanged();
 		notifyObservers("msg Exiting window now.");
 	}
