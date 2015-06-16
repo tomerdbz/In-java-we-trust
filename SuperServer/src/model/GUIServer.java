@@ -2,6 +2,10 @@ package model;
 
 import presenter.ServerProperties;
 
+/** Remote control TCP server - didn't use. UDP is smarter for this type of communication. but saved it.
+ * @author Tomer
+ *
+ */
 public class GUIServer extends MyTCPIPServer {
 
 	public GUIServer(ServerProperties serverProperties,

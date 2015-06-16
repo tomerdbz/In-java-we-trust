@@ -19,6 +19,11 @@ import algorithms.mazeGenerators.Maze;
 import algorithms.search.Solution;
 import algorithms.search.State;
 
+/**	This Class defines a TCP/IP Server which loads data from DB - Hibernate
+ * upon closing the Server it saves the data in the DB.
+ * @author Tomer
+ *
+ */
 public class MazeServer extends MyTCPIPServer implements Runnable {
 
 	/**	every solved maze will be inserted to the cache - a HashMap linking between a maze and its solution. 
@@ -41,6 +46,10 @@ public class MazeServer extends MyTCPIPServer implements Runnable {
 	ConcurrentHashMap<String,Maze> generatedMazes=new ConcurrentHashMap<String,Maze>();
 	
 	
+	/** Ct'r that gets a MazeClientHandler to inject to TCP/IPServer and the Server properties.  
+	 * @param serverProperties
+	 * @param clientHandler
+	 */
 	public MazeServer(ServerProperties serverProperties, MazeClientHandler clientHandler) {
 		//loadFromDatabase();
 		super(serverProperties, clientHandler);
@@ -68,6 +77,9 @@ public class MazeServer extends MyTCPIPServer implements Runnable {
 	
 	
 	
+	/**
+	 * 	loads mazes and solutions from the database. inserts them to the data structures generatedMazes, cache,...
+	 */
 	private void loadFromDatabase()
 	{
 		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
@@ -146,6 +158,8 @@ public class MazeServer extends MyTCPIPServer implements Runnable {
 		}
 		return names;
 	}
+	/** start server as Runnable.
+	 */
 	@Override
 	public void run() {
 		startServer();

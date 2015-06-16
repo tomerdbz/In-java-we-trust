@@ -13,6 +13,10 @@ import java.util.Observer;
 
 import presenter.ServerProperties;
 
+/** Remote control TCP/IP handler - didn't use. UDP handler is better. but saved it.
+ * @author Tomer
+ *
+ */
 public class GUIHandler extends Observable implements ClientHandler,Observer {
 	MazeClientHandler handler;
 	PrintWriter outputToGUI;

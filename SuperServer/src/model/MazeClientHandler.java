@@ -145,6 +145,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	public ConcurrentLinkedQueue<String> getMessages() {
 		return messages;
 	}
+	/** parses the properties string
+	 * @param properties - the string describing all the properties
+	 * @return string array containing each property
+	 */
 	private String[] parseProperties(String properties)
 	{		
 		return properties.split(" ");
@@ -337,8 +341,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		if(o==remote)
 			if(arg.toString().contains("disconnect"))
 			{
-				String ip=arg.toString().split(",")[0];
-				String port=arg.toString().split(",")[1];
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()));
 				try{
 					BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
