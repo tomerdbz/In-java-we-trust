@@ -138,7 +138,6 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 								input+=buffer.charAt(i);
 						else
 							break;
-					input=buffer;
 					setChanged();
 					notifyObservers(input);
 				}
