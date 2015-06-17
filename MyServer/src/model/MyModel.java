@@ -40,20 +40,15 @@ public class MyModel extends Observable implements Model {
 	/**
 	 * a thread that will recieve data all the time from server
 	 */
-	Thread t=null;
-	/**
-	 * Constructor
-	 * 
-	 */
+	int RemoteServerToServerPort;
 	ExecutorService Exec=null;
 	boolean shutdown = true;
 	public MyModel(ServerProperties serverProperties){
 		try {
 			this.serverProperties = serverProperties; //intializing the properties data member
-			socket = new DatagramSocket(serverProperties.getListeningPort()); //getting the port from the user to which we will listen to
-			address=InetAddress.getByName("127.0.0.1"); //address of user
-		
-			
+			socket = new DatagramSocket(serverProperties.getRemoteControlPortListener()); //getting the port from the user to which we will listen to
+			address=InetAddress.getByName("127.0.0.1"); //address of use
+			this.RemoteServerToServerPort=serverProperties.getPortOnWhichServerListens();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -89,7 +84,7 @@ public class MyModel extends Observable implements Model {
 		String message="stop server"; //sending the server a message to stop server
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
-		data.length, address, 5400);
+		data.length, address, RemoteServerToServerPort);
 		try {
 			socket.send(sendPacket); //sending the packet
 		} catch (IOException e) {
@@ -106,16 +101,16 @@ public class MyModel extends Observable implements Model {
 	public void StartServer() {
 		String message="start server"; 
 		byte[] data=message.getBytes(); //creating the message to be sent
-		DatagramPacket sendPacket = new DatagramPacket(data,data.length, address, 5400);
+		DatagramPacket sendPacket = new DatagramPacket(data,data.length, address, RemoteServerToServerPort);
 		try { 
 			socket.send(sendPacket); //sending the message
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		//sending the properties needed for the server
-		message =this.serverProperties.getNumOfClients() + "," +(this.serverProperties.getPort());
+		message =this.serverProperties.getNumOfClients() + "," +(this.serverProperties.getPortServerClients());
 		data = message.getBytes();
-		sendPacket = new DatagramPacket(data,data.length, address, 5400);
+		sendPacket = new DatagramPacket(data,data.length, address, RemoteServerToServerPort);
 		try {
 			socket.send(sendPacket); //send Properties
 		} catch (IOException e) {
@@ -181,7 +176,7 @@ public class MyModel extends Observable implements Model {
 		String message=client.split(" ")[2]+","+ client.split(" ")[4]+",disconnect"; //creating a message such as IP,PORT,disconnect 
 		byte[] data=message.getBytes(); // in order to disconnect certain client
 		DatagramPacket sendPacket = new DatagramPacket(data,
-		data.length, address, 5400);
+		data.length, address, RemoteServerToServerPort);
 		try {
 			socket.send(sendPacket); //sending the request to disconnect
 		} catch (IOException e) {
@@ -207,7 +202,7 @@ public class MyModel extends Observable implements Model {
 		String message="exit"; //creating a message to exit properly
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
-		data.length, address, 5400);
+		data.length, address, RemoteServerToServerPort);
 		try {
 			socket.send(sendPacket); //sending the exit message
 		} catch (IOException e) {

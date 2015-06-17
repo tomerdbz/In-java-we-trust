@@ -7,34 +7,41 @@ public class ServerProperties implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int port;
+	private int PortServerClients;
+	private int portOnWhichServerListens;
+	public int getPortOnWhichServerListens() {
+		return portOnWhichServerListens;
+	}
+	public void setPortOnWhichServerListens(int portOnWhichServerListens) {
+		this.portOnWhichServerListens = portOnWhichServerListens;
+	}
 	private int numOfClients;
-	private int listeningPort;
+	private int RemoteControlPortListener;
 	/**	Default Properties.
 	 * 
 	 */
 	public ServerProperties() {
-		port=5400;
+		PortServerClients=5400;
 		numOfClients=32;
-		listeningPort = 1234;
+		RemoteControlPortListener = 1234;
 	}
-	public ServerProperties(int port,int numOfClients,int listeningPort) {
-		this.port=port;
+	public ServerProperties(int port,int numOfClients,int RemoteControlPortListener) {
+		this.PortServerClients=port;
 		this.numOfClients=numOfClients;
-		this.listeningPort=listeningPort;
+		this.RemoteControlPortListener=RemoteControlPortListener;
 	}
 	
-	public int getListeningPort() {
-		return listeningPort;
+	public int getRemoteControlPortListener() {
+		return RemoteControlPortListener;
 	}
-	public void setListeningPort(int listeningPort) {
-		this.listeningPort = listeningPort;
+	public void setRemoteControlPortListener(int RemoteControlPortListener) {
+		this.RemoteControlPortListener = RemoteControlPortListener;
 	}
-	public int getPort() {
-		return port;
+	public int getPortServerClients() {
+		return PortServerClients;
 	}
-	public void setPort(int port) {
-		this.port = port;
+	public void setPortServerClients(int port) {
+		this.PortServerClients = port;
 	}
 	public int getNumOfClients() {
 		return numOfClients;
