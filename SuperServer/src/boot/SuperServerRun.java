@@ -1,11 +1,11 @@
 package boot;
 
-import model.GUIUDPServer;
+import model.RemoteControlUDPServer;
 
 public class SuperServerRun {
 
 	public static void main(String[] args) {
-		new GUIUDPServer().run();
+		new RemoteControlUDPServer().run();
 	}
 
 }

@@ -17,7 +17,7 @@ import presenter.ServerProperties;
  * @author Tomer
  *
  */
-public class GUIHandler extends Observable implements ClientHandler,Observer {
+public class RemoteControlHandler extends Observable implements ClientHandler,Observer {
 	MazeClientHandler handler;
 	PrintWriter outputToGUI;
 	MazeServer server;

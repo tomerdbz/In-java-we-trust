@@ -51,11 +51,11 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	/**	A reference of the UDP Server that send messages to the remote control is saved to notify him in the method update() I got by being an Observer.
 	 * 
 	 */
-	GUIUDPServer remote;
+	RemoteControlUDPServer remote;
 	public MazeClientHandler(MazeServer server) {
 		this.server=server;
 	}
-	public MazeClientHandler(GUIUDPServer remote) {
+	public MazeClientHandler(RemoteControlUDPServer remote) {
 		this.remote=remote;
 	}
 	

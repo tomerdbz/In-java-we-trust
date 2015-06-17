@@ -19,7 +19,7 @@ import presenter.ServerProperties;
  * @author Tomer
  *
  */
-public class GUIUDPServer extends Observable implements Observer,Runnable{
+public class RemoteControlUDPServer extends Observable implements Observer,Runnable{
 	/**	The TCP/IP clients Server handler
 	 * 
 	 */
