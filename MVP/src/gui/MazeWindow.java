@@ -298,12 +298,15 @@ public class MazeWindow extends BasicWindow implements View {
 		generateButton.setText("Generate Maze");
 		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,1));
 			//button that solves the maze
+		//creates an instance of mazeDisplay
+		   mazeDisplay=new MazeDisplay(shell, SWT.NONE);
+		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,3));
 		   Button clueButton=new Button(shell,SWT.PUSH);
 		   clueButton.setText("Help me solve this!");
 		   clueButton.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,1));
 		   Button solveMaze = new Button (shell ,SWT.PUSH);
 		   solveMaze.setText("Solve the maze I give up");
-		   solveMaze.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,1));
+		   solveMaze.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,1,1));
 		   clueButton.addSelectionListener(new SelectionListener(){
 
 			@Override
@@ -407,9 +410,7 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			   
 		   });
-		   //creates an instance of mazeDisplay
-		   mazeDisplay=new MazeDisplay(shell, SWT.NONE);
-		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,3));
+		   
 			//mazeDisplay.setVisible(false);
 		
 		   //timer task to render 
@@ -426,9 +427,6 @@ public class MazeWindow extends BasicWindow implements View {
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
 							 mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY].redraw(); //redraw cell in which character now stays
-							// System.out.println(rows+" " + cols+" "+ mazeDisplay.board.length+" "+ mazeDisplay.board[0].length);
-							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
-							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
 							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].redraw(); //redraw the goal cell
 							}
 							
