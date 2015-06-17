@@ -32,11 +32,11 @@ public class Run {
 				Display display=new Display();
 				Shell shell=new Shell(display);
 				guiProp.writeProperties(shell);
-				MyModel m;
+				ClientModel m;
 				ClientProperties prop;
 				if((prop=readProperties())!=null)
 				{
-					m=new MyModel(prop);
+					m=new ClientModel(prop);
 					
 					switch(prop.getUi())
 					{
