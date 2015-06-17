@@ -432,12 +432,14 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.getDisplay().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed() && input.getRowGoal()<mazeDisplay.board.length && input.getColGoal()<mazeDisplay.board[0].length){
+							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed() &&input!=null ){
+								if(input.getRowGoal()<mazeDisplay.board.length && input.getColGoal()<mazeDisplay.board[0].length){
 							 mazeDisplay.character.setCharacterImageIndex((mazeDisplay.character.getCharacterImageIndex() + 1) % mazeDisplay.character.getCharacterImagesArray().length); //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 (mazeDisplay.board[input.getRowGoal()][input.getColGoal()]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
 							 mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY].redraw(); //redraw cell in which character now stays
 							mazeDisplay.board[input.getRowGoal()][input.getColGoal()].redraw(); //redraw the goal cell
+								}
 							}
 							
 						}
