@@ -32,57 +32,85 @@ import org.eclipse.swt.widgets.Text;
 import boot.RunGui;
 import presenter.ServerCommand;
 import presenter.ServerProperties;
-
+/**
+ * 
+ * @author Alon,Tomer
+ *This class is an implemnetation of the view and an extension
+ *of the basic window,as part of the MVP structure
+ */
 public class ServerWindow extends BasicWindow implements View {
 	String [] clients;
+	/**
+	 * Later will be used to show statuses of selected Clients.
+	 */
 	Text status;
+	/**
+	 * Properties of the server
+	 */
 	ServerProperties serverProperties;
+	/**
+	 * Thread safe Hashmap that connects string to Commands
+	 */
 	ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>();
+	/**
+	 * Represents last command we used
+	 */
 	ServerCommand lastCommand =null;
+	/**
+	 * Data we got from the model througt the presenter
+	 */
 	String DataFromModel=null;
+	/**
+	 * List of connected clients
+	 */
 	List list;
+	/**
+	 * Constructor
+	 */
 	public ServerWindow(String title, int width, int height) {
 		super(title, width, height);
-		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
+		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //setting the image and some music:)
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-	//	MP3Player player = new MP3Player();
-	  //  player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	  //  player.play();
-	   // player.setRepeat(true);
+		MP3Player player = new MP3Player();
+	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
 	}
 	public ServerWindow(String title, int width, int height,org.eclipse.swt.widgets.Display display,Shell shell) {
 		super(display,shell,title, width, height);
-		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //background for winning
+		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //setting the image and some music:)
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		//MP3Player player = new MP3Player();
-	  //  player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	 //   player.play();
-	 //   player.setRepeat(true);
+		MP3Player player = new MP3Player();
+	   player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
 	}
-
+	/**
+	 * This function initializes the widgets in the window
+	 */
 	@Override
 	void initWidgets() {
 		
-		shell.addListener(SWT.Close,new Listener(){
+		shell.addListener(SWT.Close,new Listener(){ // on close listener
 
 			@Override
 			public void handleEvent(Event arg0) {
-				lastCommand  = commandMap.get("exit");
+				lastCommand  = commandMap.get("exit"); //exit correctly
 				setChanged();
 				notifyObservers();
-				display.dispose();				
+				display.dispose();				 //and dispose display
 			}
 			
 		});
 		initMenu();
-		shell.setLayout(new GridLayout(2,false));
+		shell.setLayout(new GridLayout(2,false)); //setting layout of course
 		
 		//cool menu here
 		
 		initMenu();
 		
 		
-		//what startServer and stopServer will do - your job
+		//Start server buttons
 		Button startServerButton=new Button(shell,SWT.PUSH);
 		startServerButton.setText("Start Server");
 		startServerButton.setLayoutData(new GridData(SWT.LEFT,SWT.CENTER,false,false,1,1));
@@ -95,7 +123,7 @@ public class ServerWindow extends BasicWindow implements View {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				lastCommand = commandMap.get("start server");
+				lastCommand = commandMap.get("start server"); //telling the server to start running
 				setChanged();
 				notifyObservers();
 				
@@ -103,7 +131,7 @@ public class ServerWindow extends BasicWindow implements View {
 			
 		});
 		
-		
+		//Stop server buttons
 		Button stopServerButton=new Button(shell,SWT.PUSH);
 		stopServerButton.setText("Stop Server");
 		stopServerButton.setLayoutData(new GridData(SWT.RIGHT,SWT.CENTER,false,false,1,1));
@@ -116,48 +144,44 @@ public class ServerWindow extends BasicWindow implements View {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				lastCommand = commandMap.get("stop server");
-				setChanged();
+				setChanged(); //telling the server to stop running
 				notifyObservers("stop server");
 				
 			}
 			
 		});
-		
+		//Designing a bit of the window
 		final Label listLabel=new Label(shell,SWT.CENTER);
-		listLabel.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
+		listLabel.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN)); //setting color
 		listLabel.setText("Connected Clients");
 		FontData fontData = listLabel.getFont().getFontData()[0];
 		fontData.setHeight(20);
 		Font font = new Font(display, new FontData(fontData.getName(), fontData
-		    .getHeight(), SWT.ITALIC));
+		    .getHeight(), SWT.ITALIC)); //setting a special font
 		listLabel.setFont(font);
-		listLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 2, 1));
+		listLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 2, 1)); //setting layout
 		
-		 list = new List(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-	    //list.setBounds(40, 20, 220, 100);
+		 list = new List(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL); //setting the list of connected clients
 		list.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 		list.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true,2,1));
-	 //   for (int loopIndex = 0; loopIndex < 20; loopIndex++) { //example to how I would put the data
-	     // list.add("Client IP: 127.0.0." + loopIndex +" Port: x");
-	   // }
-
-	    final Text status = new Text(shell, SWT.CENTER | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-	    //status.setBounds(300, 130, 160, 25);
+//set Layout
+		//setting status of selected clients
+	    status = new Text(shell, SWT.CENTER | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 	    status.setForeground(listLabel.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 	    status.setLayoutData(new GridData(SWT.FILL,SWT.CENTER,true,true,2,1));
-	    list.addSelectionListener(new SelectionListener() {
+	    list.addSelectionListener(new SelectionListener() { //on selection show status
 	      public void widgetSelected(SelectionEvent event) {
-	        String[] selectedClients = list.getSelection();
+	        String[] selectedClients = list.getSelection(); //get all clients selcted
 	        String outString = "";
 	        if(selectedClients.length>1)
-	        {
+	        {// for each selected client
 	        	for (int loopIndex = 0; loopIndex < selectedClients.length; loopIndex++)
 	        	{
 	        		lastCommand =commandMap.get("connection status");
 		        	setChanged();
-		        	notifyObservers(selectedClients[loopIndex]);
+		        	notifyObservers(selectedClients[loopIndex]); //retrieve data about Client which is the status
 	        		if(loopIndex!=selectedClients.length-1)
-	        			outString += selectedClients[loopIndex].split(" ")[2] +" " + DataFromModel +", ";
+	        			outString += selectedClients[loopIndex].split(" ")[2] +" " + DataFromModel +", "; //Data from model is the data about the client
 	        		else
 	        			outString+=selectedClients[loopIndex].split(" ")[2] +" " + DataFromModel;
 	        	}
@@ -169,13 +193,9 @@ public class ServerWindow extends BasicWindow implements View {
 	        	outString=selectedClients[0].split(" ")[2]+" " +DataFromModel;
 	        }
 	        if(selectedClients.length!=0)
-	        	status.setText("Selected Clients: " + outString);//INSTEAD SHOULD BE SOMETHING LIKE THAT
+	        	status.setText("Selected Clients: " + outString);
 	        else
 	        	status.setText("");
-	        /* setChanged();
-	         * notifyObservers(status for chosen client)
-	         * showStatus(params);
-	         */
 	      }
 
 	      public void widgetDefaultSelected(SelectionEvent event) {
@@ -185,12 +205,12 @@ public class ServerWindow extends BasicWindow implements View {
 	        	outString += selectedClients[loopIndex] + " ";
 	        	
 	        	
-	        }
+	        }//displaying the data we collected
 	        System.out.println("Selected Clients: " + outString);
 	      }
 	    });
 		
-		
+		// a button for disconnecting selected clients
 		Button disconnectClientButton=new Button(shell,SWT.PUSH | SWT.CENTER);
 		disconnectClientButton.setText("Disconnect Clients");
 		disconnectClientButton.setLayoutData(new GridData(SWT.CENTER,SWT.CENTER,false,false,2,1));
@@ -198,26 +218,13 @@ public class ServerWindow extends BasicWindow implements View {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				String[] unparsedClients = list.getSelection();
+				String[] unparsedClients = list.getSelection(); //getting all selected clients
 				for(int i=0;i<unparsedClients.length;i++){
-					lastCommand = commandMap.get("disconnect user");
+					lastCommand = commandMap.get("disconnect user"); //telling server to disconnect them
 					setChanged();
-					//notifyObservers(unparsedClients[i].split(" ")[2]);
 					notifyObservers(unparsedClients[i]);
 					
 				}
-				
-				
-				//clients values in the list - how they are written in the list
-				/* You choose how the Presenter shall transfer the clients to the list and how they will be written
-				 * Parse it accordingly. if it's written like: "Client: IP PORT ..." You can parse it easily. 
-				 */
-				/*
-				 * In the end:
-				 * clients= (parsed unparsedclients)
-				 * setChanged();
-				 * notifyObservers(I have clients here waiting for diconnections - go pick them up);
-				 */
 			}
 			
 			@Override
@@ -263,9 +270,9 @@ public class ServerWindow extends BasicWindow implements View {
 				fd.setFilterExtensions(filterExt);
 				String filename=fd.open(); //choose the file
 				if(filename!=null){
-					setProperties(filename);
+					setProperties(filename); //sets Properties
 					shell.close();
-					new RunGui().loadWindow(serverProperties);
+					new RunGui().loadWindow(serverProperties); //runs a new programm with new properties from user
 					
 				}
 			}
@@ -293,7 +300,7 @@ public class ServerWindow extends BasicWindow implements View {
 							if(guiProp.writeProperties(display,shell)!=-1)
 							{
 								shell.close();
-								new RunGui().loadWindow(readProperties());
+								new RunGui().loadWindow(readProperties()); //runs a new programm with new properties from user
 							}
 							
 						}
@@ -315,9 +322,10 @@ public class ServerWindow extends BasicWindow implements View {
 
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
-						display.dispose();
+						lastCommand  = commandMap.get("exit"); //exit correctly
 						setChanged();
 						notifyObservers();
+						display.dispose();				 //and dispose display
 						
 						
 					}
@@ -354,6 +362,10 @@ public class ServerWindow extends BasicWindow implements View {
 		return clients;
 		
 	}
+	/**
+	 * Set properties
+	 * @param filename the file from which we take the properties
+	 */
 	private void setProperties(String filename) {//sets properties from a certain file
 		
 		FileInputStream in;
@@ -368,7 +380,10 @@ public class ServerWindow extends BasicWindow implements View {
 		}
 		
 	}
-	
+	/**
+	 * A function for reading properties 
+	 * @return the readed properties
+	 */
 	public static ServerProperties readProperties()
 	{
 		XMLDecoder d;
@@ -384,32 +399,57 @@ public class ServerWindow extends BasicWindow implements View {
 		}
 		return p;
 	}
-
+	/**
+	 * get Command from view
+	 * @return the command
+	 */
 	@Override
 	public ServerCommand getCommand() {
 		return this.lastCommand;
 	}
-
+	/**
+	 * Set the hashMAP of commands in the view
+	 * @param commandMap a hashmap of String to server commands
+	 */
 	@Override
 	public void setCommands(ConcurrentHashMap<String, ServerCommand> commandMap) {
 		this.commandMap=commandMap;
 		
 	}
-
+	/**
+	 * display data to view
+	 * @param msg the data to be displayed
+	 */
 	@Override
 	public void Display(String msg) {
-		MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-        messageBox.setText("Information");
-        messageBox.setMessage(msg);
-		messageBox.open();
+		display.asyncExec(new Runnable(){
+
+			@Override
+			public void run() {
+				if(!shell.isDisposed()){
+				MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+				messageBox.setText("Information");
+				messageBox.setMessage(msg);
+				messageBox.open(); //message to user
+				}
+			}
+			
+		});
 		
 	}
-
+	/**
+	 * Save data to view so he can use it
+	 * @param data -data to be saved
+	 */
 	@Override
 	public void saveData(String data) {
 		this.DataFromModel=data;
 		
 	}
+	/**
+	 * remove client from a list or something we choose
+	 * @param Client -the client to be removed
+	 */
 	@Override
 	public void addClient(String Client) {
 		display.asyncExec(new Runnable(){
@@ -424,15 +464,18 @@ public class ServerWindow extends BasicWindow implements View {
 		
 		
 	}
+	/**
+	 * remove client from a list or something we choose
+	 * @param Client -the client to be removed
+	 */
 	@Override
 	public void removeClient(String Client) {
-		//list.remove("Client IP: " + Client.split(" ")[0]+ " Port: "+ Client.split(" ")[1]);
 		display.asyncExec(new Runnable(){
 
 			@Override
 			public void run() {
 				list.remove(Client);
-				
+				status.setText("");
 			}
 			
 		});

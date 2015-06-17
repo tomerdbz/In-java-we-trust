@@ -8,18 +8,22 @@ import presenter.ServerProperties;
 import model.MyModel;
 import view.ServerWindow;
 import view.WriteServerPropertiesGUI;
-
+/**
+ * 
+ * @author Alon
+ *The main class used to execute the program
+ */
 public class MyServerRun {
 
 	public static void main(String[] args) {
-		WriteServerPropertiesGUI sp = new WriteServerPropertiesGUI();
-		Display display= new Display();
-		Shell shell=new Shell(display);
-		sp.writeProperties(display, shell);
+		WriteServerPropertiesGUI sp = new WriteServerPropertiesGUI(); //we start by writing the properties we need for the server
+		Display display= new Display(); // creating display
+		Shell shell=new Shell(display); // creating a shell
+		sp.writeProperties(display, shell); // writing the properties onto the display and shell
 		ServerWindow SE= new ServerWindow("StarShip phoenix",500,500,display,shell);
-		MyModel m = new MyModel(ServerWindow.readProperties());
-		Presenter p = new Presenter(m, SE);
-		m.addObserver(p);
+		MyModel m = new MyModel(ServerWindow.readProperties()); //writing the properties to the model
+		Presenter p = new Presenter(m, SE); // creating presenter
+		m.addObserver(p); //adding observers and running
 		SE.addObserver(p);
 		SE.run();
 

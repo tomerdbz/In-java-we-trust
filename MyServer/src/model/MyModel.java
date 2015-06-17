@@ -10,53 +10,67 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import presenter.ServerProperties;
-
+/**
+ * 
+ * @author Alon
+ *	This class is an implementation of the interface model
+ *	to be used in a MVP architecture  
+ */
 public class MyModel extends Observable implements Model {
-	//private InputStream inFromServer;
-	//private OutputStream outToServer;
+	/**
+	 * Properties of the server
+	 */
 	ServerProperties serverProperties;
+	/**
+	 * A socket which will alow us to send and recieve data
+	 */
 	DatagramSocket socket;
+	/**
+	 * representation of the address to which we are sending
+	 */
 	InetAddress address;
-	ExecutorService executor=Executors.newSingleThreadExecutor();
+	/**
+	 * a hash map that works safely with threads and can easily allow us to get a staus of a connected cliend
+	 */
 	ConcurrentHashMap<String,String> clientStatus = new ConcurrentHashMap<String, String>();
+	/**
+	 * data that is created during some methods in the model
+	 */
+	String modelData=null;
+	/**
+	 * a thread that will recieve data all the time from server
+	 */
 	Thread t=null;
-	//BufferedReader BR;
+	/**
+	 * Constructor
+	 * 
+	 */
 	public MyModel(ServerProperties serverProperties){
 		try {
-			/*Socket myServer=new Socket("localhost",5400);
-			inFromServer=myServer.getInputStream();
-			outToServer=myServer.getOutputStream();
-			this.serverProperties=serverProperties;
-			BR= new BufferedReader(new InputStreamReader(inFromServer));*/
-			this.serverProperties = serverProperties;
-			socket = new DatagramSocket(1234);
-			address=InetAddress.getByName("127.0.0.1");
-			
+			this.serverProperties = serverProperties; //intializing the properties data member
+			socket = new DatagramSocket(serverProperties.getListeningPort()); //getting the port from the user to which we will listen to
+			address=InetAddress.getByName("127.0.0.1"); //address of user
+		
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
+	/**
+	 * 
+	 * @param client- represents a client in the server
+	 * This function will return the status of this
+	 * specific client on the server
+	 */
 	@Override
 	public void getStatusClient(String client) {
 	
-		/*BufferedReader in = new BufferedReader(new InputStreamReader(inFromServer));
-		String re;
-		try {
-			while((re=in.readLine())!=null){
-				if(re.split(",")[0]==client){
-					setChanged();
-					notifyObservers(re.split(",")[2]);
-					break;
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		setChanged();
-		notifyObservers(this.clientStatus.get(client.split(" ")[2]+","+client.split(" ")[4]));
+		//client comes in a format of Client Ip: THEIP Port: THEPORT
+		//therefore needs to be changed a bit in order to get data from hash map
+		modelData=this.clientStatus.get(client.split(" ")[2]+","+client.split(" ")[4]); //we return the status of the client from the hash map
+		setChanged(); //Hash map example looks like 127.0.0.1,2222,"connected"
+		notifyObservers();
 		
 		
 		
@@ -65,78 +79,48 @@ public class MyModel extends Observable implements Model {
 	
 
 	
-
+	/**
+	 * This function will allow us to disconnect the server in a remote way
+	 */
 	@Override
 	public void DisconnectServer() {
-		/*PrintWriter write =new PrintWriter(outToServer);
-		write.println("stop server");
-		write.flush();
-		if(ClientManager!=null)
-			ClientManager.interrupt();*/
-		String message="stop server";
+		String message="stop server"; //sending the server a message to stop server
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socket.send(sendPacket);
+			socket.send(sendPacket); //sending the packet
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.modelData="msg server has stopped"; //notifying the view
 		setChanged();
-		notifyObservers("msg server has stopped");
+		notifyObservers();
 	}
+	/**
+	 * This functon will allow us to start the server in a remote way
+	 */
 	@Override
 	public void StartServer() {
-		/*PrintWriter write;
-		write = new  PrintWriter(outToServer);
-		write.println("start server");
-		write.flush();
-		try {
-			ObjectOutputStream os = new ObjectOutputStream(outToServer);
-			os.writeObject(serverProperties);
-			os.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		ClientManager = new Thread ( new Runnable(){
-
-			@Override
-			public void run() {
-				
-				
-				
-				try {
-					String line = BR.readLine();
-					if(line.split(",").length==3){
-						setChanged();
-						notifyObservers( "add " +line);
-					}
-					
-				} catch (IOException e) {
-					
-					e.printStackTrace();
-				}
-				
-				
-			}
-			
-		});*/
-		String message="start server";
-		byte[] data=message.getBytes();
+		String message="start server"; 
+		byte[] data=message.getBytes(); //creating the message to be sent
 		DatagramPacket sendPacket = new DatagramPacket(data,data.length, address, 5400);
-		try {
-			socket.send(sendPacket);
+		try { 
+			socket.send(sendPacket); //sending the message
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//sending the properties needed for the server
 		message =this.serverProperties.getNumOfClients() + "," +(this.serverProperties.getPort());
 		data = message.getBytes();
 		sendPacket = new DatagramPacket(data,data.length, address, 5400);
 		try {
-			socket.send(sendPacket);
+			socket.send(sendPacket); //send Properties
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//creating a thread that will read data from the socket
+		//like status updates new clients and so on
 		t = new Thread((new Runnable(){
 
 			@Override
@@ -145,86 +129,96 @@ public class MyModel extends Observable implements Model {
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
-					socket.receive(receivedPacket);
+					socket.receive(receivedPacket); //recieving data
 					String line=new String(receivedPacket.getData(), 0,receivedPacket.getLength());
-					System.out.println(line);
-					String [] lines =line.split("\n");
-					for(int i =0 ;i<lines.length;i++){
-					if(lines[i].split(",").length==3 ){
-						System.out.println(lines[i].split(",")[2].equals("connected"));
+					String [] lines =line.split("\n"); 
+					for(int i =0 ;i<lines.length;i++){//understanding the data and using it
+					if(lines[i].split(",").length==3 ){  //if new user
 						if(lines[i].split(",")[2].equals("connected")){
 						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"connected");
 						setChanged();
-						System.out.println(lines[i]);
-						notifyObservers( "add " +lines[i]);
+						modelData="add " +lines[i];
+						notifyObservers();
 						}
 						else
-						if(lines[i].split(",")[2].equals("disconnected"))
+						if(lines[i].split(",")[2].equals("disconnected")) //if user disconnected
 						{
 							clientStatus.remove(lines[i]);
+							modelData="remove "+"Client IP: " + lines[i].split(",")[0]+" Port: "+ lines[i].split(",")[1];
 							setChanged();
-							notifyObservers("remove "+"Client IP: " + lines[i].split(",")[0]+" Port: "+ lines[i].split(",")[1]);
+							notifyObservers();
 						}
 						else
-						{
+						{ //or just updating user status
 							clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],lines[i].split(",")[2]);
 						}
 					}
 					}
 				} catch (IOException e) {
 					
-					//e.printStackTrace();
 				}
 			}
 			}
 		}));
-		t.start();
-		setChanged();
-		notifyObservers("msg server started");
+		t.start(); //starting the thread 
+		this.modelData="msg server started";
+		setChanged(); 
+		notifyObservers(); //notifying the view that server has started
 	
 		
 	}
+	/**
+	 * 
+	 * @param client - represents a client in the server
+	 * This function will alow us to disconnect the client 
+	 * from the server
+	 */
 	@Override
 	public void DisconnectClient(String client) {
-		/*try {
-			ObjectOutputStream write =new ObjectOutputStream(outToServer);
-			write.writeObject("disconnect "+client); //ip,port,disconnect
-			write.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		String message=client.split(" ")[2]+","+ client.split(" ")[4]+",disconnect";
-		byte[] data=message.getBytes();
+		String message=client.split(" ")[2]+","+ client.split(" ")[4]+",disconnect"; //creating a message such as IP,PORT,disconnect 
+		byte[] data=message.getBytes(); // in order to disconnect certain client
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socket.send(sendPacket);
+			socket.send(sendPacket); //sending the request to disconnect
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.clientStatus.remove(message);
+		this.clientStatus.remove(message); //removing the client from the views list
+		modelData="remove "+client;
 		setChanged();
-		notifyObservers("remove "+client);
+		notifyObservers(); //telling the view to do the commands
 		
 	}
+	/**
+	 * this function will close the everyting properly
+	 */
 	@Override
 	public void exit() {
 		if(t!=null){
-		t.interrupt();
+		t.interrupt(); //stopping the thread reading if it does exist
 		}
-		String message="exit";
+		String message="exit"; //creating a message to exit properly
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
 		data.length, address, 5400);
 		try {
-			socket.send(sendPacket);
+			socket.send(sendPacket); //sending the exit message
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		socket.close();
+		this.modelData="msg Exiting window now.";
 		setChanged();
-		notifyObservers("msg Exiting window now.");
+		notifyObservers(); //telling the view he should exit
+	}
+	/**
+	 * 
+	 * @return this function returns a string that was created by some actions in the presenter later to be used by the view through the presneter
+	 */
+	@Override
+	public String takedata() {
+		return this.modelData;
 	}
 	
 }
