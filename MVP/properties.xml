@@ -4,12 +4,6 @@
   <void property="diagonalMovementCost">
    <double>12.0</double>
   </void>
-  <void property="mazeSolver">
-   <object class="java.lang.Enum" method="valueOf">
-    <class>presenter.ClientProperties$MazeSolver</class>
-    <string>AIR_DISTANCE_ASTAR</string>
-   </object>
-  </void>
   <void property="movementCost">
    <double>12.0</double>
   </void>

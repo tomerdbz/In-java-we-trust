@@ -358,12 +358,10 @@ public class MazeWindow extends BasicWindow implements View {
 			    if(input!=null && input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows()){
 			    	MazeWindow.this.mazeName=input.getMazeName();
 			    }
-			    else
-			    
 				LastUserCommand= commands.get("maze exists");
 			    setChanged(); //check if maze already exists
 				notifyObservers(MazeWindow.this.mazeName); 
-				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved ){ //if maze doesnt exist create a new one
+				if(input!=null && MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved ){ //if maze doesnt exist create a new one
 					MazeWindow.this.mazeDisplay.won=false;
 					MazeWindow.this.rows =(Integer)input.getRows(); //takes the info about rows
 					MazeWindow.this.cols=(Integer)input.getCols(); //takes the info about cols
@@ -375,7 +373,7 @@ public class MazeWindow extends BasicWindow implements View {
 				System.out.println(board);
 				notifyObservers(" "+ board); //passses data to generate maze in MVP System
 				}
-				else if(input==null || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
+				else if(input==null || input.getColGoal()>=input.getCols() || input.getRowGoal()>=input.getRows()){// || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("An error has occureed");

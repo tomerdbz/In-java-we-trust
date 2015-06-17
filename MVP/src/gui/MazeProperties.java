@@ -1,30 +1,30 @@
 package gui;
 
 public class MazeProperties {
-	private String mazeName;
-	private int rows;
-	private int cols;
+	private String MazeName;
+	private int Rows;
+	private int Cols;
 	private int rowSource;
 	private int colSource;
 	private int rowGoal;
 	private int colGoal;
 	public String getMazeName() {
-		return mazeName;
+		return MazeName;
 	}
 	public void setMazeName(String mazeName) {
-		this.mazeName = mazeName;
+		this.MazeName = mazeName;
 	}
 	public int getRows() {
-		return rows;
+		return Rows;
 	}
 	public void setRows(int rows) {
-		this.rows = rows;
+		this.Rows = rows;
 	}
 	public int getCols() {
-		return cols;
+		return Cols;
 	}
 	public void setCols(int cols) {
-		this.cols = cols;
+		this.Cols = cols;
 	}
 	public int getRowSource() {
 		return rowSource;
