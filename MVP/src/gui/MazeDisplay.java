@@ -44,7 +44,10 @@ public class MazeDisplay extends CommonBoard {
 	 * frame of the gif
 	 */
 	int frameIndex=0;
-	
+	int rowsource;
+	int rowgoal;
+	int colgoal;
+	int colsource;
 	MP3Player player;
 
 	
@@ -323,7 +326,7 @@ public class MazeDisplay extends CommonBoard {
 		board[x][y].redraw();
 		
 	}
-		 if(character.currentCellX== board.length-1 && character.currentCellY == board[0].length-1 && board!=null){
+		 if(character.currentCellX== this.rowgoal && character.currentCellY == this.colgoal && board!=null){
 			 //if we have reacharactered the destination
 			 won=true; 
 			 redraw(); //play a sound :)
@@ -332,6 +335,16 @@ public class MazeDisplay extends CommonBoard {
 		
 	
 	}
+	@Override
+	public void SetBoardData(String arg) {
+		String[]arg1 = arg.split(" ");
+		this.rowsource=Integer.parseInt(arg1[0]);
+		this.colsource=Integer.parseInt(arg1[1]);
+		this.rowgoal=Integer.parseInt(arg1[2]);
+		this.colgoal=Integer.parseInt(arg1[3]);
+		
+	}
+	
 	}
 	
 	

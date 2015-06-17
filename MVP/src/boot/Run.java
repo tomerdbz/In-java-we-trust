@@ -1,5 +1,6 @@
 package boot;
 
+import gui.MazeProperties;
 import gui.MazeWindow;
 
 import java.beans.XMLDecoder;
@@ -78,4 +79,19 @@ public class Run {
 				}
 				return p;
 			}
+			/*public static MazeProperties readPropertiesM()
+			{
+				XMLDecoder d;
+				MazeProperties p=null;
+				try {
+					FileInputStream in=new FileInputStream("properties.xml");
+					d=new XMLDecoder(in);
+					p=(MazeProperties)d.readObject();
+					System.out.println(p);
+					d.close();
+				} catch (IOException e) {
+					return new MazeProperties();
+				}
+				return p;
+			}*/
 		}

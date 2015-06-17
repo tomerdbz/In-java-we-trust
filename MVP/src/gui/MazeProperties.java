@@ -1,12 +1,19 @@
 package gui;
 
 public class MazeProperties {
+	private String mazeName;
 	private int rows;
 	private int cols;
 	private int rowSource;
 	private int colSource;
 	private int rowGoal;
 	private int colGoal;
+	public String getMazeName() {
+		return mazeName;
+	}
+	public void setMazeName(String mazeName) {
+		this.mazeName = mazeName;
+	}
 	public int getRows() {
 		return rows;
 	}

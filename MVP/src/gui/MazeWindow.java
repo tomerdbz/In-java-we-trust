@@ -93,6 +93,7 @@ public class MazeWindow extends BasicWindow implements View {
 	 * true if the data we sent already exists in the database
 	 */
 	boolean dataRecieved=false; 
+	MazeProperties input;
 	
 	public MazeWindow(Display display,Shell shell,String title, int width, int height) {
 		super(display,shell,title,width,height);
@@ -348,26 +349,33 @@ public class MazeWindow extends BasicWindow implements View {
 				MP3Player player = new MP3Player(); //play sound
 			    player.addToPlayList(new File(".\\resources\\sounds\\menuselect.mp3"));
 			    player.play();
-				ArrayList<Object> mazearrayData = new SetMazeData(shell).open(); //set Data of maze in a different window
+				/*ArrayList<Object> mazearrayData = new SetMazeData(shell).open(); //set Data of maze in a different window
 				if(mazearrayData!=null){ //if data has been accepted 
 				MazeWindow.this.mazeName= (String)mazearrayData.get(0); //take the name of the maze
-				}
+				}*/
+			    ClassInputDialog dlg = new ClassInputDialog(shell,MazeProperties.class);
+			    input = (MazeProperties) dlg.open();
+			    if(input!=null && input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows()){
+			    	MazeWindow.this.mazeName=input.getMazeName();
+			    }
+			    else
+			    
 				LastUserCommand= commands.get("maze exists");
 			    setChanged(); //check if maze already exists
 				notifyObservers(MazeWindow.this.mazeName); 
-				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved && mazearrayData!=null){ //if maze doesnt exist create a new one
+				if(MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved ){ //if maze doesnt exist create a new one
 					MazeWindow.this.mazeDisplay.won=false;
-					MazeWindow.this.rows =(Integer)mazearrayData.get(1); //takes the info about rows
-					MazeWindow.this.cols=(Integer)mazearrayData.get(2); //takes the info about cols
+					MazeWindow.this.rows =(Integer)input.getRows(); //takes the info about rows
+					MazeWindow.this.cols=(Integer)input.getCols(); //takes the info about cols
 					mazeDisplay.setVisible(true); //makes sure the mazeDisplay is visible
 					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg")); //sets Background images
 				LastUserCommand= commands.get("generate maze");
 				setChanged();
-				String board= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ",0,0,"+(MazeWindow.this.rows-1)+","+(MazeWindow.this.cols-1);
+				String board= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ","+input.getRowSource()+","+input.getColSource()+","+(input.getRowGoal())+","+(input.getColGoal());
 				System.out.println(board);
 				notifyObservers(" "+ board); //passses data to generate maze in MVP System
 				}
-				else if(mazearrayData!=null){ //if error has occureed 
+				else if(input==null || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("An error has occureed");
@@ -422,12 +430,12 @@ public class MazeWindow extends BasicWindow implements View {
 					mazeDisplay.getDisplay().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed()){
+							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed() && input.getRowGoal()<mazeDisplay.board.length && input.getColGoal()<mazeDisplay.board[0].length){
 							 mazeDisplay.character.setCharacterImageIndex((mazeDisplay.character.getCharacterImageIndex() + 1) % mazeDisplay.character.getCharacterImagesArray().length); //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
-							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
+							 (mazeDisplay.board[input.getRowGoal()][input.getColGoal()]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
 							 mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY].redraw(); //redraw cell in which character now stays
-							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].redraw(); //redraw the goal cell
+							mazeDisplay.board[input.getRowGoal()][input.getColGoal()].redraw(); //redraw the goal cell
 							}
 							
 						}
@@ -503,15 +511,18 @@ public class MazeWindow extends BasicWindow implements View {
 	
 		display.syncExec(new Runnable() {
 			   public void run() {
-				   //mazeDisplay.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, true,true,4,1));
+				   
 				   mazeDisplay.displayMaze(m);
-				   mazeDisplay.character = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
+				   mazeDisplay.SetBoardData(input.getRowSource()+" "+input.getColSource() + " "+ input.getRowGoal() + " " + input.getColGoal());
+				   mazeDisplay.character = new MazeCharacter(mazeDisplay.board[input.getRowSource()][input.getColSource()],SWT.FILL);
+				   mazeDisplay.character.setCurrentCellX(input.getRowSource());
+				   mazeDisplay.character.setCurrentCellY(input.getColSource());
 				   mazeDisplay.character.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-				   (mazeDisplay.board[0][0]).setCharacter(mazeDisplay.character); //set character to the begining of the maze
-				   mazeDisplay.board[0][0].redraw();
+				   (mazeDisplay.board[input.getRowSource()][input.getColSource()]).setCharacter(mazeDisplay.character); //set character to the begining of the maze
+				   mazeDisplay.board[input.getRowSource()][input.getColSource()].redraw();
 				   mazeDisplay.layout(); //draw all the things needed
 				   mazeDisplay.forceFocus();
-			    
+				   
 			   }
 			}); 
 			
