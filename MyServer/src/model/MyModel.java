@@ -45,6 +45,8 @@ public class MyModel extends Observable implements Model {
 	 * Constructor
 	 * 
 	 */
+	ExecutorService Exec=null;
+	boolean shutdown = true;
 	public MyModel(ServerProperties serverProperties){
 		try {
 			this.serverProperties = serverProperties; //intializing the properties data member
@@ -121,14 +123,12 @@ public class MyModel extends Observable implements Model {
 		}
 		//creating a thread that will read data from the socket
 		//like status updates new clients and so on
-		t = new Thread((new Runnable(){
+		 Exec = Executors.newSingleThreadExecutor();
+				Exec.execute((new Runnable(){
 
 			@Override
 			public void run() {
-				int j=0;
-				while(true){
-					System.out.println("chunk #"+ j);
-					j++;
+				while(true && shutdown){
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
@@ -163,7 +163,7 @@ public class MyModel extends Observable implements Model {
 			}
 			}
 		}));
-		t.start(); //starting the thread 
+		//t.start(); //starting the thread 
 		this.modelData="msg server started";
 		setChanged(); 
 		notifyObservers(); //notifying the view that server has started
@@ -198,9 +198,12 @@ public class MyModel extends Observable implements Model {
 	 */
 	@Override
 	public void exit() {
-		if(t!=null){
-		t.interrupt(); //stopping the thread reading if it does exist
-		}
+		//if(t!=null){
+		//t.interrupt(); //stopping the thread reading if it does exist
+		//}
+		shutdown =false;
+		if(Exec!=null)
+		Exec.shutdownNow();
 		String message="exit"; //creating a message to exit properly
 		byte[] data=message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(data,
