@@ -316,8 +316,8 @@ public class MazeDisplay extends CommonBoard {
    	 character.currentCellX=x+rowT;
    	 character.currentCellY=y+colT;
    	 character.setFrameIndex(0);
-		( board[x+rowT][y+colT]).setCharacter( character);
 		board[x][y].setCharacter(null);
+		( board[x+rowT][y+colT]).setCharacter( character);
 		board[x][y].redraw();
 		
 	}

@@ -36,14 +36,6 @@ public class MazeCharacter extends CommonCharacter {
 	}
 
 	@Override
-	public ImageLoader getGifs() {
-		return gifs;
-	}
-	@Override
-	public void setGifs(ImageLoader gifs) {
-		this.gifs = gifs;
-	}
-	@Override
 	public ImageData[] getImages() {
 		return images;
 	}
@@ -59,5 +51,7 @@ public class MazeCharacter extends CommonCharacter {
 	public void setFrameIndex(int frameIndex) {
 		this.frameIndex = frameIndex;
 	}
+
+
 	
 }

@@ -33,8 +33,6 @@ public abstract class CommonCharacter extends Canvas implements Character{
 		
 	}
 
-	public abstract ImageLoader getGifs();
-	public abstract void setGifs(ImageLoader gifs);
 	public abstract ImageData[] getImages();
 	public abstract void setImages(ImageData[] images);
 	public abstract int getFrameIndex();
