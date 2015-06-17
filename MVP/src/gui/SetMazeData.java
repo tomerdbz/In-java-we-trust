@@ -90,7 +90,7 @@ public class SetMazeData extends Dialog {
 	   Text cols = new Text(shell,SWT.NONE);
 	   cols.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,2,1));
 	   Button Ok=new Button(shell,SWT.PUSH);
-	   Ok.setText("Ok This is the maze I want!");
+	   Ok.setText("OK");
 	   Ok.setLayoutData(new GridData(SWT.None,SWT.NONE,false,false,1,1));
 	   Ok.addSelectionListener(new SelectionListener(){
 		   @Override
@@ -104,7 +104,7 @@ public class SetMazeData extends Dialog {
 				if(rows.getText().equals("") || cols.getText().equals("")|| name.getText().equals("")||!isNumeric(rows.getText())||!isNumeric(cols.getText())||Integer.parseInt(rows.getText())<=0||Integer.parseInt(cols.getText())<0){
 					MessageBox messageBox = new MessageBox(shell,SWT.ERROR|SWT.OK);
 			        messageBox.setText("Error");
-			        messageBox.setMessage("Maze data has  not been accepted!");
+			        messageBox.setMessage("An error has occured");
 					messageBox.open();
 				}
 				else{ //if data is ok
@@ -112,10 +112,10 @@ public class SetMazeData extends Dialog {
 				input.add(name.getText());
 				input.add(Integer.parseInt(rows.getText()));
 				input.add(Integer.parseInt(cols.getText()));
-				MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+				/*MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 		        messageBox.setText("Information");
 		        messageBox.setMessage("Maze data has been accepted!");
-				messageBox.open();
+				messageBox.open();*/
 				shell.dispose();
 				}
 				
@@ -127,7 +127,7 @@ public class SetMazeData extends Dialog {
 	    cancel.setText("Cancel");
 	   // GridData dataCancel = new GridData(GridData.FILL_HORIZONTAL);
 	    //cancel.setLayoutData(dataCancel);
-	    cancel.setLayoutData(new GridData(SWT.NONE,SWT.NONE,true,true,1,1));
+	    cancel.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,1,1));
 	    cancel.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  MP3Player player = new MP3Player();

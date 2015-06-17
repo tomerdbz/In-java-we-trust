@@ -59,6 +59,12 @@ public class ClientModel extends Observable implements Model {
 				return;
 		}
 		SerializableMaze serializableMaze=(SerializableMaze)queryServer(properties.getServerIP(),properties.getServerPort(),"generate maze",name+" "+rows+","+cols+","+rowSource+","+colSource+","+rowGoal+","+colGoal,property);
+		if(serializableMaze==null)
+		{
+			setChanged();
+			notifyObservers("disconnect");
+			return;
+		}
 		maze=serializableMaze.getOriginalMaze();
 		setChanged();
 		notifyObservers(notifyArgument+" "+name);
@@ -66,10 +72,14 @@ public class ClientModel extends Observable implements Model {
 
 	@Override
 	public Maze getMaze(String mazeName) {
-		if(maze==null)
+		Object value=queryServer(properties.getServerIP(), properties.getServerPort(), "exists maze", mazeName, null);
+		if(maze==null && value==null)
 		{
-			setChanged();
-			notifyObservers("error");
+			return null;
+		}
+		else if(value!=null)
+		{
+			return ((SerializableMaze)value).getOriginalMaze();
 		}
 		Maze retMaze=maze;
 		maze=null;
@@ -107,6 +117,12 @@ public class ClientModel extends Observable implements Model {
 		}
 		property+=" "+properties.getMovementCost()+" "+properties.getDiagonalMovementCost();
 		SerializableSolution serializableSolution=(SerializableSolution)queryServer(properties.getServerIP(),properties.getServerPort(),"solve maze",mazeName,property);
+		if(serializableSolution==null)
+		{
+			setChanged();
+			notifyObservers("disconnect");
+			return;
+		}
 		solution=serializableSolution.getOriginalSolution();
 		System.out.println(solution);
 		setChanged();
@@ -168,6 +184,12 @@ public class ClientModel extends Observable implements Model {
 		}
 		property+=" "+properties.getMovementCost()+" "+properties.getDiagonalMovementCost();
 		SerializableState serializableHint=(SerializableState)queryServer(properties.getServerIP(),properties.getServerPort(),"calculate hint",mazeName+" "+row+","+col,property);
+		if(serializableHint==null)
+		{
+			setChanged();
+			notifyObservers("disconnect");
+			return;
+		}
 		hint=serializableHint.getOriginalState();
 		setChanged();
 		notifyObservers(notifyArgument+ " "+mazeName);

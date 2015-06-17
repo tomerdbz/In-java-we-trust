@@ -52,7 +52,9 @@ public class MazeDisplay extends CommonBoard {
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 		images=gifs.load(".\\resources\\images\\ChaosEmerald.gif");
 		player = new MP3Player();
-
+		player.addToPlayList(new File(".\\resources\\sounds\\startmenu.mp3"));
+	    player.play();
+	    player.setRepeat(true);
 		
 	
 		
