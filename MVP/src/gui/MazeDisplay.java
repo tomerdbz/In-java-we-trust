@@ -305,7 +305,7 @@ public class MazeDisplay extends CommonBoard {
     	character = new MazeCharacter( board[row-rowT][col-colT],SWT.FILL);
     	character.currentCellX=row-rowT;
     	character.currentCellY=col-colT;
-		character.setFrameIndex(0);
+		character.setCharacterImageIndex(0);
 		board[row-rowT][col-colT].setCharacter(character);
 		board[character.currentCellX+rowT][character.currentCellY+colT].redraw();
 		board[character.currentCellX][character.currentCellY].redraw();
@@ -315,7 +315,7 @@ public class MazeDisplay extends CommonBoard {
 		character = new MazeCharacter(( board[x+1][y+1]),SWT.FILL);
    	 character.currentCellX=x+rowT;
    	 character.currentCellY=y+colT;
-   	 character.setFrameIndex(0);
+   	character.setCharacterImageIndex(0);
 		board[x][y].setCharacter(null);
 		( board[x+rowT][y+colT]).setCharacter( character);
 		board[x][y].redraw();

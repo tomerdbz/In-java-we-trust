@@ -36,19 +36,19 @@ public class MazeCharacter extends CommonCharacter {
 	}
 
 	@Override
-	public ImageData[] getImages() {
+	public ImageData[] getCharacterImagesArray() {
 		return images;
 	}
 	@Override
-	public void setImages(ImageData[] images) {
+	public void setCharacterImagesArray(ImageData[] images) {
 		this.images = images;
 	}
 	@Override
-	public int getFrameIndex() {
+	public int getCharacterImageIndex() {
 		return frameIndex;
 	}
 	@Override
-	public void setFrameIndex(int frameIndex) {
+	public void setCharacterImageIndex(int frameIndex) {
 		this.frameIndex = frameIndex;
 	}
 

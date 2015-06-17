@@ -33,10 +33,10 @@ public abstract class CommonCharacter extends Canvas implements Character{
 		
 	}
 
-	public abstract ImageData[] getImages();
-	public abstract void setImages(ImageData[] images);
-	public abstract int getFrameIndex();
-	public abstract void setFrameIndex(int frameIndex);
+	public abstract ImageData[] getCharacterImagesArray();
+	public abstract void setCharacterImagesArray(ImageData[] images);
+	public abstract int getCharacterImageIndex();
+	public abstract void setCharacterImageIndex(int frameIndex);
 
 	public int getCurrentCellX() {
 		return currentCellX;
