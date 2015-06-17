@@ -41,13 +41,23 @@ public class RemoteControlUDPServer extends Observable implements Observer,Runna
 	 * 
 	 */
 	MazeServer clientsServer;
+	/**	The Server properties - numOfClients field irrelevant for UDP. will only consider the port to open the server.
+	 * 
+	 */
+	ServerProperties properties;
+	/**	An Executor Service for the TCP/IP Server. I'd like to run it as a Thread as the UDP server listens for signals from the remote control. 
+	 * 
+	 */
 	ExecutorService executor=Executors.newSingleThreadExecutor();
+	public RemoteControlUDPServer(ServerProperties properties) {
+		this.properties=properties;
+	}
 	/** starts the UDP server.
 	 */
 	@Override
 	public void run() {
 		try {
-			serverSocket=new DatagramSocket(5400);
+			serverSocket=new DatagramSocket(properties.getPort());
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

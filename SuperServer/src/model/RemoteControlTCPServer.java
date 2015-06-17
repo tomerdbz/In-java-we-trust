@@ -12,8 +12,8 @@ public class RemoteControlTCPServer extends MyTCPIPServer {
 			ClientHandler clientHandler) {
 		super(serverProperties, clientHandler);
 	}
-	public RemoteControlTCPServer() {
-		super(new ServerProperties(5400,1),new RemoteControlHandler()); //1 for the maze server, 1 for the communication with gui
+	public RemoteControlTCPServer(ServerProperties properties) {
+		super(properties,new RemoteControlHandler()); //1 for the maze server, 1 for the communication with gui
 		//but please note Eli's saying - you may need to put numOfClients+2 if mazeServer steals threads
 	}
 
