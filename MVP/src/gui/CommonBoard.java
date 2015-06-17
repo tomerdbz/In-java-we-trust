@@ -31,18 +31,6 @@ public abstract class CommonBoard extends Composite implements Board {
 	 * representation of the characteraracter in the maze
 	 */
 	CommonCharacter character=null;
-	/**
-	 * Helps load gif to single images
-	 */
-	ImageLoader gifs=new ImageLoader();
-	/**
-	 * an array of images whicharacter represent the gif of the goal
-	 */
-	ImageData[] images;
-	/**
-	 * frame of the gif
-	 */
-	int frameIndex=0;
 	boolean checkDragged=false; 
 	
 	public CommonBoard(Composite parent, int style) {
@@ -110,27 +98,16 @@ public abstract class CommonBoard extends Composite implements Board {
 					
 				}
 		});
-			// mouse listener
-			//addMouseListenerToComposite();
 			
-				/*	this.addDragDetectListener(new DragDetectListener(){
-
-						@Override
-						public void dragDetected(DragDetectEvent arg0) {
-							if(character!=null){
-							wasDragged=true; //detect if a drag has occureed
-							}
-						}
-						
-					});*/
 	}
 
 
 
-
+	/**
+	 * apply direction on board
+	 */
 	@Override
 	public abstract void  applyInputDirection(Direction direction);
-	public abstract void applyDiagonalInputDirection(Direction direction);
 	
 	public void addMouseListenerToComposite() {
 		MouseListener ma=new MouseListener(){
@@ -142,19 +119,19 @@ public abstract class CommonBoard extends Composite implements Board {
 			
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				checkDragged=false;
+				checkDragged=false; 
 				if(board!=null){
-				int sizeOftileX = CommonBoard.this.getSize().x/(board[0].length);
+				int sizeOftileX = CommonBoard.this.getSize().x/(board[0].length); //get the size of each tile x,y
 				int sizeOftileY = CommonBoard.this.getSize().y/(board.length);
 					String str =CommonBoard.this.toControl(getDisplay().getCursorLocation()).toString(); //calculates mouse location by pixels
 					String []loc = str.substring(7).split(",");
-					before[0]=Integer.parseInt(loc[0].substring(0));
+					before[0]=Integer.parseInt(loc[0].substring(0)); //taking cording
 					before[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1));
-					int Ycell=((before[0]/sizeOftileX));
+					int Ycell=((before[0]/sizeOftileX)); //which tile we are on
 					int xcell=((before[1]/sizeOftileY));
 					System.out.println(before[0] + " " +before[1]);
-					if((character.currentCellX==xcell)&&character.currentCellY==Ycell)
-						checkDragged=true;
+					if((character.currentCellX==xcell)&&character.currentCellY==Ycell)//check if tile that we are on contains character
+						checkDragged=true; //if character is conatined
 				}
 			}
 
@@ -165,11 +142,10 @@ public abstract class CommonBoard extends Composite implements Board {
 					String []loc = str.substring(7).split(",");
 					after[0]=Integer.parseInt(loc[0].substring(0));
 					after[1]=Integer.parseInt(loc[1].substring(1, loc[1].length()-1)); //calculates mouse location by pixels
-					System.out.println(after[0] + " " +after[1]);
+					double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
 					if(after[0]> before[0] && after[1]>before[1]){
-						double Shipua = (double)((double)(after[1]-before[1])/(double)(after[0]-before[0]));
 						if(Shipua<1.5 && Shipua>  0.5 )
-						applyDiagonalInputDirection(Direction.DownRight);
+						applyInputDirection(Direction.DownRight);
 						else
 							if(Shipua>1.5 && character.currentCellX+1<=board.length-1)
 							{
@@ -181,45 +157,39 @@ public abstract class CommonBoard extends Composite implements Board {
 									System.out.println("right");
 								applyInputDirection(Direction.RIGHT);
 								}
-						//dir=Direction.DownRight;					//charactereck in whicharacter direction did the mouse move
 					}
 					if(after[0]> before[0] && after[1]<before[1]){
-						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
 						if(Shipua>-1.5 && Shipua<-0.5)
-						applyDiagonalInputDirection(Direction.UpRight);
+						applyInputDirection(Direction.UpRight);
 						else
 							if(Shipua<-0.5 && character.currentCellX-1>=0)
 							applyInputDirection(Direction.UP);
 							else
 								if( character.currentCellY+1<= board[0].length-1)
 								applyInputDirection(Direction.RIGHT);
-						//dir=Direction.UpRight;
+						
 					}
 					if(after[0]< before[0] && after[1]>before[1]){
-						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
 						if(Shipua>-1.5 && Shipua<-0.5)
-							applyDiagonalInputDirection(Direction.DownLeft);
+							applyInputDirection(Direction.DownLeft);
 							else
 								if(Shipua<-1.5  && character.currentCellX+1<=board.length-1)
 								applyInputDirection(Direction.DOWN);
 								else
 									if(character.currentCellY-1>=0)
 									applyInputDirection(Direction.LEFT);
-						//dir=Direction.DownLeft;
 						
 					}
 					
 					if(after[0]< before[0] && after[1]<before[1]){
-						double Shipua = ((double)((double)after[1]-before[1])/((double)after[0]-before[0]));
 						if(Shipua<1.5 && Shipua> 0.5)
-						applyDiagonalInputDirection(Direction.UpLeft);
+						applyInputDirection(Direction.UpLeft);
 						else
 							if(Shipua<0.5 && character.currentCellY-1>=0)
 							applyInputDirection(Direction.LEFT);
 							else
 								if(character.currentCellX-1>=0)
 								applyInputDirection(Direction.UP);
-						//dir=Direction.UpLeft;
 						
 					}
 					}
