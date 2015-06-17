@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CellDisplay extends CommonTile{
 	
-	boolean wasDragged=false; 
 	/**
 	 * 
 	 * @author Alon
@@ -71,7 +70,7 @@ public class CellDisplay extends CommonTile{
     	   e.gc.drawImage(Hint,0,0,data2.width,data2.height,0,0,width,height);
        } 
        if(ch!=null){ //if a character is on the tile display it 
-    	   Image img= new Image(getDisplay(),ch.images[ch.frameIndex]);
+    	   Image img= new Image(getDisplay(),ch.getCharacterImagesArray()[ch.getCharacterImageIndex()]);
 			ImageData data3= img.getImageData();
 			e.gc.drawImage(img,0,0,data3.width,data3.height,0,0,getSize().x,getSize().y);
        }

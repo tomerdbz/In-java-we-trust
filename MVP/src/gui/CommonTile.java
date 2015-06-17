@@ -30,7 +30,6 @@ public abstract class CommonTile extends Canvas implements Tile{
 	 * does the tile represent the goal or not
 	 */
 	Image goal =null; 
-	Direction dir;
 	public CommonTile(Composite parent, int style) {
 		super(parent, style);
 		addPaintListener(new PaintListener() {

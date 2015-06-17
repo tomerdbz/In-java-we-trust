@@ -91,7 +91,7 @@ public class SetMazeData extends Dialog {
 	   cols.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,2,1));
 	   Button Ok=new Button(shell,SWT.PUSH);
 	   Ok.setText("Ok This is the maze I want!");
-	   Ok.setLayoutData(new GridData(SWT.None,SWT.NONE,false,false,2,1));
+	   Ok.setLayoutData(new GridData(SWT.None,SWT.NONE,false,false,1,1));
 	   Ok.addSelectionListener(new SelectionListener(){
 		   @Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {}
@@ -125,8 +125,9 @@ public class SetMazeData extends Dialog {
 	   //cancel insertion of data
 	    Button cancel = new Button(shell, SWT.PUSH);
 	    cancel.setText("Cancel");
-	    GridData dataCancel = new GridData(GridData.FILL_HORIZONTAL);
-	    cancel.setLayoutData(dataCancel);
+	   // GridData dataCancel = new GridData(GridData.FILL_HORIZONTAL);
+	    //cancel.setLayoutData(dataCancel);
+	    cancel.setLayoutData(new GridData(SWT.NONE,SWT.NONE,true,true,1,1));
 	    cancel.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  MP3Player player = new MP3Player();

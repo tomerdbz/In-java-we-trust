@@ -5,20 +5,9 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-public class CommonCharacter extends Canvas implements Character{
+public abstract class CommonCharacter extends Canvas implements Character{
 
-	   /**
-		 *  Image Loader is used in order to take a gif and turn it into single pictures
-		 */
-		ImageLoader gifs=new ImageLoader();
-		/**
-		 * loads gif of character movment
-		 */
-		   ImageData[] images; 
-		   /**
-		    * frame of the gif at this point.
-		    */
-		   int frameIndex=0; 
+	  
 		   /**
 		    * row in the maze
 		    */
@@ -44,29 +33,10 @@ public class CommonCharacter extends Canvas implements Character{
 		
 	}
 
-	public ImageLoader getGifs() {
-		return gifs;
-	}
-
-	public void setGifs(ImageLoader gifs) {
-		this.gifs = gifs;
-	}
-
-	public ImageData[] getImages() {
-		return images;
-	}
-
-	public void setImages(ImageData[] images) {
-		this.images = images;
-	}
-
-	public int getFrameIndex() {
-		return frameIndex;
-	}
-
-	public void setFrameIndex(int frameIndex) {
-		this.frameIndex = frameIndex;
-	}
+	public abstract ImageData[] getCharacterImagesArray();
+	public abstract void setCharacterImagesArray(ImageData[] images);
+	public abstract int getCharacterImageIndex();
+	public abstract void setCharacterImageIndex(int frameIndex);
 
 	public int getCurrentCellX() {
 		return currentCellX;

@@ -120,7 +120,8 @@ public class MazeWindow extends BasicWindow implements View {
 		});
 		//sets the background image to white
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
-		shell.setLayout(new GridLayout(3,false));
+		shell.setLayout(new GridLayout(2,false));
+		//shell.setLayoutData((new GridData(SWT.FILL,SWT.FILL,true,true,3,3)));
 		shell.setText("Maze Generations"); //sets the text of window
 		//creates a tool bar
 		Menu menuBar = new Menu(shell, SWT.BAR);
@@ -295,13 +296,17 @@ public class MazeWindow extends BasicWindow implements View {
 	   //buttons for generate maze
 		Button generateButton=new Button(shell,SWT.PUSH);
 		generateButton.setText("Generate Maze");
-		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
+		generateButton.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,1));
 			//button that solves the maze
+		//creates an instance of mazeDisplay
+		   mazeDisplay=new MazeDisplay(shell, SWT.NONE);
+		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,3));
 		   Button clueButton=new Button(shell,SWT.PUSH);
 		   clueButton.setText("Help me solve this!");
-		   clueButton.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false,1,1));
+		   clueButton.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,1));
 		   Button solveMaze = new Button (shell ,SWT.PUSH);
 		   solveMaze.setText("Solve the maze I give up");
+		   solveMaze.setLayoutData(new GridData(SWT.NONE,SWT.NONE,false,false,1,1));
 		   clueButton.addSelectionListener(new SelectionListener(){
 
 			@Override
@@ -405,9 +410,7 @@ public class MazeWindow extends BasicWindow implements View {
 			}
 			   
 		   });
-		   //creates an instance of mazeDisplay
-		   mazeDisplay=new MazeDisplay(shell, SWT.NONE);
-		   mazeDisplay.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,3,1));
+		   
 			//mazeDisplay.setVisible(false);
 		
 		   //timer task to render 
@@ -420,13 +423,10 @@ public class MazeWindow extends BasicWindow implements View {
 						@Override
 						public void run() {
 							if(mazeDisplay.character!=null && !mazeDisplay.isDisposed()){
-							 mazeDisplay.character.frameIndex= (mazeDisplay.character.frameIndex + 1) % mazeDisplay.character.images.length; //next frame in gifs
+							 mazeDisplay.character.setCharacterImageIndex((mazeDisplay.character.getCharacterImageIndex() + 1) % mazeDisplay.character.getCharacterImagesArray().length); //next frame in gifs
 							 mazeDisplay.frameIndex =(mazeDisplay.frameIndex+1) % mazeDisplay.images.length; //next frame in gifs
 							 (mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1]).setGoal(new Image(display,mazeDisplay.images[mazeDisplay.frameIndex]));
 							 mazeDisplay.board[mazeDisplay.character.currentCellX][mazeDisplay.character.currentCellY].redraw(); //redraw cell in which character now stays
-							// System.out.println(rows+" " + cols+" "+ mazeDisplay.board.length+" "+ mazeDisplay.board[0].length);
-							// if( rows== mazeDisplay.board.length && cols == mazeDisplay.board[0].length )
-							 //mazeDisplay.board[rows-1][cols-1].redraw(); //redraw the goal cell - bug
 							mazeDisplay.board[mazeDisplay.board.length-1][mazeDisplay.board[0].length-1].redraw(); //redraw the goal cell
 							}
 							
@@ -503,6 +503,7 @@ public class MazeWindow extends BasicWindow implements View {
 	
 		display.syncExec(new Runnable() {
 			   public void run() {
+				   //mazeDisplay.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, true,true,4,1));
 				   mazeDisplay.displayMaze(m);
 				   mazeDisplay.character = new MazeCharacter(mazeDisplay.board[0][0],SWT.FILL);
 				   mazeDisplay.character.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
