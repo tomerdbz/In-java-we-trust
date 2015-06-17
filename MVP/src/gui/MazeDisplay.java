@@ -298,8 +298,8 @@ public class MazeDisplay extends CommonBoard {
 			
 		}	
 	if((direction == Direction.UP || direction == Direction.DOWN || direction == Direction.RIGHT || direction == Direction.LEFT)){
-		int row=character.currentCellX;
-    	int col = character.currentCellY;
+		int row=character.currentCellX;  //this function redraws the character
+    	int col = character.currentCellY; //in the new place as needed
     	board[row][col].setCharacter(null);
     	character.setVisible(false);
     	character = new MazeCharacter( board[row-rowT][col-colT],SWT.FILL);
@@ -308,10 +308,10 @@ public class MazeDisplay extends CommonBoard {
 		character.setCharacterImageIndex(0);
 		board[row-rowT][col-colT].setCharacter(character);
 		board[character.currentCellX+rowT][character.currentCellY+colT].redraw();
-		board[character.currentCellX][character.currentCellY].redraw();
+		board[character.currentCellX][character.currentCellY].redraw(); //redrawing the character
 			
 	    }	
-	else{
+	else{ //this is incase the direction is diagonal and requires different actions
 		character = new MazeCharacter(( board[x+1][y+1]),SWT.FILL);
    	 character.currentCellX=x+rowT;
    	 character.currentCellY=y+colT;
