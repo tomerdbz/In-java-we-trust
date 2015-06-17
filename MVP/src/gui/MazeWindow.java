@@ -92,7 +92,7 @@ public class MazeWindow extends BasicWindow implements View {
 	/**
 	 * true if the data we sent already exists in the database
 	 */
-	boolean dataRecieved=false; 
+	Maze dataRecieved=null; 
 	MazeProperties input;
 	
 	public MazeWindow(Display display,Shell shell,String title, int width, int height) {
@@ -361,7 +361,7 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("maze exists");
 			    setChanged(); //check if maze already exists
 				notifyObservers(MazeWindow.this.mazeName); 
-				if(input!=null && MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved ){ //if maze doesnt exist create a new one
+				if(input!=null && MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved==null ){ //if maze doesnt exist create a new one
 					MazeWindow.this.mazeDisplay.won=false;
 					MazeWindow.this.rows =(Integer)input.getRows(); //takes the info about rows
 					MazeWindow.this.cols=(Integer)input.getCols(); //takes the info about cols
@@ -372,6 +372,10 @@ public class MazeWindow extends BasicWindow implements View {
 				String board= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ","+input.getRowSource()+","+input.getColSource()+","+(input.getRowGoal())+","+(input.getColGoal());
 				System.out.println(board);
 				notifyObservers(" "+ board); //passses data to generate maze in MVP System
+				}
+				else if(dataRecieved!=null)
+				{
+					displayMaze(dataRecieved);
 				}
 				else if(input==null || input.getColGoal()>=input.getCols() || input.getRowGoal()>=input.getRows()){// || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
@@ -607,15 +611,8 @@ public class MazeWindow extends BasicWindow implements View {
 	 * @param data checks if data exists in database true if not false if yes
 	 */
 	@Override
-	public void receiveData(String data) {
-		if(data==null)
-		{
-			this.dataRecieved= true;
-		}
-		else
-		{
-			this.dataRecieved= false;
-		}
+	public void receiveExistsMaze(Maze data) {
+		this.dataRecieved=data;
 	}
 	/**
 	 * getter

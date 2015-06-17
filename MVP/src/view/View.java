@@ -15,7 +15,7 @@ import algorithms.search.State;
 public interface View {
 	void start();
 	void displayHint(State h);
-	void receiveData(String data);
+	void receiveExistsMaze(Maze data);
 	ClientProperties getProperties();
 	void setCommands(ConcurrentHashMap<String, presenter.Presenter.Command> commands);
 	Command getUserCommand();

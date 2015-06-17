@@ -107,10 +107,7 @@ public class Presenter implements Observer {
 
 		@Override
 		public void doCommand(String arg, String params) {
-			if(m.getMaze(arg)==null)
-				v.receiveData(null);
-			else
-				v.receiveData("1");
+			v.receiveExistsMaze(m.getMaze(arg));
 		}
 
 	}

@@ -125,8 +125,9 @@ public class MyView extends Observable implements View,Observer {
 		
 	}
 	@Override
-	public void receiveData(String data) {
-		return;
+	public void receiveExistsMaze(Maze data) {
+		if(data!=null)
+			displayMaze(data);
 		
 	}
 	@Override
