@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import presenter.ServerProperties;
 
@@ -39,6 +41,7 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 	 * 
 	 */
 	MazeServer clientsServer;
+	ExecutorService executor=Executors.newSingleThreadExecutor();
 	/** starts the UDP server.
 	 */
 	@Override
@@ -106,7 +109,8 @@ public class GUIUDPServer extends Observable implements Observer,Runnable{
 			this.addObserver(handler);
 			clientsServer=new MazeServer(clientsServerProperties,handler);
 			handler.setServer(clientsServer);
-			new Thread(clientsServer).start();
+			executor.execute(clientsServer);
+			//new Thread(clientsServer).start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

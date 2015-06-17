@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -45,7 +43,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 * 
 	 */
 	volatile ConcurrentHashMap<String,Socket> activeConnections=new ConcurrentHashMap<String,Socket>();
-	volatile ConcurrentHashMap<String,ObjectOutputStream> activeConnectionsOutputStream=new ConcurrentHashMap<String,ObjectOutputStream>();
 	
 	/**	A queue containing all the messages - all the things the handler is doing right now. Every time it changes it notifies the remote control.
 	 * 
@@ -81,7 +78,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			String command=readerFromClient.readLine();
 			ObjectOutputStream outputCompressedToClient=new ObjectOutputStream(new GZIPOutputStream(client.getOutputStream()));
 			outputCompressedToClient.flush();
-			activeConnectionsOutputStream.put(clientIP+","+clientPort, outputCompressedToClient);
 			if(command.contains("generate maze"))
 			{
 				String generator=readerFromClient.readLine();
@@ -131,6 +127,22 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				messages.remove(message);
 				//outputToClient.flush();
 			}
+			else if(command.contains("maze exists"))
+			{
+				readerFromClient.readLine();//property doesn't matter
+				String mazeName=readerFromClient.readLine();
+				message=clientIP+ ","+clientPort+",checking maze existance";
+				messages.add(message);
+				setChanged();
+				notifyObservers();
+				if(server.generatedMazes.containsKey(mazeName))
+					outputCompressedToClient.writeObject(server.generatedMazes.get(mazeName));
+				else
+					outputCompressedToClient.writeObject(null);
+				outputCompressedToClient.flush();
+				//outputToClient.writeObject(calculateHint(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
+				messages.remove(message);
+			}
 			outputCompressedToClient.close();
 			readerFromClient.close();
 			client.close();
@@ -140,7 +152,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 		}
 		
 		activeConnections.remove(clientIP+","+clientPort);
-		activeConnectionsOutputStream.remove(clientIP+","+clientPort);
 		String last=new String(clientIP +","+ clientPort+",disconnected");
 		messages.add(last);
 		setChanged();
@@ -212,7 +223,12 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	 */
 	public SerializableMaze generateMaze(String generator,String name,int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal) {
-		
+		/* for video*/
+		  int i=0;
+		while(i!=-30)
+		{
+			i=i;
+		}
 		if(server.generatedMazes.containsKey(name))
 			return new SerializableMaze(server.generatedMazes.get(name));
 		Maze maze=null;
@@ -228,6 +244,7 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				break;
 		}
 		server.generatedMazes.put(name, maze);
+		
 		return new SerializableMaze(maze);
 				
 	}
@@ -349,23 +366,21 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			if(arg.toString().contains("disconnect"))
 			{
 				Socket clientToDisconnect=activeConnections.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
-				
-					//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
-				System.out.println(activeConnectionsOutputStream.containsKey(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1)));	
+			/*	
+				//BufferedReader readerFromClient=new BufferedReader(new InputStreamReader(clientToDisconnect.getInputStream()));
 				ObjectOutputStream objOut=activeConnectionsOutputStream.get(arg.toString().substring(0, arg.toString().length()-"disconnect".length()-1));
-				System.out.println(objOut);
-				/*try {
+				try {
 					objOut.writeObject("disconnect");
 					objOut.flush();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}*/
+				}
 					
-					//readerFromClient.readLine(); //Client answers and acks.
-			
+				//readerFromClient.readLine(); //Client answers and acks.
+			*/
 				try{
-				clientToDisconnect.close();
+					clientToDisconnect.close();
 				}catch(Exception e)
 				{
 					

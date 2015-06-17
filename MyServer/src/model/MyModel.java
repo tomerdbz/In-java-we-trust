@@ -141,7 +141,10 @@ public class MyModel extends Observable implements Model {
 
 			@Override
 			public void run() {
+				int j=0;
 				while(true){
+					System.out.println("chunk #"+ j);
+					j++;
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
