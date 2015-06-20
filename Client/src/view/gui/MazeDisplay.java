@@ -31,7 +31,7 @@ public class MazeDisplay extends CommonBoard {
 	 */
 	ImageLoader gifs=new ImageLoader();
 	/**
-	 * an array of images whicharacter represent the gif of the goal
+	 * an array of images which represent the gif of the goal
 	 */
 	ImageData[] images;
 	/**
@@ -258,6 +258,7 @@ public class MazeDisplay extends CommonBoard {
 		int dCol =0;
 		switch (direction){
 		case UP:
+				dRow=1;
 			 	break;
 		case RIGHT:
 				dCol=-1;

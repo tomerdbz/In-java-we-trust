@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -107,7 +108,7 @@ public class MazeWindow extends BasicWindow implements View {
 			
 		});
 		//sets the background image to white
-		shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg"));
+		shell.setBackground(new Color(null,255,255,255));
 		shell.setLayout(new GridLayout(2,false));
 		//shell.setLayoutData((new GridData(SWT.FILL,SWT.FILL,true,true,3,3)));
 		shell.setText("Maze Generations"); //sets the text of window
