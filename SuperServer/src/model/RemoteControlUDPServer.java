@@ -119,8 +119,8 @@ public class RemoteControlUDPServer extends Observable implements Observer,Runna
 			this.addObserver(handler);
 			clientsServer=new MazeServer(clientsServerProperties,handler);
 			handler.setServer(clientsServer);
-			executor.execute(clientsServer);
-			//new Thread(clientsServer).start();
+			//executor.execute(clientsServer);
+			new Thread(clientsServer).start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -143,7 +143,7 @@ public class RemoteControlUDPServer extends Observable implements Observer,Runna
 				senderPort=receivePacket.getPort();
 				if(input.startsWith("exit"))
 					return;
-				else if(input.contains("disconnect"))
+				else if(input.contains("disconnect") && !input.startsWith("stop"))
 				{
 					String buffer=input;
 					input="";
@@ -154,6 +154,13 @@ public class RemoteControlUDPServer extends Observable implements Observer,Runna
 							break;
 					setChanged();
 					notifyObservers(input);
+				}
+				else if(input.contains("stop"))
+				{
+					clientsServer.stoppedServer();
+					clientsServer=null;
+					executor.shutdownNow();
+					return;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -168,6 +175,7 @@ public class RemoteControlUDPServer extends Observable implements Observer,Runna
 		}while(!input.startsWith("stop server"));
 		clientsServer.stoppedServer();
 		clientsServer=null;
+		executor.shutdownNow();
 	}
 	/** upon any change in what the clients maze server is doing - it will call here where I send messages to the remote control.
 	 */

@@ -1,6 +1,5 @@
 package model;
 
-import presenter.ServerProperties;
 /**
  * 
  * @author Alon

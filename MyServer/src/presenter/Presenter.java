@@ -5,7 +5,6 @@ import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import model.Model;
-import view.ServerWindow;
 import view.View;
 
 
@@ -20,7 +19,7 @@ public class Presenter implements Observer{
 	 * @author Alon
 	 *Check Connection Status Class
 	 */
-	public class ConnectionStatus implements ServerCommand {
+	public class ConnectionStatus implements RemoteControlCommand {
 
 		/**
 		 * Checks connection of client
@@ -38,7 +37,7 @@ public class Presenter implements Observer{
 	 * @author Alon
 	 *Disconnect User Class
 	 */
-	public class DisconnectUser implements ServerCommand{
+	public class DisconnectUser implements RemoteControlCommand{
 
 		/**
 		 * Disconnect user 
@@ -56,7 +55,7 @@ public class Presenter implements Observer{
 	 * @author Alon
 	 *A class for starting the server
 	 */
-	public class StartServer implements ServerCommand{
+	public class StartServer implements RemoteControlCommand{
 
 		@Override
 		/**
@@ -73,7 +72,7 @@ public class Presenter implements Observer{
 	 * @author Alon
 	 *a class for stopping the server
 	 */
-	public class StopServer implements ServerCommand{
+	public class StopServer implements RemoteControlCommand{
 		/**
 		 * Stop the server
 		 */
@@ -89,7 +88,7 @@ public class Presenter implements Observer{
 	 * @author Alon
 	 *a class for exiting properly
 	 */
-	public class ExitWindow implements ServerCommand{
+	public class ExitWindow implements RemoteControlCommand{
 		
 		/**
 		 * exit properly
@@ -117,7 +116,7 @@ public class Presenter implements Observer{
 	{
 		this.m=m;
 		this.v=v;
-		ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>(); //creating a safe hash map for threads which is a map for strings and commands
+		ConcurrentHashMap<String, RemoteControlCommand> commandMap=new ConcurrentHashMap<String, RemoteControlCommand>(); //creating a safe hash map for threads which is a map for strings and commands
 		commandMap.put("connection status", new ConnectionStatus());
 		commandMap.put("disconnect user", new DisconnectUser());
 		commandMap.put("start server",new StartServer());

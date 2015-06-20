@@ -1,7 +1,6 @@
 package model;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -89,9 +88,17 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				notifyObservers();
 				outputCompressedToClient.writeObject(generateMaze(generator,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6])));
 				outputCompressedToClient.flush();
+				setChanged();
+				notifyObservers();
+				try {
+				    Thread.sleep(6000);                 //1000 milliseconds is one second.
+				} catch(InterruptedException ex) {
+				    Thread.currentThread().interrupt();
+				}
 				//outputToClient.writeObject(generateMaze(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
 				messages.remove(message);
 				//outputToClient.flush();
+				
 
 			}
 			else if(command.contains("solve maze"))
@@ -106,9 +113,12 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				notifyObservers();
 				outputCompressedToClient.writeObject(solveMaze(properties[0],properties[1],Double.parseDouble(properties[2]),Double.parseDouble(properties[3]),params[0]));
 				outputCompressedToClient.flush();
+			
 				//outputToClient.writeObject(solveMaze(clientIP,clientPort,params[0],"solving maze"));
 				messages.remove(message);
 				//outputToClient.flush();
+				
+
 
 			}
 			else if(command.contains("calculate hint"))
@@ -124,8 +134,10 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				outputCompressedToClient.writeObject(calculateHint(properties[0],properties[1],Double.parseDouble(properties[2]),Double.parseDouble(properties[3]),params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2])));
 				outputCompressedToClient.flush();
 				//outputToClient.writeObject(calculateHint(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),"calculating hint"));
+				
 				messages.remove(message);
 				//outputToClient.flush();
+				
 			}
 			else if(command.contains("maze exists"))
 			{
@@ -145,10 +157,11 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 			}
 			outputCompressedToClient.close();
 			readerFromClient.close();
+
 			client.close();
 			
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			
 		}
 		
 		activeConnections.remove(clientIP+","+clientPort);
@@ -224,11 +237,11 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 	public SerializableMaze generateMaze(String generator,String name,int rows, int cols, int rowSource, int colSource,
 			int rowGoal, int colGoal) {
 		/* for video*/
-		  int i=0;
+		/*  int i=0;
 		while(i!=-30)
 		{
 			i=i;
-		}
+		}*/
 		if(server.generatedMazes.containsKey(name))
 			return new SerializableMaze(server.generatedMazes.get(name));
 		Maze maze=null;

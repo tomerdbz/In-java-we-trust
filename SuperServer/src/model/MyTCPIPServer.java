@@ -72,6 +72,7 @@ public class MyTCPIPServer {
 				} catch (SocketTimeoutException e) {
 				}
 			}
+			threadPool.shutdownNow();
 			server.close();
 			
 		} catch (IOException e1) {

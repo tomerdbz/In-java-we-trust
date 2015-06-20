@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import presenter.ServerProperties;
+import presenter.RemoteControlProperties;
 /**
  * 
  * @author Alon
@@ -20,7 +20,7 @@ public class MyModel extends Observable implements Model {
 	/**
 	 * Properties of the server
 	 */
-	ServerProperties serverProperties;
+	RemoteControlProperties serverProperties;
 	/**
 	 * A socket which will alow us to send and recieve data
 	 */
@@ -43,7 +43,7 @@ public class MyModel extends Observable implements Model {
 	int RemoteServerToServerPort;
 	ExecutorService Exec=null;
 	boolean shutdown = true;
-	public MyModel(ServerProperties serverProperties){
+	public MyModel(RemoteControlProperties serverProperties){
 		try {
 			this.serverProperties = serverProperties; //intializing the properties data member
 			socket = new DatagramSocket(serverProperties.getRemoteControlPortListener()); //getting the port from the user to which we will listen to
@@ -90,7 +90,7 @@ public class MyModel extends Observable implements Model {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.modelData="msg server has stopped"; //notifying the view
+		this.modelData="msg Server Got The Signal and Stopped Serving"; //notifying the view
 		setChanged();
 		notifyObservers();
 	}
@@ -127,10 +127,13 @@ public class MyModel extends Observable implements Model {
 				byte info[]=new byte[1000];
 				DatagramPacket receivedPacket=new DatagramPacket(info,info.length);
 				try {
+					
+					System.out.println("chunk");
 					socket.receive(receivedPacket); //recieving data
 					String line=new String(receivedPacket.getData(), 0,receivedPacket.getLength());
 					String [] lines =line.split("\n"); 
 					for(int i =0 ;i<lines.length;i++){//understanding the data and using it
+						System.out.println(lines[i]);
 					if(lines[i].split(",").length==3 ){  //if new user
 						if(lines[i].split(",")[2].equals("connected")){
 						clientStatus.put(lines[i].split(",")[0]+","+ lines[i].split(",")[1],"connected");
@@ -159,7 +162,7 @@ public class MyModel extends Observable implements Model {
 			}
 		}));
 		//t.start(); //starting the thread 
-		this.modelData="msg server started";
+		this.modelData="msg Server Got The Signal and Starting to Operate";
 		setChanged(); 
 		notifyObservers(); //notifying the view that server has started
 	

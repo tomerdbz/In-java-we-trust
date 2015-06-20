@@ -2,7 +2,7 @@ package view;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import presenter.ServerCommand;
+import presenter.RemoteControlCommand;
 /**
  * 
  * @author Alon
@@ -15,12 +15,12 @@ public interface View {
 	 * get Command from view
 	 * @return the command
 	 */
-	public ServerCommand getCommand();
+	public RemoteControlCommand getCommand();
 	/**
 	 * Set the hashMAP of commands in the view
 	 * @param commandMap a hashmap of String to server commands
 	 */
-	public void setCommands(ConcurrentHashMap<String, ServerCommand> commandMap);
+	public void setCommands(ConcurrentHashMap<String, RemoteControlCommand> commandMap);
 	/**
 	 * display data to view
 	 * @param msg the data to be displayed

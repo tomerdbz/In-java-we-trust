@@ -29,9 +29,9 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import presenter.RemoteControlCommand;
+import presenter.RemoteControlProperties;
 import boot.RunGui;
-import presenter.ServerCommand;
-import presenter.ServerProperties;
 /**
  * 
  * @author Alon,Tomer
@@ -47,15 +47,15 @@ public class ServerWindow extends BasicWindow implements View {
 	/**
 	 * Properties of the server
 	 */
-	ServerProperties serverProperties;
+	RemoteControlProperties serverProperties;
 	/**
 	 * Thread safe Hashmap that connects string to Commands
 	 */
-	ConcurrentHashMap<String, ServerCommand> commandMap=new ConcurrentHashMap<String, ServerCommand>();
+	ConcurrentHashMap<String, RemoteControlCommand> commandMap=new ConcurrentHashMap<String, RemoteControlCommand>();
 	/**
 	 * Represents last command we used
 	 */
-	ServerCommand lastCommand =null;
+	RemoteControlCommand lastCommand =null;
 	/**
 	 * Data we got from the model througt the presenter
 	 */
@@ -342,7 +342,7 @@ public class ServerWindow extends BasicWindow implements View {
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
 						MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-				        messageBox.setText("Information");
+				        messageBox.setText("Maze Generations");
 				        messageBox.setMessage("This entire software was created by Tomer Cabouly and Alon Orlovsky Enjoy It!");
 						messageBox.open();
 						
@@ -350,16 +350,6 @@ public class ServerWindow extends BasicWindow implements View {
 			    	
 			    });
 			shell.setMenuBar(menuBar);
-		
-	}
-
-	private void showStatus()//params
-	{
-		//status.setText(params);
-	}
-	private String[] clientsToDisconnect()
-	{
-		return clients;
 		
 	}
 	/**
@@ -373,7 +363,7 @@ public class ServerWindow extends BasicWindow implements View {
 			XMLDecoder d;
 			in = new FileInputStream(filename);
 			d=new XMLDecoder(in);
-			serverProperties=(ServerProperties)d.readObject();
+			serverProperties=(RemoteControlProperties)d.readObject();
 			d.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -384,18 +374,18 @@ public class ServerWindow extends BasicWindow implements View {
 	 * A function for reading properties 
 	 * @return the readed properties
 	 */
-	public static ServerProperties readProperties()
+	public static RemoteControlProperties readProperties()
 	{
 		XMLDecoder d;
-		ServerProperties p=null;
+		RemoteControlProperties p=null;
 		try {
 			FileInputStream in=new FileInputStream("properties.xml");
 			d=new XMLDecoder(in);
-			p=(ServerProperties)d.readObject();
+			p=(RemoteControlProperties)d.readObject();
 			System.out.println(p);
 			d.close();
 		} catch (IOException e) {
-			return new ServerProperties();
+			return new RemoteControlProperties();
 		}
 		return p;
 	}
@@ -404,7 +394,7 @@ public class ServerWindow extends BasicWindow implements View {
 	 * @return the command
 	 */
 	@Override
-	public ServerCommand getCommand() {
+	public RemoteControlCommand getCommand() {
 		return this.lastCommand;
 	}
 	/**
@@ -412,7 +402,7 @@ public class ServerWindow extends BasicWindow implements View {
 	 * @param commandMap a hashmap of String to server commands
 	 */
 	@Override
-	public void setCommands(ConcurrentHashMap<String, ServerCommand> commandMap) {
+	public void setCommands(ConcurrentHashMap<String, RemoteControlCommand> commandMap) {
 		this.commandMap=commandMap;
 		
 	}
@@ -428,7 +418,7 @@ public class ServerWindow extends BasicWindow implements View {
 			public void run() {
 				if(!shell.isDisposed()){
 				MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
-				messageBox.setText("Information");
+				messageBox.setText("Maze Generations");
 				messageBox.setMessage(msg);
 				messageBox.open(); //message to user
 				}
@@ -474,7 +464,11 @@ public class ServerWindow extends BasicWindow implements View {
 
 			@Override
 			public void run() {
-				list.remove(Client);
+				try{list.remove(Client);}
+				catch(Exception e)
+				{
+					
+				}
 				status.setText("");
 			}
 			

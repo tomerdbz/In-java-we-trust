@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -51,12 +52,12 @@ public class MazeServer extends MyTCPIPServer implements Runnable {
 	 * @param clientHandler
 	 */
 	public MazeServer(ServerProperties serverProperties, MazeClientHandler clientHandler) {
-		//loadFromDatabase();
 		super(serverProperties, clientHandler);
+		loadFromDatabase();
 	}
 	@Override
 	public void stoppedServer() {
-		/*SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		session.beginTransaction();
 		ConcurrentLinkedQueue<String> names=namesToWriteToDB();
@@ -70,7 +71,7 @@ public class MazeServer extends MyTCPIPServer implements Runnable {
 				session.save(data);//add flush every once in a while - 20?
 			}
 		}
-		session.getTransaction().commit();*/
+		session.getTransaction().commit();
 		super.stoppedServer();
 	}
 	

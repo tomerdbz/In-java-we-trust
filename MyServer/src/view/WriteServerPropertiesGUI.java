@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import presenter.ServerProperties;
+import presenter.RemoteControlProperties;
 
 
 
@@ -29,8 +29,8 @@ public class WriteServerPropertiesGUI {
 		//Display display = new Display();
 	    //Shell shell = new Shell(display);
 
-	    ClassInputDialog dlg = new ClassInputDialog(shell,ServerProperties.class);
-	    ServerProperties input = (ServerProperties) dlg.open();
+	    ClassInputDialog dlg = new ClassInputDialog(shell,RemoteControlProperties.class);
+	    RemoteControlProperties input = (RemoteControlProperties) dlg.open();
 	    if (input != null) {
 	      // User clicked OK; set the text into the label
 	    	try {
