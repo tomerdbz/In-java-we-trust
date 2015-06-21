@@ -38,13 +38,30 @@ public class MazeDisplay extends CommonBoard {
 	 * frame of the gif
 	 */
 	int frameIndex=0;
+	/**
+	 * row source in which character starts
+	 */
 	int rowSource;
+	/**
+	 * row goal in which character beats the maze
+	 */
 	int rowGoal;
+	/**
+	 * column goal in which characters beats the maze
+	 */
 	int colGoal;
+	/***
+	 * column source in which character starts
+	 */
 	int colSource;
+	/**
+	 * MP3 player to play sounds
+	 */
 	MP3Player player;
 
-	
+	/**
+	 * Constructor
+	 */
 	public MazeDisplay(Composite parent, int style) {
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 		images=gifs.load(".\\resources\\images\\ChaosEmerald.gif");
@@ -60,12 +77,11 @@ public class MazeDisplay extends CommonBoard {
 					if(!isDisposed()){
 					getDisplay().syncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run() { //this is the timer task allowing us to redraw the goal target gif
 							if(character!=null && !isDisposed() &&input!=null){
 								if(input.getRowGoal()<board.length && input.getColGoal()<board[0].length){
 							 character.setCharacterImageIndex((character.getCharacterImageIndex() + 1) % character.getCharacterImagesArray().length); //next frame in gifs
 							 frameIndex =(frameIndex+1) % images.length; //next frame in gifs
-							 //(board[input.getRowGoal()][input.getColGoal()]).setGoal(new Image(display,images[frameIndex]));
 							 (board[rowGoal][colGoal]).setGoal(new Image(getDisplay(),images[frameIndex]));
 							 board[character.currentCellX][character.currentCellY].redraw(); //redraw cell in which character now stays
 							board[rowGoal][colGoal].redraw();
@@ -88,6 +104,10 @@ public class MazeDisplay extends CommonBoard {
 	/**
 	 * displays the maze in a gui way
 	 * @param m the maze to be displayed
+	 */
+	/**
+	 * sets the maze data which ar ethe tiles the row source col source row goal col goal
+	 * @param o represents the maze
 	 */
 	@Override
 	public void setBoardData(Object o)
@@ -129,6 +149,9 @@ public class MazeDisplay extends CommonBoard {
 			}); 
 		
 	}
+	/**
+	 * Disposes the maze Data all images from tiles
+	 */
 	public void destructBoard()
 	{
 		for(int i=0;i<board.length;i++)
@@ -240,11 +263,6 @@ public class MazeDisplay extends CommonBoard {
 		    player.addToPlayList(new File(".\\resources\\sounds\\win.mp3"));
 		    player.play();
 			setVisible(false);
-			//won=false;
-			//won=false;
-
-			/*ImageData data = new ImageData(".\\resources\\images\\sonicwon.png");
-			arg0.gc.drawImage(new Image(getDisplay(),".\\resources\\images\\sonicwon.png"),0,0,data.width,data.height,0,0,width,height);*/
 		}
 		else if(board!=null)
 			for(int i=0;i<board.length;i++)
@@ -252,13 +270,18 @@ public class MazeDisplay extends CommonBoard {
 					board[i][j].redraw();
 		
 	}
+	/**
+	 * Applys the direction in the maze
+	 * if right we try to go right
+	 * @param direction - in which we try to go in the maze
+	 */
 	@Override
 	public void applyInputDirection(Direction direction) {
 		int dRow=0;
 		int dCol =0;
 		switch (direction){
 		case UP:
-				dRow=1;
+				dRow=1; //for example if we go up we need to take 1 from the row 
 			 	break;
 		case RIGHT:
 				dCol=-1;
@@ -310,6 +333,10 @@ public class MazeDisplay extends CommonBoard {
 		
 	
 	}
+	/**
+	 * Sets the maze Properties
+	 * @param temp input - represents the maze Properties
+	 */
 	@Override
 	public void setBoardProperties(Object tempInput) {
 		input=(MazeProperties)tempInput;

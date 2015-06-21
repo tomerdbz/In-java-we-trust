@@ -27,13 +27,17 @@ public class CellDisplay extends CommonTile{
 	 */
 	public CellDisplay(Composite parent, int style) {//wanna get it from the outside
 		super(parent, style | SWT.DOUBLE_BUFFERED);
-		// mouse listener
+		
 		
 		
 		
 	
 		
 	}
+	/***
+	 * Setting image of the cell
+	 * @param image the image
+	 */
 	public void setImage(Image image) 		//getters and setters of images
 	{
 		if(this.cellImage!=null)
@@ -42,6 +46,11 @@ public class CellDisplay extends CommonTile{
 		//change image
 		redraw();
 	}
+	/**
+	 * draws the tile with a paint event 
+	 * each tile has its own way of drawing
+	 * @param e the paint event that allows us to draw
+	 */
 	@Override
 	public void drawTile(PaintEvent e) {
 		int width=getSize().x; //get width of window

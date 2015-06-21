@@ -23,7 +23,7 @@ public abstract class CommonBoard extends Composite implements Board {
 	 */
 	boolean won=false;
 	/**
-	 * a 2 dimension array whicharacter represents the tiles in the board
+	 * a 2 dimension array which represents the tiles in the board
 	 */
 	CommonTile[][] board;
 	/**
@@ -35,11 +35,17 @@ public abstract class CommonBoard extends Composite implements Board {
 	 */
 	int boardCols;
 	/**
-	 * representation of the characteraracter in the maze
+	 * representation of the character in the board
 	 */
 	CommonCharacter character=null;
+	/**
+	 * allows us to check what kind of a drag has occurred if there was any
+	 */
 	boolean checkDragged=false; 
 	
+	/**
+	 * Constructor
+	 */
 	public CommonBoard(Composite parent, int style) {
 		super(parent, style);
 			addPaintListener(new PaintListener() { 
@@ -51,7 +57,7 @@ public abstract class CommonBoard extends Composite implements Board {
 		});
 			this.addKeyListener(new KeyListener(){	
 				@Override
-				public void keyPressed(KeyEvent e) { //eacharacter of those codes represenets a key on the keyboard in our case up down right left arrows
+				public void keyPressed(KeyEvent e) { //each of those codes represents a key on the keyboard in our case up down right left arrows
 					if (e.keyCode == 16777217 && character.currentCellX!=0 && hasPathUP(character.currentCellX,character.currentCellY)){
 						applyInputDirection((Direction.UP));
 						 //up

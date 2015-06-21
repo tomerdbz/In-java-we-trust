@@ -15,6 +15,9 @@ public abstract class CommonCharacter extends Canvas implements Character{
 		    * col in the maze
 		    */
 		   int currentCellY=0;
+		   /**
+		    * check if we should redraw
+		    */
 		   boolean Redraw=true;
 
 	   /**
@@ -25,7 +28,9 @@ public abstract class CommonCharacter extends Canvas implements Character{
 	public CommonCharacter(Composite parent, int style) {
 		super(parent, style);
 	}
-
+	/**
+	 * a function for drawing the character
+	 */
 	@Override
 	public void drawCharacter() {
 		this.redraw();
@@ -36,27 +41,44 @@ public abstract class CommonCharacter extends Canvas implements Character{
 	public abstract void setCharacterImagesArray(ImageData[] images);
 	public abstract int getCharacterImageIndex();
 	public abstract void setCharacterImageIndex(int frameIndex);
-
+	/**
+	 * getter
+	 * @return current character row in the array
+	 */
 	public int getCurrentCellX() {
 		return currentCellX;
 	}
-
+	/**
+	 * setter
+	 * @param currentCellX current characterrow in the array
+	 */
 	public void setCurrentCellX(int currentCellX) {
 		this.currentCellX = currentCellX;
 	}
-
+	/**
+	 * 
+	 * @return current column of character in the array
+	 */
 	public int getCurrentCellY() {
 		return currentCellY;
 	}
-
+	/**
+	 * 
+	 * @param currentCellY current column of character in the array
+	 */
 	public void setCurrentCellY(int currentCellY) {
 		this.currentCellY = currentCellY;
 	}
-
+	/**
+	 * 
+	 * @return true if needs to redraw
+	 */
 	public boolean isRedraw() {
 		return Redraw;
 	}
-
+	/**
+	 * sets the boolean of redraw
+	 */
 	public void setRedraw(boolean redraw) {
 		Redraw = redraw;
 	}

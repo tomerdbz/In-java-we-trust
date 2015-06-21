@@ -17,12 +17,44 @@ public interface Board {
 	 * @param arg - an Object which is the data to set in the specific board
 	 */
 	void setBoardData(Object arg);
-	
+	/**
+	 * This function allows us to set the Properties of the board
+	 * if it was a maze it was mazeProperties and so on	
+	 * @param tempInput represents some kind of a properties
+	 */
 	 void setBoardProperties(Object tempInput);
+	 /**
+	  * Checks if there is a path to go Up in a board
+	  * @param characterRow Row of character
+	  * @param characterCol Column of character
+	  * @return true if there is
+	  */
 	 boolean hasPathUP(int characterRow,int characterCol);
+	 /**
+ * Checks if there is a path to go Right in a board
+	  * @param characterRow Row of character
+	  * @param characterCol Column of character
+	  * @return true if there is
+	  */
 	 boolean hasPathRIGHT(int characterRow,int characterCol);
+	 /**
+	 * Checks if there is a path to go Down in a board
+	  * @param characterRow Row of character
+	  * @param characterCol Column of character
+	  * @return true if there is
+	  * */
 	 boolean hasPathDOWN(int characterRow,int characterCol);
+	 /**
+	 * Checks if there is a path to go Left in a board
+	  * @param characterRow Row of character
+	  * @param characterCol Column of character
+	  * @return true if there is
+	  * 
+	  */
 	 boolean hasPathLEFT(int characterRow,int characterCol);
+	 /***
+	  * Disposes of all things created in board
+	  */
 	 void destructBoard();
 	
 }

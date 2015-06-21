@@ -82,16 +82,26 @@ public class MazeWindow extends BasicWindow implements View {
 	 * true if the data we sent already exists in the database
 	 */
 	Maze dataRecieved=null; 
+	/**
+	 * represents the maze properties
+	 */
 	MazeProperties input;
-	
+	/**
+	 * Constructor
+	 */
 	public MazeWindow(Display display,Shell shell,String title, int width, int height) {
 		super(display,shell,title,width,height);
 	}
+	/**
+	 * second constructor less specific
+	 */
 	public MazeWindow(String title, int width, int height) {
 		super(title, width, height);
 		
 	}
-
+	/**
+	 * a fucnction that sets all the widget in the maze
+	 */
 	@Override
 	void initWidgets() {
 		shell.addListener(SWT.Close,new Listener(){
@@ -110,7 +120,6 @@ public class MazeWindow extends BasicWindow implements View {
 		//sets the background image to white
 		shell.setBackground(new Color(null,255,255,255));
 		shell.setLayout(new GridLayout(2,false));
-		//shell.setLayoutData((new GridData(SWT.FILL,SWT.FILL,true,true,3,3)));
 		shell.setText("Maze Generations"); //sets the text of window
 		//creates a tool bar
 		Menu menuBar = new Menu(shell, SWT.BAR);
@@ -412,7 +421,10 @@ public class MazeWindow extends BasicWindow implements View {
 		
 		   
 	}
-
+	/**
+	 * sets properties
+	 * @param filename represents the file name of the properties file
+	 */
 	protected void setProperties(String filename) {//sets properties from a certain file
 		
 		FileInputStream in;
@@ -538,17 +550,6 @@ public class MazeWindow extends BasicWindow implements View {
 				(boardWidget.board[xt][yt]).setHint(img); //put hints all over the solutions path
 			}
 	
-		
-			/*final int dx=x;
-			final int dy=y;
-			display.asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					boardWidget.board[dx][dy].Hint=img;
-					boardWidget.board[dx][dy].redraw(); //redraw the hint
-				}
-			});*/
 			
 		display.syncExec(new Runnable() {
 			
@@ -585,7 +586,9 @@ public class MazeWindow extends BasicWindow implements View {
 	public ClientProperties getProperties() {
 		return properties;
 	}
-
+	/**
+	 * Displays the hint on the maze
+	 */
 	@Override
 	public void displayHint(State h) {
 		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
@@ -604,6 +607,11 @@ public class MazeWindow extends BasicWindow implements View {
 		}
 		
 	}
+	/**
+	 * checks if a string is numeric
+	 * @param str is the string which we check if it is a number
+	 * @return true if it is numeric else false
+	 */
 	private static boolean isNumeric(String str)
 	  {
 	    NumberFormat formatter = NumberFormat.getInstance();
