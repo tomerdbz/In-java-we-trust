@@ -15,10 +15,7 @@ public abstract class CommonCharacter extends Canvas implements Character{
 		    * col in the maze
 		    */
 		   int currentCellY=0;
-		   /**
-		    * check if we should redraw
-		    */
-		   boolean Redraw=true;
+
 
 	   /**
 	    * constructor
@@ -69,18 +66,6 @@ public abstract class CommonCharacter extends Canvas implements Character{
 	public void setCurrentCellY(int currentCellY) {
 		this.currentCellY = currentCellY;
 	}
-	/**
-	 * 
-	 * @return true if needs to redraw
-	 */
-	public boolean isRedraw() {
-		return Redraw;
-	}
-	/**
-	 * sets the boolean of redraw
-	 */
-	public void setRedraw(boolean redraw) {
-		Redraw = redraw;
-	}
+
 
 }

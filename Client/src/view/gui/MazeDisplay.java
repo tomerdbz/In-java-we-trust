@@ -3,6 +3,8 @@ package view.gui;
 import jaco.mp3.player.MP3Player;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,6 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import algorithms.mazeGenerators.Cell;
 import algorithms.mazeGenerators.Maze;
+import algorithms.search.Solution;
+import algorithms.search.State;
 /**
  * 
  * @author Alon,Tomer
@@ -25,7 +29,6 @@ import algorithms.mazeGenerators.Maze;
  */
 public class MazeDisplay extends CommonBoard {
 	
-	MazeProperties input;
 	/**
 	 * Helps load gif to single images
 	 */
@@ -70,33 +73,7 @@ public class MazeDisplay extends CommonBoard {
 	    player.play();
 	    player.setRepeat(true);
 	  //timer task to render 
-		TimerTask  timerTask = new TimerTask() {
-				
-				@Override
-				public void run() {
-					if(!isDisposed()){
-					getDisplay().syncExec(new Runnable() {
-						@Override
-						public void run() { //this is the timer task allowing us to redraw the goal target gif
-							if(character!=null && !isDisposed() &&input!=null){
-								if(input.getRowGoal()<board.length && input.getColGoal()<board[0].length){
-							 character.setCharacterImageIndex((character.getCharacterImageIndex() + 1) % character.getCharacterImagesArray().length); //next frame in gifs
-							 frameIndex =(frameIndex+1) % images.length; //next frame in gifs
-							 (board[rowGoal][colGoal]).setGoal(new Image(getDisplay(),images[frameIndex]));
-							 board[character.currentCellX][character.currentCellY].redraw(); //redraw cell in which character now stays
-							board[rowGoal][colGoal].redraw();
-							//redraw the goal cell
-								}
-							}
-							
-						}
-					});
-					}
-				}
-			};
-			
-			this.timer = new Timer();
-			timer.scheduleAtFixedRate(timerTask, 0, 50); //ever 0.05 seconds render display
+		
 	
 		
 	
@@ -109,10 +86,12 @@ public class MazeDisplay extends CommonBoard {
 	 * sets the maze data which ar ethe tiles the row source col source row goal col goal
 	 * @param o represents the maze
 	 */
-	@Override
-	public void setBoardData(Object o)
+	/**	
+	 * 	Extending class would like to display the problem in the widget and it will do so via this method.
+	 * @param m - the problem to display - maze,...
+	 */
+	private void setBoardData(Maze m)
 	{
-		Maze m=(Maze)o;
 		player.stop();
 		player=new MP3Player();
 		player.addToPlayList(new File(".\\resources\\sounds\\mazemenu.mp3"));
@@ -154,12 +133,30 @@ public class MazeDisplay extends CommonBoard {
 	 */
 	public void destructBoard()
 	{
-		for(int i=0;i<board.length;i++)
-			for(int j=0;j<board[0].length;j++)
+		if(board!=null){
+			for(int i=0;i<board.length;i++)
 			{
-				board[i][j].getCellImage().dispose();
-				board[i][j].dispose();
+				for(int j=0;j<board[0].length;j++)
+				{	
+					 if( board[i][j].getCellImage()!=null)
+						( board[i][j]).getCellImage().dispose();
+					 if(( board[i][j]).getGoal()!=null)
+						 ( board[i][j]).getGoal().dispose();
+					 if(( board[i][j]).getHint()!=null)
+						 ( board[i][j]).getHint().dispose();
+					 if(( board[i][j]).getCharacter()!=null)
+						 ( board[i][j]).getCharacter().dispose();
+					
+					 if(character!=null)
+						 character.dispose();
+						 
+					 ( board[i][j]).dispose();
+				}
 			}
+			}
+			if(timer!=null)
+				timer.cancel();
+		
 	}
 	/**
 	 * 
@@ -209,6 +206,8 @@ public class MazeDisplay extends CommonBoard {
 	// a function to calculate if cell has a right wall
 	@Override
 	public boolean hasPathRIGHT(int Row,int Col){
+		if(character.currentCellY==board[0].length-1)
+			return false;
 		 boolean cond1 = board[Row][Col].getImageName().charAt(2)=='0';
 		 boolean cond2 =board[Row][Col+1].getImageName().charAt(0)=='0';
 	if(cond1&&cond2)
@@ -219,6 +218,8 @@ public class MazeDisplay extends CommonBoard {
 	// a function to calculate if cell has a left wall
 	@Override
 	public boolean hasPathLEFT(int Row,int Col){
+		if(character.currentCellY==0)
+			return false;
 		 boolean cond1 = board[Row][Col].getImageName().charAt(0)=='0';
 		 boolean cond2 =board[Row][Col-1].getImageName().charAt(2)=='0';
 	if(cond1&&cond2)
@@ -229,7 +230,8 @@ public class MazeDisplay extends CommonBoard {
 	// a function to calculate if cell has a up wall
 	@Override
 	public boolean hasPathUP(int Row,int Col){
-		
+		if(character.currentCellX==0)
+			return false;
 		 boolean cond1 = board[Row][Col].getImageName().charAt(1)=='0';
 		 boolean cond2 =board[Row-1][Col].getImageName().charAt(3)=='0';
 		 	if(cond1 && cond2)
@@ -239,7 +241,8 @@ public class MazeDisplay extends CommonBoard {
 	// a function to calculate if cell has a down wall
 	@Override
 	public boolean hasPathDOWN(int Row,int Col){
-		
+		if(character.currentCellX== board.length-1)
+			return false;
 		boolean cond1 = board[Row][Col].getImageName().charAt(3)=='0';
 		 boolean cond2 =board[Row+1][Col].getImageName().charAt(1)=='0';	
 		 if(cond1&&cond2)
@@ -333,15 +336,106 @@ public class MazeDisplay extends CommonBoard {
 		
 	
 	}
-	/**
-	 * Sets the maze Properties
-	 * @param temp input - represents the maze Properties
-	 */
+	
 	@Override
-	public void setBoardProperties(Object tempInput) {
-		input=(MazeProperties)tempInput;
+	public void displayProblem(Object o) {
+		Maze m=(Maze)o;
+		getDisplay().syncExec(new Runnable() {
+			   public void run() {
+				   setBoardData(m);
+				   character = new MazeCharacter(board[m.getRowSource()][m.getColSource()],SWT.FILL);
+				   character.setCurrentCellX(m.getRowSource());
+				   character.setCurrentCellY(m.getColSource());
+				   character.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
+				   (board[m.getRowSource()][m.getColSource()]).setCharacter(character); //set character to the begining of the maze
+				   board[m.getRowSource()][m.getColSource()].redraw();
+				   layout(); //draw all the things needed
+				   forceFocus();
+				   
+			   }
+			});
+		
+		scheduleTimer(m);
+		
+		
+		
 	}
-
+	private void scheduleTimer(Maze m)
+	{
+		TimerTask  timerTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+				if(!isDisposed()){
+				getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() { //this is the timer task allowing us to redraw the goal target gif
+						if(character!=null && !isDisposed() && m!=null){
+							if(m.getRowGoal()<board.length && m.getColGoal()<board[0].length){
+						 character.setCharacterImageIndex((character.getCharacterImageIndex() + 1) % character.getCharacterImagesArray().length); //next frame in gifs
+						 frameIndex =(frameIndex+1) % images.length; //next frame in gifs
+						 (board[rowGoal][colGoal]).setGoal(new Image(getDisplay(),images[frameIndex]));
+						 board[character.currentCellX][character.currentCellY].redraw(); //redraw cell in which character now stays
+						board[rowGoal][colGoal].redraw();
+						//redraw the goal cell
+							}
+						}
+						
+					}
+				});
+				}
+			}
+		};
+		
+		this.timer = new Timer();
+		timer.scheduleAtFixedRate(timerTask, 0, 50); //ever 0.05 seconds render display
+	}
+	@Override
+	public void displaySolution(Solution s) {
+		String Solution = s.toString().substring(9);
+		String []path = Solution.split("	");
+		Image img = new Image(getDisplay(),".\\resources\\images\\ring.png"); //hint image
+		for(int i=0;i<path.length-1;i++){
+			String []indexes = path[i].split(",");
+			int xt=Integer.parseInt(indexes[0]);
+			int yt=Integer.parseInt(indexes[1]);	
+				(board[xt][yt]).setHint(img); //put hints all over the solutions path
+			}
+	
+			drawBoard(null);
+			forceFocus();
+		
+		
+	}
+	@Override
+	public void displayHint(State h) {
+		Image img = new Image(getDisplay(),".\\resources\\images\\ring.png"); //hint image
+		final String[] coordinates=h.getState().split(",");
+		if(isNumeric(coordinates[0]) && isNumeric(coordinates[1]))
+		{
+			
+			(board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])]).setHint(img); //put hints all over the solutions path
+			getDisplay().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].redraw(); //redraw the hint
+				}
+			});
+		}
+	}
+	/**
+	 * checks if a string is numeric
+	 * @param str is the string which we check if it is a number
+	 * @return true if it is numeric else false
+	 */
+	private static boolean isNumeric(String str)
+	  {
+	    NumberFormat formatter = NumberFormat.getInstance();
+	    ParsePosition pos = new ParsePosition(0);
+	    formatter.parse(str, pos);
+	    return str.length() == pos.getIndex();
+	  }
 	
 	}
 	

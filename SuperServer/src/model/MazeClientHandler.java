@@ -90,11 +90,6 @@ public class MazeClientHandler extends Observable implements ClientHandler,Obser
 				outputCompressedToClient.flush();
 				setChanged();
 				notifyObservers();
-				try {
-				    Thread.sleep(6000);                 //1000 milliseconds is one second.
-				} catch(InterruptedException ex) {
-				    Thread.currentThread().interrupt();
-				}
 				//outputToClient.writeObject(generateMaze(clientIP,clientPort,params[0],Integer.parseInt(params[1]),Integer.parseInt(params[2]),Integer.parseInt(params[3]),Integer.parseInt(params[4]),Integer.parseInt(params[5]),Integer.parseInt(params[6]),"generating maze"));
 				messages.remove(message);
 				//outputToClient.flush();

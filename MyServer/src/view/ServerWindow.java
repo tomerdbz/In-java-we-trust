@@ -1,9 +1,6 @@
 package view;
 
-import jaco.mp3.player.MP3Player;
-
 import java.beans.XMLDecoder;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +15,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -71,19 +69,11 @@ public class ServerWindow extends BasicWindow implements View {
 		super(title, width, height);
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //setting the image and some music:)
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		MP3Player player = new MP3Player();
-	    player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	    player.play();
-	    player.setRepeat(true);
 	}
-	public ServerWindow(String title, int width, int height,org.eclipse.swt.widgets.Display display,Shell shell) {
+	public ServerWindow(String title, int width, int height,Display display,Shell shell) {
 		super(display,shell,title, width, height);
 		shell.setBackgroundImage(new Image(display,".\\resources\\images\\image.png")); //setting the image and some music:)
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		MP3Player player = new MP3Player();
-	   player.addToPlayList(new File(".\\resources\\sounds\\menu.mp3"));
-	    player.play();
-	    player.setRepeat(true);
 	}
 	/**
 	 * This function initializes the widgets in the window
@@ -235,6 +225,9 @@ public class ServerWindow extends BasicWindow implements View {
 		 
 		
 	}
+	/**	Initializes the Menu in the window.
+	 * 
+	 */
 	private void initMenu() {
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		//creates a file category in toolbar

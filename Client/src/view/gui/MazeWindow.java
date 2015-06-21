@@ -7,15 +7,12 @@ import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -68,16 +65,6 @@ public class MazeWindow extends BasicWindow implements View {
 	 * name of the maze
 	 */
 	String mazeName=null;
-	/**
-	 * number of cols in the maze
-	 */
-	int cols=0;
-	/**
-	 * number of rows in the maze
-	 */
-	int rows =0;
-	
-
 	/**
 	 * true if the data we sent already exists in the database
 	 */
@@ -317,11 +304,7 @@ public class MazeWindow extends BasicWindow implements View {
 				LastUserCommand= commands.get("calculate hint");
 				setChanged(); //mvp solve maze
 				notifyObservers(" "+MazeWindow.this.mazeName + " "+ boardWidget.character.currentCellX+","+ boardWidget.character.currentCellY);
-				for(int i=0; i<boardWidget.boardRows;i++)
-					for(int j=0;j<boardWidget.boardCols;j++){
-						boardWidget.board[i][j].redraw();
-					}
-				boardWidget.redraw();
+				boardWidget.drawBoard(null);
 				boardWidget.forceFocus();
 				}
 				else{ //if there is no maze to be solved error
@@ -347,38 +330,25 @@ public class MazeWindow extends BasicWindow implements View {
 			    MazeProperties tempInput=(MazeProperties)dlg.open();
 			    if(tempInput!=null)
 			    {
-			    	boardWidget.setBoardProperties(tempInput);
 			    	input=tempInput;
 			    }
 			    boardWidget.forceFocus();
 			    if(input!=null && input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows()){
 			    	MazeWindow.this.mazeName=input.getMazeName();
 			    }
-				LastUserCommand= commands.get("maze exists");
-			    setChanged(); //check if maze already exists
-				notifyObservers(MazeWindow.this.mazeName); 
-				if(input!=null && MazeWindow.this.mazeName!=null &&  MazeWindow.this.dataRecieved==null ){ //if maze doesnt exist create a new one
-					MazeWindow.this.boardWidget.won=false;
-					MazeWindow.this.rows =(Integer)input.getRows(); //takes the info about rows
-					MazeWindow.this.cols=(Integer)input.getCols(); //takes the info about cols
-					boardWidget.setVisible(true); //makes sure the boardWidget is visible
-					shell.setBackgroundImage(new Image(display,".\\resources\\images\\White.jpg")); //sets Background images
-				LastUserCommand= commands.get("generate maze");
-				setChanged();
-				String board= "" + MazeWindow.this.mazeName + " "+MazeWindow.this.rows + ","+ MazeWindow.this.cols+ ","+input.getRowSource()+","+input.getColSource()+","+(input.getRowGoal())+","+(input.getColGoal());
-				System.out.println(board);
-				notifyObservers(" "+ board); //passses data to generate maze in MVP System
-				}
-				else if(dataRecieved!=null)
-				{
-					displayMaze(dataRecieved);
-				}
-				else if(input!=null &&(input.getColGoal()>=input.getCols() || input.getRowGoal()>=input.getRows())){// || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
+			    if(input!=null &&(input.getColGoal()>=input.getCols() || input.getRowGoal()>=input.getRows())){// || !(input.getColGoal()<input.getCols() && input.getRowGoal()<input.getRows())){ //if error has occureed 
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
 			        messageBox.setText("Information");
 			        messageBox.setMessage("An error has occureed");
 					messageBox.open();
 				}
+			    else
+			    {
+				    LastUserCommand= commands.get("maze exists");
+				    setChanged(); //check if maze already exists
+					notifyObservers(" " +MazeWindow.this.mazeName); 
+			    }
+				
 				
 					
 			}
@@ -435,8 +405,7 @@ public class MazeWindow extends BasicWindow implements View {
 			properties=(ClientProperties)d.readObject();
 			d.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				Display("Error Loading Properties");
 		}
 		
 	}
@@ -485,51 +454,13 @@ public class MazeWindow extends BasicWindow implements View {
 	 */
 	@Override
 	public void displayMaze(Maze m) {
-	
-		display.syncExec(new Runnable() {
-			   public void run() {
-				   boardWidget.setBoardData(m);
-				   boardWidget.character = new MazeCharacter(boardWidget.board[m.getRowSource()][m.getColSource()],SWT.FILL);
-				   boardWidget.character.setCurrentCellX(m.getRowSource());
-				   boardWidget.character.setCurrentCellY(m.getColSource());
-				   boardWidget.character.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,true,2,2));
-				   (boardWidget.board[m.getRowSource()][m.getColSource()]).setCharacter(boardWidget.character); //set character to the begining of the maze
-				   boardWidget.board[m.getRowSource()][m.getColSource()].redraw();
-				   boardWidget.layout(); //draw all the things needed
-				   boardWidget.forceFocus();
-				   
-			   }
-			}); 
-			
-		
+		boardWidget.displayProblem(m);
 	}
 	/**
 	 * disposes all data of the maze
 	 */
 	public void closeCorrect(){
-		if(boardWidget.board!=null){
-		for(int i=0;i<boardWidget.board.length;i++)
-		{
-			for(int j=0;j<boardWidget.board[0].length;j++)
-			{	
-				 if( boardWidget.board[i][j].getCellImage()!=null)
-					( boardWidget.board[i][j]).getCellImage().dispose();
-				 if(( boardWidget.board[i][j]).getGoal()!=null)
-					 ( boardWidget.board[i][j]).getGoal().dispose();
-				 if(( boardWidget.board[i][j]).getHint()!=null)
-					 ( boardWidget.board[i][j]).getHint().dispose();
-				 if(( boardWidget.board[i][j]).getCharacter()!=null)
-					 ( boardWidget.board[i][j]).getCharacter().dispose();
-				
-				 if(boardWidget.character!=null)
-					 boardWidget.character.dispose();
-					 
-				 ( boardWidget.board[i][j]).dispose();
-			}
-		}
-		}
-		if(boardWidget.timer!=null)
-			boardWidget.timer.cancel();
+		boardWidget.destructBoard();
 		boardWidget.dispose();
 	}
 	/**
@@ -539,33 +470,7 @@ public class MazeWindow extends BasicWindow implements View {
 	 */
 	@Override
 	public void displaySolution(Solution s) {
-		System.out.println(s);
-		String Solution = s.toString().substring(9);
-		String []path = Solution.split("	");
-		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
-		for(int i=0;i<path.length-1;i++){
-			String []indexes = path[i].split(",");
-			int xt=Integer.parseInt(indexes[0]);
-			int yt=Integer.parseInt(indexes[1]);	
-				(boardWidget.board[xt][yt]).setHint(img); //put hints all over the solutions path
-			}
-	
-			
-		display.syncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				for(int i=0; i<boardWidget.boardRows;i++)
-					for(int j=0;j<boardWidget.boardCols;j++){
-						boardWidget.board[i][j].redraw();
-					}
-				boardWidget.redraw(); //redraw maze
-				boardWidget.forceFocus();	
-			}
-		});
-			
-		
-			
+			boardWidget.displaySolution(s);		
 		}
 	
 			
@@ -576,7 +481,22 @@ public class MazeWindow extends BasicWindow implements View {
 	 */
 	@Override
 	public void receiveExistsMaze(Maze data) {
-		this.dataRecieved=data;
+		if(input!=null && MazeWindow.this.mazeName!=null &&  data==null ){ //if maze doesnt exist create a new one
+			MazeWindow.this.boardWidget.won=false;
+			boardWidget.setVisible(true); //makes sure the boardWidget is visible
+			LastUserCommand= commands.get("generate maze");
+			setChanged();
+			String board= "" + MazeWindow.this.mazeName + " "+(Integer)input.getRows() + ","+ (Integer)input.getCols()+ ","+input.getRowSource()+","+input.getColSource()+","+(input.getRowGoal())+","+(input.getColGoal());
+			notifyObservers(" "+ board); //passses data to generate maze in MVP System
+		}
+		else if(data!=null)
+		{
+			MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION|SWT.OK);
+	        messageBox.setText("Information");
+	        messageBox.setMessage("Maze already exists. Loading it!");
+			messageBox.open();
+			displayMaze(data);
+		}
 	}
 	/**
 	 * getter
@@ -591,36 +511,8 @@ public class MazeWindow extends BasicWindow implements View {
 	 */
 	@Override
 	public void displayHint(State h) {
-		Image img = new Image(display,".\\resources\\images\\ring.png"); //hint image
-		final String[] coordinates=h.getState().split(",");
-		if(isNumeric(coordinates[0]) && isNumeric(coordinates[1]))
-		{
-			
-			(boardWidget.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])]).setHint(img); //put hints all over the solutions path
-			display.asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					boardWidget.board[Integer.parseInt(coordinates[0])][Integer.parseInt(coordinates[1])].redraw(); //redraw the hint
-				}
-			});
-		}
-		
+		boardWidget.displayHint(h);	
 	}
-	/**
-	 * checks if a string is numeric
-	 * @param str is the string which we check if it is a number
-	 * @return true if it is numeric else false
-	 */
-	private static boolean isNumeric(String str)
-	  {
-	    NumberFormat formatter = NumberFormat.getInstance();
-	    ParsePosition pos = new ParsePosition(0);
-	    formatter.parse(str, pos);
-	    return str.length() == pos.getIndex();
-	  }
-
-	
 }
 	
 	

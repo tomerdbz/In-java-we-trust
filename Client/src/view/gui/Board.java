@@ -1,6 +1,9 @@
 package view.gui;
 
 import org.eclipse.swt.events.PaintEvent;
+
+import algorithms.search.Solution;
+import algorithms.search.State;
 /**
  * 
  * @author Alon,Tomer
@@ -13,16 +16,8 @@ public interface Board {
 	 */
 	void drawBoard(PaintEvent arg0);
 	void applyInputDirection(Direction direction);
-	/**	This method gives the Specific board an option to set its specific data
-	 * @param arg - an Object which is the data to set in the specific board
-	 */
-	void setBoardData(Object arg);
-	/**
-	 * This function allows us to set the Properties of the board
-	 * if it was a maze it was mazeProperties and so on	
-	 * @param tempInput represents some kind of a properties
-	 */
-	 void setBoardProperties(Object tempInput);
+
+
 	 /**
 	  * Checks if there is a path to go Up in a board
 	  * @param characterRow Row of character
@@ -56,5 +51,18 @@ public interface Board {
 	  * Disposes of all things created in board
 	  */
 	 void destructBoard();
-	
+	 
+	 /**Through this method the Board will display its Problem.
+	  * 
+	 * @param o - the problem to display
+	 */
+	void displayProblem(Object o);
+	/** displays the solution in the Board.
+	 * @param s - the Solution to display.
+	 */
+	void displaySolution(Solution s);
+	/** displays hint in the Board.
+	 * @param h - the State - the Hint to display.
+	 */
+	void displayHint(State h);
 }

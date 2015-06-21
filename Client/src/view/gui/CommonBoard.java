@@ -12,10 +12,10 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Composite;
 
+import algorithms.search.Solution;
+import algorithms.search.State;
+
 public abstract class CommonBoard extends Composite implements Board {
-	
-	
-	
 	
 	Timer timer;
 	/**
@@ -58,25 +58,25 @@ public abstract class CommonBoard extends Composite implements Board {
 			this.addKeyListener(new KeyListener(){	
 				@Override
 				public void keyPressed(KeyEvent e) { //each of those codes represents a key on the keyboard in our case up down right left arrows
-					if (e.keyCode == 16777217 && character.currentCellX!=0 && hasPathUP(character.currentCellX,character.currentCellY)){
+					if (e.keyCode == 16777217 && hasPathUP(character.currentCellX,character.currentCellY)){
 						applyInputDirection((Direction.UP));
 						 //up
 						 	
 				    } 
 					 else 
-						 if (e.keyCode == 16777220 && character.currentCellY!=board[0].length-1 && hasPathRIGHT(character.currentCellX,character.currentCellY)) {
+						 if (e.keyCode == 16777220 && hasPathRIGHT(character.currentCellX,character.currentCellY)) {
 							 applyInputDirection((Direction.RIGHT));
 				    	//right
 							 
 				    } 
 						else 
-						if (e.keyCode == 16777219 && character.currentCellY!=0 && hasPathLEFT(character.currentCellX,character.currentCellY)) {
+						if (e.keyCode == 16777219 &&  hasPathLEFT(character.currentCellX,character.currentCellY)) {
 							applyInputDirection(Direction.LEFT);
 				    	//left
 						
 				    } 
 						else
-						if (e.keyCode == 16777218 &&character.currentCellX!= board.length-1 && hasPathDOWN(character.currentCellX,character.currentCellY)) {
+						if (e.keyCode == 16777218  && hasPathDOWN(character.currentCellX,character.currentCellY)) {
 							applyInputDirection(Direction.DOWN);
 				    	//down
 							 
@@ -114,11 +114,8 @@ public abstract class CommonBoard extends Composite implements Board {
 			
 	}
 
-	/**	This method should be overwritten when a class extends it.
-	 * 	Extending class would like to display the problem in the widget and it will do so via this method.
-	 * @param o - the problem to display - maze,...
-	 */
-	public abstract void setBoardData(Object o);
+	
+	
 
 	/**
 	 * apply direction on board
@@ -257,12 +254,22 @@ public abstract class CommonBoard extends Composite implements Board {
 	     	for(int j=0;j<board[0].length;j++)
 	      		board[i][j].addMouseListener(ma);
 	}
-
-	public abstract void setBoardProperties(Object tempInput);
+	
+	@Override
 	public abstract boolean hasPathUP(int characterRow,int characterCol);
+	@Override
 	public abstract boolean hasPathRIGHT(int characterRow,int characterCol);
+	@Override
 	public abstract boolean hasPathDOWN(int characterRow,int characterCol);
+	@Override
 	public abstract boolean hasPathLEFT(int characterRow,int characterCol);
+	@Override
+	public abstract void displayProblem(Object o);
+	@Override
+	public abstract void displaySolution(Solution s);
+	@Override
+	public abstract void displayHint(State h);
+
 	/**
 	 * disposes of board cells
 	 */

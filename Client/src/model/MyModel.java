@@ -173,7 +173,11 @@ public class MyModel extends Observable implements Model{
 			return;
 		}
 		if(generatedMazes.containsKey(name))
+		{
+			setChanged();
+			notifyObservers(notifyArgument+" " +name);
 			return;
+		}
 		ListenableFuture<Maze> futureMaze=null;
 		switch(properties.getMazeGenerator()) 
 		{
