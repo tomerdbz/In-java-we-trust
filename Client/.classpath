@@ -15,7 +15,11 @@
 	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/javassist-3.9.0.GA.jar"/>
 	<classpathentry kind="lib" path="lib/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/LibraryOfOldProjectParts.jar"/>
+	<classpathentry kind="lib" path="lib/LibraryOfOldProjectParts.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Tomer/git/In-java-we-trust-baby/Client/lib/LibraryOfOldProjectParts.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.8.jar"/>

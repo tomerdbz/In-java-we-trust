@@ -288,7 +288,7 @@ public class MyModel extends Observable implements Model{
 				lastState=path.get(i);
 			}
 		}
-		lastState=path.get(path.indexOf(lastState)+3);
+		lastState=path.get(path.indexOf(lastState)+2);
 		indexes = lastState.getState().toString().split(",");
 		x=Integer.parseInt(indexes[0]); //t stands for temp
 		y=Integer.parseInt(indexes[1]);
